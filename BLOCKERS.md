@@ -7,8 +7,8 @@
 
 ## Medium
 4. **GNSS fix not yet obtained (device found night 2).** The Here+/u-blox receiver streams NMEA on `/dev/ttyACM0` and the reader service runs, but indoors it reports NO_FIX (0 satellites used). Needs sky view (window/outdoors) for first coordinates; RTK additionally needs a correction source that is not configured, so no RTK claim.
-5. **Cellular data needs Rasmus’s sudo line.** Profile creation is polkit-denied over SSH. Run `sudo ~/quberon-robot-interface/scripts/setup_cellular.sh` via the Mac one-liner in MORNING-HANDOFF. SIM/registration/signal were already proven; subscription data allowance remains unproven until that test runs.
-6. **Cellular data allowance unproven.** Quectel EC25 USB hardware is present, but SIM/APN/registration/allowance were not established at inventory. Diagnostics must stay read-only/bounded and must not guess credentials/APN.
+5. **Cellular data: DONE 2026-11-03** (was: needs sudo line). Profile creation is polkit-denied over SSH. Run `sudo ~/quberon-robot-interface/scripts/setup_cellular.sh` via the Mac one-liner in MORNING-HANDOFF. SIM/registration/signal were already proven; subscription data allowance remains unproven until that test runs.
+6. **Cellular: SOLVED 2026-11-03.** EC25 data works (Tele2, `internet.tele2.se`, HTTP 200 via wwan0). Profile `Quberon-Tele2` exists with autoconnect off; bring it up deliberately with `sudo nmcli connection up Quberon-Tele2`. Failover policy (backup-only vs primary) is a future product decision, not yet configured.
 7. **Camera framing is not useful in the captured frame.** OV5647 responds, but the saved capture is nearly black and shows no display/label. Needs light/reposition/focus check by a human before it can debug the e-ink panel visually.
 
 ## Not blockers for the simulated demo
