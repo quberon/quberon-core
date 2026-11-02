@@ -9,7 +9,7 @@ Design constraints (panel care):
   rebase pauses blinking for a few seconds.
 - Stop the service to stop blinking; a final full refresh restores the base.
 """
-import os, sys, time
+import json, os, sys, time
 from pathlib import Path
 
 sys.path.insert(0, os.path.expanduser("~/waveshare-lib"))
@@ -22,12 +22,37 @@ X0, Y0, X1, Y1 = 560, 88, 736, 136
 REBASE_EVERY = 180
 
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+GNSS_STATUS = Path(os.path.expanduser("~/.local/share/quberon-robot-interface/gnss-status.json"))
 
 
-def badge(on: bool) -> Image.Image:
+def _font(size):
+    try:
+        return ImageFont.truetype(FONT, size)
+    except Exception:
+        return ImageFont.load_default()
+
+
+def dynamic_base() -> Image.Image:
+    """Static QR view + current GPS line (refreshed at start and each rebase)."""
+    img = Image.open(BASE).convert("1")
+    d = ImageDraw.Draw(img)
+    try:
+        g = json.loads(GNSS_STATUS.read_text())
+    except Exception:
+        g = {"state": "NO_DEVICE", "satellites_used": None, "latitude": None, "longitude": None, "age_seconds": None}
+    d.rectangle((16, 424, 372, 478), fill=1)
+    if g.get("latitude") is not None and g.get("longitude") is not None:
+        d.text((20, 430), f"GPS: {g['latitude']:.6f}, {g['longitude']:.6f}", fill=0, font=_font(19))
+        d.text((20, 456), f"{g.get('state')} - sats {g.get('satellites_used')} - age {g.get('age_seconds')}s", fill=0, font=_font(15))
+    else:
+        d.text((20, 430), f"GPS: {g.get('state', 'NO_DEVICE')} - sats {g.get('satellites_used')}", fill=0, font=_font(20))
+        d.text((20, 456), "No coordinates (needs sky view)", fill=0, font=_font(15))
+    return img
+
+
+def badge(on: bool, base_img: Image.Image) -> Image.Image:
     img = Image.new("1", (800, 480), 1)
-    base = Image.open(BASE).convert("1")
-    img.paste(base, (0, 0))
+    img.paste(base_img, (0, 0))
     d = ImageDraw.Draw(img)
     try:
         fnt = ImageFont.truetype(FONT, 26)
@@ -46,7 +71,7 @@ def badge(on: bool) -> Image.Image:
 
 def main() -> int:
     epd = epd7in5_V2.EPD()
-    base = Image.open(BASE).convert("1")
+    base = dynamic_base()
     if epd.init() != 0:
         return 1
     epd.display(epd.getbuffer(base))
@@ -57,11 +82,12 @@ def main() -> int:
     try:
         while True:
             start = time.time()
-            epd.display_Partial(epd.getbuffer(badge(on)), 0, 0, 800, 480)
+            epd.display_Partial(epd.getbuffer(badge(on, base)), 0, 0, 800, 480)
             on = not on
             cycles += 1
             if cycles >= REBASE_EVERY:
                 cycles = 0
+                base = dynamic_base()
                 if epd.init() == 0:
                     epd.display(epd.getbuffer(base))
                 epd.init_part()
