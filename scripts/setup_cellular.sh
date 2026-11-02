@@ -13,6 +13,10 @@ if ! systemctl cat ModemManager.service >/dev/null 2>&1; then
   DEBIAN_FRONTEND=noninteractive apt-get install -y -qq modemmanager
 fi
 systemctl enable --now ModemManager
+# The modem was plugged in before ModemManager existed, so its ports never got
+# ID_MM_* udev tags. Re-trigger udev for modem-related subsystems, then scan.
+udevadm trigger --action=add --subsystem-match=tty --subsystem-match=usbmisc --subsystem-match=net 2>/dev/null || true
+udevadm settle 2>/dev/null || true
 mmcli --scan-modems 2>/dev/null || true
 i=0
 while [ $i -lt 30 ]; do
