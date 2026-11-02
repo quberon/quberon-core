@@ -6,9 +6,10 @@
 3. **Pi AP activation needs Rasmus’s sudo at the Pi keyboard.** NetworkManager polkit denied profile creation over SSH (`Insufficient privileges`). Exact step: first `systemctl --user start quberon-ap-rollback.timer` (re-arms the 10-minute rollback), then `sudo ~/quberon-robot-interface/scripts/setup_ap.sh`. The rollback mechanism itself was exercised: the timer fired at 03:04 CET and client Wi-Fi/Ethernet/app health remained good. A second Wi-Fi client/phone is still needed to prove join/DHCP/app reachability from the phone segment.
 
 ## Medium
-4. **Here+ not observed.** No distinct Here+ serial/USB device was found; RTK state is `NO_DEVICE` by available evidence. Need physical identification/transport and a correction source before any RTK claim.
-5. **Cellular data not assumed usable.** Quectel EC25 USB hardware is present, but SIM/APN/registration/allowance were not established at inventory. Diagnostics must stay read-only/bounded and must not guess credentials/APN.
-6. **Camera framing is not useful in the captured frame.** OV5647 responds, but the saved capture is nearly black and shows no display/label. Needs light/reposition/focus check by a human before it can debug the e-ink panel visually.
+4. **GNSS fix not yet obtained (device found night 2).** The Here+/u-blox receiver streams NMEA on `/dev/ttyACM0` and the reader service runs, but indoors it reports NO_FIX (0 satellites used). Needs sky view (window/outdoors) for first coordinates; RTK additionally needs a correction source that is not configured, so no RTK claim.
+5. **Cellular data needs Rasmus’s sudo line.** Profile creation is polkit-denied over SSH. Run `sudo ~/quberon-robot-interface/scripts/setup_cellular.sh` via the Mac one-liner in MORNING-HANDOFF. SIM/registration/signal were already proven; subscription data allowance remains unproven until that test runs.
+6. **Cellular data allowance unproven.** Quectel EC25 USB hardware is present, but SIM/APN/registration/allowance were not established at inventory. Diagnostics must stay read-only/bounded and must not guess credentials/APN.
+7. **Camera framing is not useful in the captured frame.** OV5647 responds, but the saved capture is nearly black and shows no display/label. Needs light/reposition/focus check by a human before it can debug the e-ink panel visually.
 
 ## Not blockers for the simulated demo
 - Meta live API availability is optional; mocked, clearly labelled planning remains testable offline and STOP does not depend on it.

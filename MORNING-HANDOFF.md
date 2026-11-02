@@ -1,5 +1,15 @@
 # Morning Handoff — Quberon Robot Interface (overnight prototype)
 
+## Night 2 update (user asleep, supervised-by-brief work)
+- **Here+ found.** The u-blox receiver inside the Here+ streams NMEA on `/dev/ttyACM0`. A passive reader service (`quberon-gnss.service`) now publishes `gnss-status.json`. Indoors it honestly reports **NO_FIX, 0 satellites used** — no coordinates until it sees sky. Take the Pi/GPS near a window or outside and watch the display: coordinates appear automatically once GGA reports a fix (RTK states are labelled separately; no corrections source is configured, so expect plain FIX at best).
+- **LIVE display running.** `quberon-display-live.timer` refreshes the e-ink every 5 minutes: robot drawing, a LIVE dot that alternates filled/hollow each cycle (e-ink cannot blink faster — a dead display is exposed by the frozen “Updated” time), GPS state/satellites/coordinates, and the ACCESS AND CONTROL QR block. The first cycle succeeded; check the panel in the morning — the dot state and clock prove it’s alive.
+- **4G data still needs one sudo line from you** (same polkit barrier). Run in Mac terminal:
+  ```bash
+  ssh -t quberon1@10.77.0.2 'sudo ~/quberon-robot-interface/scripts/setup_cellular.sh'
+  ```
+  It creates the Tele2 profile (published APN `internet.tele2.se`, SIM already registered night 1), brings it up, runs two tiny interface-bound requests, and brings it back down (`KEEP_UP=1` env to leave it up). Then tell Hermes the result for verification.
+- AP after reboot: the Wi-Fi AP profile still has `autoconnect no` unless you ran the earlier one-liner; the display QR assumes the AP. The timer/service states above are all user-level and survive reboot (enabled + linger).
+
 ## What exists now
 An authenticated mobile web prototype for a **simulated** robot STOP-request workflow, deployed on the Raspberry Pi and verified end-to-end over the direct Ethernet cable. No physical robot, GPIO, serial robot control, or e-ink hardware was driven.
 

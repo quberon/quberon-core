@@ -111,6 +111,22 @@ def test_qr_payload_escapes_and_contains_no_login():
     assert p.startswith("WIFI:T:WPA;S:Quberon\\;Demo;")
     assert "operator" not in p and "password-123" not in p
 
+def _nmea(body):
+    c = 0
+    for ch in body:
+        c ^= ord(ch)
+    return f"${body}*{c:02X}"
+
+def test_gnss_parser_no_fix_and_fix_and_bad_checksum():
+    from adapters.gnss import GnssStatus, parse_sentence
+    st = GnssStatus(state="NO_DATA")
+    assert parse_sentence(_nmea("GNGGA,120000.00,,,,,0,00,99.99,,,,,,"), st)
+    assert st.state == "NO_FIX" and st.latitude is None
+    assert parse_sentence(_nmea("GNGGA,120000.00,4807.038,N,01131.000,E,4,12,0.8,545.4,M,46.9,M,,"), st)
+    assert st.state == "RTK_FIXED"
+    assert abs(st.latitude - 48.1173) < 1e-4 and abs(st.longitude - 11.516667) < 1e-4
+    assert not parse_sentence("$GNGGA,badchecksum*00", st)
+
 def test_meta_validator_rejects_bad_schema_and_live_unconfigured(monkeypatch):
     from integrations.meta import validate_plan, LiveMetaProvider, MetaProviderError
     bad = {"robot_id": "other", "requested_action": "MOVE_REAL_ROBOT", "required_capabilities": ["fly"], "human_confirmation_required": False}

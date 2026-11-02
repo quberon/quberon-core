@@ -33,8 +33,9 @@ Captured: 2026-11-02 overnight session (Pi clock reported Mon Nov 2 01:35 UTC 20
 - No GSM/NetworkManager modem connection profile exists and ModemManager is inactive, so **no cellular data session was started and no data test was run**. Registration/signal is not proof of an active data plan/APN allowance.
 
 ### Here+ GNSS
-- No distinct Here+ USB/serial device was observed. `/dev/serial/by-id` entries all belong to the Quectel modem (`Android_Android` interfaces). No `/dev/ttyACM*` device.
-- Here+ state at inventory: `NO_DEVICE` observed by this inspection path. A device attached through an unpowered/other transport cannot be excluded.
+- **FOUND 2026-11-02 night 2, by measured evidence.** Kernel log: `usb 1-1.3: Product: u-blox GNSS receiver`. Device: `/dev/ttyACM0`, stable by-id path `/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_GNSS_receiver-if00` (u-blox receiver consistent with the Here+; sub-model/firmware unverified).
+- Night-1 note superseded: an early inventory missed the ttyACM device; later captures proved it. Passive read-only capture (15 s): 6,128 bytes / 304 NMEA lines (GNRMC/GNGGA/GNGSA/GPGSV). GGA quality `0`, 0 satellites used, HDOP 99.99 → **NO_FIX indoors**. Live UTC present. Firmware, receiver sub-model, RTK mode and correction source remain unverified.
+- `quberon-gnss.service` (user systemd) now parses checksum-validated GGA/RMC/GSV into `~/.local/share/quberon-robot-interface/gnss-status.json`; it never transmits to the receiver and does not log raw streams.
 
 ## Assumptions not treated as facts
 - The e-ink panel is not assumed to be a specific Waveshare size/revision.
