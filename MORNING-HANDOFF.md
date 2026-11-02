@@ -4,7 +4,7 @@
 An authenticated mobile web prototype for a **simulated** robot STOP-request workflow, deployed on the Raspberry Pi and verified end-to-end over the direct Ethernet cable. No physical robot, GPIO, serial robot control, or e-ink hardware was driven.
 
 - Mac workspace: `/Users/quberon1/quberon-robot-interface`
-- Git: branch `feature/overnight-prototype`, local commit created at the end of the run (see `git log --oneline -1` in the workspace). Nothing pushed.
+- Git: branch `feature/overnight-prototype`, initial local commit `d867787` (plus a small docs commit adding this ID). Nothing pushed.
 - Pi deployment: `quberon1@10.77.0.2`, code at `~/quberon-robot-interface`, state DB at `~/.local/share/quberon-robot-interface/quberon.db`
 - Service: systemd **user** service `quberon-robot-interface.service` (enabled, linger on). The preferred system service in `systemd/` + `scripts/deploy_pi.sh` still needs an interactive sudo session to install.
 - Robot identity: `quberon-demo-001`, `adapter_mode=SIMULATION`, fresh state starts STOP-latched.
