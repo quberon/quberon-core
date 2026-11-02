@@ -7,3 +7,4 @@ __pycache__/
 artifacts/wifi-qr.png
 artifacts/display-mock.png
 *.db
+.DS_Store
