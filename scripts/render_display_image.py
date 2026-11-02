@@ -45,15 +45,16 @@ d.text((190, 458), "/robots/quberon-demo-001", fill=0, font=font(17), anchor="ma
 
 # Right side, large text
 x = 388
-d.text((x, 96), "NOT AN", fill=0, font=font(38, bold=True))
-d.text((x, 140), "EMERGENCY", fill=0, font=font(38, bold=True))
-d.text((x, 184), "STOP", fill=0, font=font(38, bold=True))
+d.text((x, 96), "ACCESS", fill=0, font=font(38, bold=True))
+d.text((x, 140), "AND", fill=0, font=font(38, bold=True))
+d.text((x, 184), "CONTROL", fill=0, font=font(38, bold=True))
 d.line((x, 238, 772, 238), fill=0, width=3)
 d.text((x, 254), "1. Join Wi-Fi:", fill=0, font=font(27, bold=True))
 d.text((x + 24, 290), "Quberon-Demo", fill=0, font=font(27))
 d.text((x, 330), "2. Scan the QR code", fill=0, font=font(27, bold=True))
 d.text((x, 366), "3. Log in and", fill=0, font=font(27, bold=True))
 d.text((x + 24, 402), "request STOP", fill=0, font=font(27, bold=True))
+d.text((x, 446), "SIMULATED - NOT AN EMERGENCY STOP", fill=0, font=font(18, bold=True))
 
 img.save(OUT)
 print(f"wrote {OUT} size={img.size} url={URL}")
