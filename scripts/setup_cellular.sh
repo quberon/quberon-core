@@ -6,6 +6,15 @@
 # is left DOWN after the test unless KEEP_UP=1 is set.
 set -eu
 APN=${APN:-internet.tele2.se}
+# NetworkManager can only use the QMI device once ModemManager manages it.
+systemctl enable --now ModemManager
+i=0
+while [ $i -lt 30 ]; do
+  if nmcli device status | grep -qiE 'gsm|cdc-wdm'; then break; fi
+  i=$((i+1)); sleep 1
+done
+mmcli -L 2>/dev/null || true
+nmcli device status
 nmcli -t -f NAME,TYPE connection show > /tmp/nm-connections-before-cellular.txt
 if nmcli -t -f NAME connection show | grep -qx Quberon-Tele2; then
   echo "Profile Quberon-Tele2 already exists"
