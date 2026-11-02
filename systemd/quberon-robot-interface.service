@@ -1,0 +1,21 @@
+[Unit]
+Description=Quberon Robot Interface (simulated robot prototype)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=quberon
+Group=quberon
+WorkingDirectory=/opt/quberon-robot-interface
+EnvironmentFile=-/etc/quberon-robot-interface/app.env
+ExecStart=/opt/quberon-robot-interface/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-certfile /etc/quberon-robot-interface/server.crt --ssl-keyfile /etc/quberon-robot-interface/server.key
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/quberon-robot-interface
+
+[Install]
+WantedBy=multi-user.target

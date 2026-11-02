@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# The Wi-Fi QR encodes the demo AP PSK by design for people near the display.
+# Keep it as a local artifact; do not commit it to git history.
+artifacts/wifi-qr.png
+artifacts/display-mock.png
+*.db
