@@ -13,6 +13,7 @@ if ! systemctl cat ModemManager.service >/dev/null 2>&1; then
   DEBIAN_FRONTEND=noninteractive apt-get install -y -qq modemmanager
 fi
 systemctl enable --now ModemManager
+mmcli --scan-modems 2>/dev/null || true
 i=0
 while [ $i -lt 30 ]; do
   if nmcli device status | grep -qiE 'gsm|cdc-wdm'; then break; fi
