@@ -7,6 +7,11 @@
 set -eu
 APN=${APN:-internet.tele2.se}
 # NetworkManager can only use the QMI device once ModemManager manages it.
+# ModemManager is not installed in the base image; install it if missing.
+if ! systemctl cat ModemManager.service >/dev/null 2>&1; then
+  apt-get update -qq
+  DEBIAN_FRONTEND=noninteractive apt-get install -y -qq modemmanager
+fi
 systemctl enable --now ModemManager
 i=0
 while [ $i -lt 30 ]; do
