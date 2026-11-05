@@ -33,6 +33,29 @@ ALLOWED_HOSTS = {h.strip().lower() for h in os.environ.get("ALLOWED_HOSTS", "loc
 INSECURE_HTTP = os.environ.get("DEMO_INSECURE_HTTP", "false").lower() == "true"
 SESSION_COOKIE = "quberon_session"
 SECURE_CORE_NOT_BUILT_MESSAGE = "secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them."
+DEFAULT_STATE_DIR = Path.home() / ".local" / "share" / "quberon-robot-interface"
+DEFAULT_DB_PATH = DEFAULT_STATE_DIR / "quberon.db"
+
+
+def _private_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+    # Never tighten a shared/system ancestor: a DB placed directly in
+    # /, the system temp dir, or $HOME must not chmod that shared dir.
+    resolved = path.resolve()
+    shared = {Path(resolved.anchor), Path.home().resolve()}
+    try:
+        import tempfile
+
+        shared.add(Path(tempfile.gettempdir()).resolve())
+    except Exception:
+        pass
+    if resolved not in shared:
+        path.chmod(0o700)
+
+
+def _private_file(path: Path) -> None:
+    if path.exists():
+        path.chmod(0o600)
 
 
 def utcnow() -> datetime:
@@ -64,10 +87,10 @@ def token_hash(token: str) -> str:
 
 class Store:
     def __init__(self, db_path: str):
-        self.db_path = db_path
+        self.db_path = str(Path(db_path).expanduser().resolve())
         self.lock = threading.RLock()
         self.persistence_ok = True
-        Path(db_path).parent.mkdir(parents=True, exist_ok=True)
+        _private_dir(Path(self.db_path).parent)
         try:
             self._init_db()
             with self._db() as db:
@@ -84,12 +107,18 @@ class Store:
             self.persistence_ok = False
             self.stop_latched = True
             self.observed_state = "UNKNOWN"
+        self._harden_state_files()
+
+    def _harden_state_files(self):
+        for suffix in ("", "-wal", "-shm"):
+            _private_file(Path(self.db_path + suffix))
 
     def _db(self):
         db = sqlite3.connect(self.db_path, timeout=5, isolation_level=None)
         db.row_factory = sqlite3.Row
         db.execute("PRAGMA journal_mode=WAL")
         db.execute("PRAGMA foreign_keys=ON")
+        self._harden_state_files()
         return db
 
     def _init_db(self):
@@ -223,7 +252,7 @@ function stopRobot(){post('/api/robots/__ROBOT__/stop',{note:'phone UI STOP requ
 
 
 def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provider=None, secure_core="auto") -> FastAPI:
-    db_path = db_path or os.environ.get("QUBERON_DB_PATH", "/var/lib/quberon-robot-interface/quberon.db")
+    db_path = str(Path(db_path or os.environ.get("QUBERON_DB_PATH", str(DEFAULT_DB_PATH))).expanduser())
     store = Store(db_path)
     adapter = SimulatedRobotAdapter(fail=adapter_fail or os.environ.get("SIM_ADAPTER_FAIL", "false").lower() == "true")
     if provider is not None:
@@ -237,6 +266,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
         meta = MockMetaProvider()
     app = FastAPI(title="Quberon Robot Interface", docs_url=None, redoc_url=None, openapi_url=None)
     app.state.store = store
+    app.state.db_path = store.db_path
     app.state.plan_semaphore = threading.BoundedSemaphore(2)
     app.state.voice_recognizer = VoiceStopRecognizer()
     app.state.gesture_recognizer = OpenPalmStopRecognizer()
@@ -577,4 +607,6 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     return app
 
 
-app = create_app(db_path=os.environ.get("QUBERON_DB_PATH", "/tmp/quberon-robot-interface.db"))
+def asgi_app() -> FastAPI:
+    """Explicit ASGI application factory; importing this module is inert."""
+    return create_app()

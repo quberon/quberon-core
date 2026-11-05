@@ -127,11 +127,24 @@ def load_key_file(path) -> str:
     return raw.lower()
 
 
+def _private_parent(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+    resolved = path.resolve()
+    import tempfile
+
+    shared = {Path(resolved.anchor), Path.home().resolve(), Path(tempfile.gettempdir()).resolve()}
+    if resolved not in shared:
+        path.chmod(0o700)
+
+
 def _atomic_write_int(path: Path, value: int) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+    _private_parent(path.parent)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(str(value))
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as handle:
+        handle.write(str(value))
     tmp.replace(path)
+    path.chmod(0o600)
 
 
 def _read_int(path: Path) -> int:
@@ -147,7 +160,8 @@ class SecureCoreClient:
                  timeout_s: float = 5.0, anchor_path=None, epoch=None,
                  epoch_path=None, max_audit_records: int = 0, rate_limiter=None):
         self.binary = Path(binary)
-        self.db_path = str(db_path)
+        self.db_path = str(Path(db_path).expanduser().resolve())
+        _private_parent(Path(self.db_path).parent)
         self.trusted = trusted  # list of trusted-issuer dicts for the CLI
         self._signing_key_hex = signing_key_hex
         self.kid = kid
@@ -155,15 +169,15 @@ class SecureCoreClient:
         self.robot_id = robot_id
         self.simulation_id = simulation_id
         self.timeout_s = timeout_s
-        self.anchor_path = str(anchor_path) if anchor_path else None
+        self.anchor_path = str(Path(anchor_path).expanduser().resolve()) if anchor_path else None
         self.max_audit_records = int(max_audit_records or 0)
         self.rate_limiter = rate_limiter or PriorityRateLimiter()
         self._lock = threading.Lock()
-        self._seq_path = Path(sequence_path) if sequence_path else Path(str(db_path) + ".seq")
+        self._seq_path = Path(sequence_path).expanduser().resolve() if sequence_path else Path(self.db_path + ".seq")
         self._sequence = _read_int(self._seq_path)
         # Monotonic boot/session epoch: each new client process-instance
         # advances the persisted epoch. The persisted sequence is NOT reset.
-        self._epoch_path = Path(epoch_path) if epoch_path else Path(str(db_path) + ".epoch")
+        self._epoch_path = Path(epoch_path).expanduser().resolve() if epoch_path else Path(self.db_path + ".epoch")
         if epoch is not None:
             self.epoch = int(epoch)
             if self.epoch < 1:
@@ -331,7 +345,9 @@ def client_from_env(robot_id, app_db_path=None):
             )
         if mode == "production":
             return None  # fail closed: no external signing key configured
-        app_db = app_db_path or os.environ.get("QUBERON_DB_PATH", "/tmp/quberon-robot-interface.db")
+        if not app_db_path:
+            return None
+        app_db = app_db_path
         core_db = str(Path(app_db).with_name(Path(app_db).stem + "-secure-core.db"))
         return provision_ephemeral(
             binary, core_db, robot_id, simulation_id,

@@ -28,4 +28,4 @@ demo:
 	@if [ -z "$(CORE_CLI)" ] && [ -z "$$QUBERON_SECURE_CORE_BIN" ]; then \
 		echo "secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them."; \
 	fi
-	$(VENV_PY) -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+	$(VENV_PY) -m uvicorn app.main:asgi_app --factory --host 127.0.0.1 --port 8000
