@@ -14,6 +14,8 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 
 ## Current status (2026-11-05)
 
+Post-deadline notice: all work after 2026-11-05 02:00 UTC (Nov 4 21:00 ET) is post-deadline work; commit timestamps are preserved as-is and no hackathon-window authorship is claimed for it.
+
 | Capability | Status |
 |---|---|
 | Public code, app + simulator + scripts + tests | ✅ In this repo |
@@ -21,7 +23,7 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 | Authenticated STOP (viewer/operator/admin, CSRF, persistent latch, audit log, simulator ACK) | ✅ Implemented against the **simulator** |
 | Physical humanoid control / certified e-stop | ❌ Not implemented, no such claim |
 | Phone onboarding (private CA + local AP) | ⚠️ Works with certificate install; not zero-setup, not claimed as frictionless |
-| Runtime Meta planning | ⚠️ Mock by default; live adapter exists in code, **live inference not verified** (see `docs/evidence/meta-live.md`) |
+| Runtime Meta planning | ⚠️ Mock by default; live adapter exists in code, **live inference not verified** (see `docs/evidence/meta-live.md`). One-shot verification (exactly one call, credentials only via `META_API_URL`/`META_API_KEY`/`META_MODEL` env): `.venv/bin/python scripts/meta_live_evidence.py` — it writes sanitized evidence and exits non-zero when blocked/failed; the warning status above may only change after a verified successful call recorded there |
 | Meta use in development | ✅ Development assistance via Hermes — separate from runtime claims (see `docs/BUILT-DURING-HACKATHON.md`) |
 | Cellular (Tele2 EC25) | ✅ Project-recorded HTTP 200 data test (row 28); no failover/continuous claim |
 | GNSS | ⚠️ Reader present, NO_FIX indoors, no RTK/accuracy claim |
