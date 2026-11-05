@@ -1,4 +1,4 @@
-import os, sys, time
+import os, shutil, sys, time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import pytest
 from fastapi.testclient import TestClient
@@ -346,6 +346,7 @@ def test_b5_degraded_ui_message_and_disabled_controls(tmp_path):
     assert "document.getElementById('resetBtn').disabled=degraded" in page
     assert "secure_core_available===false" in page
 
+@pytest.mark.skipif(shutil.which("make") is None, reason="make not available in this environment (e.g. python:3.11-slim CI container); verified where make exists")
 def test_b5_make_demo_prints_exact_degraded_message():
     # Regression: subprocess.run(timeout=...) kills only `make`, orphaning
     # the uvicorn child on port 8000 (state leakage: the next run then
