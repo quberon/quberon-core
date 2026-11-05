@@ -266,23 +266,28 @@ traceability status MUST be versioned with the profile; an
 implementation MUST state the profile version it claims against,
 and a claim against a superseded version MUST be labelled as such.
 
-## 11. Traceability to Wave 4 N4 (actual stable taxonomy, pre-merge)
+## 11. Traceability to Wave 4 N4 (actual stable taxonomy, verified on merged main)
 
-N4 is concurrent with this node. Its shipped stable taxonomy (branch
-wave4/n4, commit 310fc208555f59a2027f8e3496555e05244b229e, read
-2026-11-05; "do not renumber; append new IDs only") is:
+N4 shipped its stable taxonomy ("do not renumber; append new IDs
+only"), merged via PR #21 (merge f43f3a3) onto origin/main:
 
     QIP-ID-01..04 (R1)  QIP-AUTH-01..04 (R2)  QIP-INT-01..05 (R3/R4/R9 partial)
     QIP-LATCH-01..03 (R5)  QIP-STATE-01..03 (R6)  QIP-AUDIT-01..03 (R8 partial)
     QIP-PROP-01..03 (proposal boundary)  QIP-DEG-01..03 (R7; DEG-03 is a skipped gap)
 
-Per the Wave 4 order, this profile MUST be re-verified against the
-actual identifiers on merged origin/main (fetch, rebase, grep the
-merged conformance/ tree and its raw output, amend this table) before
-it is merged. Until that verification, a row below either names the
-actual N4 test identifier whose assertions cover the requirement, or
-carries the explicit marker UNIMPLEMENTED; naming an identifier here
-is a trace, not a pass claim, and no QIP class is claimed in v0.1.
+Verification record (post-N4-merge, mandatory amendment completed):
+after PR #21 merged, this branch was fetched and rebased onto
+origin/main e7ff41e (which includes N4 f43f3a3), every traced
+identifier below was grep-verified present in the merged
+conformance/test_conformance.py (28 test functions, 0 traced tokens
+missing), and the merged suite was run with the Rust core built:
+`pytest conformance/ -q -rs` = 27 passed, 1 skipped (QIP-DEG-03
+NOT TESTED), and the full suite = 107 passed, 1 skipped. Raw output
+is recorded in progress/N5-qip-v01.md. Every traced row therefore has
+a passing (not skipped) raw result on merged main; QIP-DEG-03 remains
+skipped, so QIP-R7.1 and QIP-R7.4 stay UNIMPLEMENTED. Naming an
+identifier above is a trace, not a pass claim for the profile as a
+whole, and no QIP class is claimed in v0.1.
 QIP-PROP-01..03 have no normative counterpart in R1-R11 beyond
 QIP-R5.3/QIP-R9.2's no-reset rule and are not used as traces below.
 Partial coverage is marked UNIMPLEMENTED, not rounded up to a trace.
@@ -324,13 +329,12 @@ Partial coverage is marked UNIMPLEMENTED, not rounded up to a trace.
 | QIP-R11.2 | OBSERVE | UNIMPLEMENTED |
 | QIP-R11.3 | EVIDENCE | UNIMPLEMENTED |
 
-Amendment rule (pre-merge, mandatory): after N4 merges, fetch
-origin/main, rebase this profile onto it, grep the merged tree and
-N4's raw test output for each identifier above, keep a trace only
-where the identifier and a passing (not skipped) raw result are both
-present, downgrade any other row to UNIMPLEMENTED, and record the
-commands and raw output in progress/N5-qip-v01.md. That verification,
-plus CI, is the precondition for merging this profile.
+Amendment rule (completed for v0.1; binding on future amendments):
+any future change to this table follows the same procedure — fetch
+origin/main, rebase, grep the merged tree and raw test output, keep a
+trace only where identifier and passing (not skipped) raw result are
+both present, downgrade the rest to UNIMPLEMENTED, record commands
+and raw output in progress/N5-qip-v01.md, and pass CI before merge.
 
 ## Annex A — Prior-art review depth (non-normative, preserved verbatim)
 

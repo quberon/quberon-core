@@ -74,3 +74,23 @@ hold on merging this PR until post-N4 rebase/verification + CI.
 PR to be opened from wave4/n5. NOT self-merged: N4 not yet merged to
 origin/main, so actual-ID traceability on merged main and CI are not
 yet verifiable. That is a Wave-4-order hold, not a content blocker.
+
+## Post-N4-merge verification (amendment, same attempt)
+
+N4 PR #21 merged (f43f3a3); origin/main advanced to e7ff41e (incl.
+PR #22 N7, PR #20 N6). This branch was fetched and rebased onto
+e7ff41e; the n7-requests append was re-applied as a pure append
+(13 added lines, no N7 lines rewritten).
+Grep verification on merged tree: 28 `def test_QIP_*` in
+conformance/test_conformance.py; every traced token in QIP Section 11
+present, 0 missing.
+Raw runs on the rebased tip (Mac, Python 3.11 venv, cargo core built):
+  .venv/bin/python -m pytest conformance/ -q -rs -p no:cacheprovider
+    -> 27 passed, 1 skipped, 1 warning in 4.24s
+    SKIPPED QIP-DEG-03 NOT TESTED (gap, not a pass)
+  .venv/bin/python -m pytest -q -p no:cacheprovider
+    -> 107 passed, 1 skipped, 1 warning in 24.53s
+Result: no traceability downgrades needed; QIP-DEG-03-dependent rows
+(QIP-R7.1, QIP-R7.4) remain UNIMPLEMENTED. QIP Section 11 amended to
+record this verification. Remaining merge precondition: green CI on
+the rebased PR #23, then self-merge is authorised by the Wave 4 order.
