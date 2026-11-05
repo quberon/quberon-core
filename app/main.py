@@ -16,7 +16,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from adapters.robot_sim import SimulatedRobotAdapter
-from integrations.meta import MockMetaProvider, get_provider, validate_plan
+from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan
 
 ROBOT_ID = os.environ.get("ROBOT_ID", "quberon-demo-001")
 ROLES = {"viewer": {"read"}, "operator": {"read", "stop", "task", "plan"}, "admin": {"read", "stop", "task", "plan", "admin"}}
@@ -185,9 +185,25 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     db_path = db_path or os.environ.get("QUBERON_DB_PATH", "/var/lib/quberon-robot-interface/quberon.db")
     store = Store(db_path)
     adapter = SimulatedRobotAdapter(fail=adapter_fail or os.environ.get("SIM_ADAPTER_FAIL", "false").lower() == "true")
-    meta = provider or (get_provider() if os.environ.get("META_MODE") else MockMetaProvider())
+    if provider is not None:
+        meta = provider
+    elif os.environ.get("META_MODE"):
+        try:
+            meta = get_provider()
+        except Exception:
+            meta = UnavailableMetaProvider()  # fix E: keep simulator interface up
+    else:
+        meta = MockMetaProvider()
     app = FastAPI(title="Quberon Robot Interface", docs_url=None, redoc_url=None, openapi_url=None)
     app.state.store = store
+
+    @app.exception_handler(sqlite3.Error)
+    async def sqlite_degraded(request: Request, exc: sqlite3.Error):
+        # Runtime DB failure (fix B): fail closed, never claim durability.
+        store.persistence_ok = False
+        store.stop_latched = True
+        store.observed_state = "UNKNOWN"
+        return JSONResponse({"detail": "persistence degraded; task acceptance inhibited and durability not claimed"}, status_code=503)
 
     @app.middleware("http")
     async def guard(request: Request, call_next):
@@ -233,7 +249,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
 
     @app.get("/healthz")
     def healthz():
-        return {"ok": True, "robot_id": ROBOT_ID, "adapter_mode": "SIMULATION", "persistence_ok": store.persistence_ok}
+        return {"ok": bool(store.persistence_ok), "robot_id": ROBOT_ID, "adapter_mode": "SIMULATION", "persistence_ok": store.persistence_ok}
 
     @app.get("/", response_class=RedirectResponse)
     def root():
@@ -295,7 +311,9 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                 if existing:
                     if existing["payload_hash"] != payload_hash:
                         raise HTTPException(409, "idempotency key conflicts with a different payload")
-                    return {"command_id": existing["id"], "command_state": existing["command_state"], "observed_state": existing["observed_state"], "stop_latched": True, "duplicate": True}
+                    # Historical duplicate: report the recorded result as history,
+                    # never as a claim about the simulator's CURRENT state (fix A).
+                    return {"command_id": existing["id"], "command_state": existing["command_state"], "observed_state": existing["observed_state"], "historical_duplicate": True, "current_stop_latched": bool(store.stop_latched), "current_observed_state": store.observed_state, "stop_latched": bool(store.stop_latched), "duplicate": True}
                 result = adapter.stop()
                 eid = secrets.token_urlsafe(16)
                 db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), row["username"], robot_id, "STOP", "allowed", idempotency_key, payload_hash, result.command_state, result.observed_state, result.detail))
@@ -317,6 +335,15 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                 raise HTTPException(503, "persistence degraded")
             if store.stop_latched:
                 raise HTTPException(409, "STOP latch is active; simulated task rejected")
+            if idempotency_key:
+                # Fix F: exact retry returns the previous result WITHOUT invoking
+                # the adapter again; same key + different action is a conflict.
+                with store._db() as db:
+                    existing = db.execute("SELECT * FROM events WHERE actor=? AND robot_id=? AND idempotency_key=?", (row["username"], robot_id, idempotency_key)).fetchone()
+                if existing:
+                    if existing["action"] != body.action:
+                        raise HTTPException(409, "idempotency key conflicts with a different action")
+                    return {"command_id": existing["id"], "command_state": existing["command_state"], "observed_state": store.observed_state, "duplicate": True}
             result = adapter.simulated_task(body.action)
             eid = event(row["username"], robot_id, body.action, "allowed", idempotency_key or None, None, result)
             if result.command_state == "ACKNOWLEDGED":
@@ -330,6 +357,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
         csrf(request, row)
         if body.confirm != "RESET_SIMULATION":
             raise HTTPException(400, "explicit confirmation required")
+        if not store.persistence_ok:
+            raise HTTPException(503, "persistence degraded; reset inhibited")
         with store.lock:
             result = adapter.reset_simulation()
             eid = event(row["username"], robot_id, "SIMULATION_RESET", "allowed", None, None, result)
@@ -353,7 +382,10 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
             proposal = meta.propose(robot_id, body.text)
         except Exception as exc:
             return {"provider_status": "unavailable", "error": type(exc).__name__, "stop_unaffected": True}
-        validation = validate_plan(proposal, robot_id, store.stop_latched)
+        try:
+            validation = validate_plan(proposal, robot_id, store.stop_latched)
+        except Exception as exc:  # provider output must never escape as a 500 (fix C)
+            validation = {"allowed_as_proposal": False, "errors": [f"invalid proposal: {type(exc).__name__}"], "latch_blocks_task": bool(store.stop_latched)}
         return {"provider": getattr(meta, "name", "unknown"), "proposal": proposal, "validation": validation}
 
     return app

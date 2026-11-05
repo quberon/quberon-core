@@ -83,18 +83,39 @@ class LiveMetaProvider:
         return data
 
 
-def validate_plan(plan: Dict[str, Any], robot_id: str, stop_latched: bool) -> Dict[str, Any]:
+ACTION_CAPABILITIES = {
+    "SIMULATE_INSPECTION": {"inspect"},
+    "SIMULATE_STATUS_CHECK": {"status"},
+}
+
+
+def validate_plan(plan: Any, robot_id: str, stop_latched: bool) -> Dict[str, Any]:
+    # Type-safe (fix C): provider output is untrusted; never raise on bad types.
     errors = []
     if not isinstance(plan, dict):
-        errors.append("plan is not an object")
-        plan = {}
+        return {
+            "allowed_as_proposal": False,
+            "errors": ["plan is not an object"],
+            "latch_blocks_task": bool(stop_latched),
+            "note": "Validation never resets the latch, grants a session capability, or commands hardware.",
+        }
     if plan.get("robot_id") != robot_id:
         errors.append("robot mismatch")
-    if plan.get("requested_action") not in ALLOWED_ACTIONS:
+    action = plan.get("requested_action")
+    if not isinstance(action, str) or action not in ALLOWED_ACTIONS:
         errors.append("action not allow-listed")
+        action = None
     caps = plan.get("required_capabilities")
-    if not isinstance(caps, list) or not set(caps).issubset(ALLOWED_CAPABILITIES):
+    if (
+        not isinstance(caps, list)
+        or not caps
+        or len(caps) > 4
+        or any(not isinstance(c, str) or len(c) > 32 for c in caps)
+        or not set(caps).issubset(ALLOWED_CAPABILITIES)
+    ):
         errors.append("capability not allow-listed")
+    elif action is not None and set(caps) != ACTION_CAPABILITIES[action]:
+        errors.append("capabilities do not match requested action")
     if plan.get("human_confirmation_required") is not True:
         errors.append("human confirmation must be required")
     allowed = not errors and not stop_latched
@@ -104,6 +125,16 @@ def validate_plan(plan: Dict[str, Any], robot_id: str, stop_latched: bool) -> Di
         "latch_blocks_task": bool(stop_latched),
         "note": "Validation never resets the latch, grants a session capability, or commands hardware.",
     }
+
+
+class UnavailableMetaProvider:
+    """Live mode requested but not fully configured (fix E): app stays up,
+    planner reports UNAVAILABLE instead of silently pretending to be mock."""
+
+    name = "unavailable"
+
+    def propose(self, robot_id: str, text: str) -> Dict[str, Any]:
+        raise MetaProviderError("Meta live mode is not fully configured")
 
 
 def get_provider():
