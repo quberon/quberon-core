@@ -111,5 +111,10 @@ e-stop, manufacturer mappings (R10 gap), other-host results.
 
 ## Merge status
 
-PENDING - PR, CI, self-merge and ancestry verification recorded here
-before final report. Three-attempt cap honoured; no gate weakened.
+PR #33 (wave5/f7 -> main). CI on be6202f: dependency-review pass,
+python-without-rust pass, rust-and-python pass (7m15s) - run
+42123437563. Self-merge follows this progress update (which re-runs
+CI on the final head); merged-main ancestry (`git merge-base
+--is-ancestor <merge> origin/main` / merged head contained in
+origin/main) is verified after merge and stated in the F7 final
+report, not pre-claimed here.
