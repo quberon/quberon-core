@@ -6,9 +6,11 @@
 //! no panic crosses this boundary):
 //!   generate-keypair                       -> {"signing_key_hex","verifying_key_hex"}
 //!   sign        {seed_hex,kid,issuer,robot_id,simulation_id,subject,
-//!                sequence,issued_at_unix,expires_at_unix} -> envelope JSON
-//!   authorize   {db_path, trusted:[{kid,issuer,robot_id,simulation_id,
-//!                verifying_key_hex}], envelope:{...}, now_unix} -> decision JSON
+//!                epoch,sequence,issued_at_unix,expires_at_unix} -> envelope JSON
+//!   authorize   {db_path, boot_epoch, anchor_path?, max_audit_records?,
+//!                trusted:[{kid,issuer,robot_id,simulation_id,
+//!                verifying_key_hex,valid_from_unix?,valid_until_unix?,
+//!                revoked?}], envelope:{...}, now_unix} -> decision JSON
 
 use quberon_secure_core::*;
 use std::collections::BTreeMap;
@@ -84,6 +86,7 @@ fn run() -> String {
                 Some(robot),
                 Some(sim),
                 Some(subject),
+                Some(epoch),
                 Some(seq),
                 Some(iat),
                 Some(exp),
@@ -94,6 +97,7 @@ fn run() -> String {
                 get_s("robot_id"),
                 get_s("simulation_id"),
                 get_s("subject"),
+                get_u("epoch"),
                 get_u("sequence"),
                 get_i("issued_at_unix"),
                 get_i("expires_at_unix"),
@@ -101,12 +105,17 @@ fn run() -> String {
             else {
                 return decision_json("REQUEST_MALFORMED");
             };
+            if epoch == 0 {
+                return decision_json("EPOCH_REJECTED");
+            }
             let seed = match hex32(&seed) {
                 Ok(s) => s,
                 Err(c) => return decision_json(&c),
             };
             let sk = signing_key_from_seed(&seed);
-            let env = sign_envelope(&sk, &kid, &issuer, &robot, &sim, &subject, seq, iat, exp);
+            let env = sign_envelope(
+                &sk, &kid, &issuer, &robot, &sim, &subject, epoch, seq, iat, exp,
+            );
             serde_json::to_string(&env).unwrap_or_else(|_| decision_json("INTERNAL_ERROR"))
         }
         "authorize" => {
@@ -127,8 +136,33 @@ fn run() -> String {
             ) else {
                 return decision_json("REQUEST_MALFORMED");
             };
+            if db_path.len() > 4096 {
+                return decision_json("REQUEST_MALFORMED");
+            }
+            let boot_epoch = v.get("boot_epoch").and_then(|x| x.as_u64()).unwrap_or(1);
+            if boot_epoch == 0 {
+                return decision_json("EPOCH_REJECTED");
+            }
+            let max_audit_records = v
+                .get("max_audit_records")
+                .and_then(|x| x.as_u64())
+                .unwrap_or(0);
+            let anchor_path = v
+                .get("anchor_path")
+                .and_then(|x| x.as_str())
+                .map(|s| s.to_string());
+            if anchor_path
+                .as_ref()
+                .map(|s| s.len() > 4096)
+                .unwrap_or(false)
+            {
+                return decision_json("REQUEST_MALFORMED");
+            }
             let mut trusted = BTreeMap::new();
             if let Some(list) = v.get("trusted").and_then(|x| x.as_array()) {
+                if list.len() > 32 {
+                    return decision_json("TRUSTED_CONFIG_MALFORMED");
+                }
                 for t in list {
                     let (Some(kid), Some(issuer), Some(robot), Some(sim), Some(vk)) = (
                         t.get("kid").and_then(|x| x.as_str()),
@@ -147,15 +181,17 @@ fn run() -> String {
                         Ok(k) => k,
                         Err(_) => return decision_json("KEY_MALFORMED"),
                     };
-                    trusted.insert(
-                        kid.to_string(),
-                        TrustedIssuer {
-                            issuer: issuer.into(),
-                            robot_id: robot.into(),
-                            simulation_id: sim.into(),
-                            verifying_key: key,
-                        },
-                    );
+                    let mut entry = TrustedIssuer::new(issuer, robot, sim, key);
+                    entry.valid_from_unix = t
+                        .get("valid_from_unix")
+                        .and_then(|x| x.as_i64())
+                        .unwrap_or(0);
+                    entry.valid_until_unix = t
+                        .get("valid_until_unix")
+                        .and_then(|x| x.as_i64())
+                        .unwrap_or(0);
+                    entry.revoked = t.get("revoked").and_then(|x| x.as_bool()).unwrap_or(false);
+                    trusted.insert(kid.to_string(), entry);
                 }
             }
             if trusted.is_empty() {
@@ -166,7 +202,19 @@ fn run() -> String {
                 Err(_) => return decision_json("ENVELOPE_MALFORMED"),
             };
             let result = std::panic::catch_unwind(move || {
-                let mut auth = match Authorizer::open(Path::new(&db_path), trusted) {
+                let anchor: Option<Box<dyn AnchorStore>> = anchor_path
+                    .as_ref()
+                    .map(|p| Box::new(FileAnchorStore::new(Path::new(p))) as Box<dyn AnchorStore>);
+                let config = CoreConfig {
+                    current_epoch: boot_epoch,
+                    max_audit_records,
+                };
+                let mut auth = match Authorizer::open_with_config(
+                    Path::new(&db_path),
+                    trusted,
+                    config,
+                    anchor,
+                ) {
                     Ok(a) => a,
                     Err(d) => return d,
                 };

@@ -1,6 +1,9 @@
 [workspace]
 resolver = "2"
 members = ["crates/quberon-secure-core", "apps/quberon-secure-core-cli"]
+# cargo-fuzz targets live in fuzz/ with their own workspace (libfuzzer-sys
+# requires a nightly / special profile); they are not part of the stable build.
+exclude = ["fuzz"]
 
 [workspace.package]
 edition = "2021"
