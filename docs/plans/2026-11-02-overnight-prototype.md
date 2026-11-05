@@ -1,3 +1,8 @@
+> Status: ARCHIVED historical plan. Not an active planning surface.
+> The single planning index is graph.md (see its "Planning-surface
+> decision"); this file is kept for provenance only and must not be
+> updated as a plan.
+
 # Quberon Robot Interface Implementation Plan
 
 > **For Hermes:** Implement task-by-task with tests at each milestone. Do not enable physical robot control.
