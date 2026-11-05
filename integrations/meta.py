@@ -5,12 +5,134 @@ validator in app.main before any simulated task is even proposed as allowed.
 Credentials are read from environment variables on the server only.
 """
 import json
+import math
 import os
+import re
 from typing import Any, Dict
 from urllib.parse import urlparse
 
 ALLOWED_ACTIONS = {"SIMULATE_INSPECTION", "SIMULATE_STATUS_CHECK"}
 ALLOWED_CAPABILITIES = {"inspect", "status"}
+
+# Downstream-visible proposal shape (Wave4 N1, from N5 corpus findings).
+PROPOSAL_KEYS = ("summary", "robot_id", "requested_action", "required_capabilities",
+                 "hazards", "human_confirmation_required", "provider")
+# Keys that look like a trusted decision/provenance/latch claim. A planner
+# proposal is advisory only; it may never carry these, at any depth.
+TRUSTED_LOOKING_KEYS = {
+    "secure_core", "secure_core_decision", "stop_latched", "stop_latch",
+    "provenance", "source", "source_status", "verified_source", "timestamp",
+    "sequence", "seq", "audit_record", "audit", "decision", "authorization",
+    "auth_result", "signature", "signed", "issuer", "kid", "verified",
+    "verification", "authority", "attestation", "attested",
+}
+_NONFINITE_STRINGS = {"nan", "+nan", "-nan", "inf", "+inf", "-inf",
+                      "infinity", "+infinity", "-infinity"}
+_NUMERIC_STRING_RE = re.compile(r"^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$")
+_MAX_DEPTH = 32
+_MAX_NODES = 4096
+
+
+def _norm_key(key):
+    return re.sub(r"[^a-z0-9]+", "_", str(key).strip().lower()).strip("_")
+
+
+def _is_nonfinite_string(value):
+    s = value.strip().lower()
+    if s in _NONFINITE_STRINGS:
+        return True
+    if _NUMERIC_STRING_RE.match(s):
+        try:
+            return not math.isfinite(float(s))
+        except ValueError:
+            return False
+    return False
+
+
+def _walk(plan):
+    """Yield (path, key_or_None, value); bounded, iterative, cycle-safe."""
+    stack = [("", None, plan)]
+    seen, nodes = set(), 0
+    while stack:
+        path, key, value = stack.pop()
+        nodes += 1
+        if nodes > _MAX_NODES or len(path.split(".")) > _MAX_DEPTH + 1:
+            yield (path, key, value, True)
+            return
+        yield (path, key, value, False)
+        if isinstance(value, (dict, list)):
+            if id(value) in seen:
+                continue
+            seen.add(id(value))
+            items = value.items() if isinstance(value, dict) else enumerate(value)
+            for k, v in items:
+                child = f"{path}.{k}" if path else str(k)
+                stack.append((child, k if isinstance(value, dict) else None, v))
+
+
+def find_nonfinite_values(plan):
+    """Paths (<=5, truncated) holding NaN/Inf, numeric or string form."""
+    found = []
+    for path, key, value, overflow in _walk(plan):
+        bad = (isinstance(key, float) and not math.isfinite(key)) \
+            or (isinstance(value, float) and not math.isfinite(value)) \
+            or (isinstance(value, str) and _is_nonfinite_string(value)) \
+            or (isinstance(key, str) and _is_nonfinite_string(key))
+        if bad:
+            found.append((path or "<root>")[:64])
+            if len(found) >= 5:
+                break
+    return found
+
+
+def structure_exceeds_bounds(plan):
+    for _p, _k, _v, overflow in _walk(plan):
+        if overflow:
+            return True
+    return False
+
+
+def find_trusted_looking_fields(plan):
+    """Paths (<=5, truncated, keys only -- never values) of forged fields."""
+    found = []
+    if not isinstance(plan, dict):
+        return found
+    for path, key, _value, _o in _walk(plan):
+        if key is None:
+            continue
+        norm = _norm_key(key)
+        if norm in TRUSTED_LOOKING_KEYS or "secure_core" in norm or norm.startswith("secure_core_"):
+            found.append(path[:64])
+            if len(found) >= 5:
+                break
+    return found
+
+
+def sanitize_proposal(plan):
+    """Bounded, allow-listed copy safe to show downstream.
+
+    Never reflects attacker-controlled large content: only PROPOSAL_KEYS,
+    strings truncated to validator bounds, trusted/extra fields dropped,
+    non-finite/non-scalar values omitted rather than echoed.
+    """
+    if not isinstance(plan, dict):
+        return {"non_object_type": type(plan).__name__}
+    out = {}
+    if isinstance(plan.get("summary"), str):
+        out["summary"] = plan["summary"][:256]
+    for k in ("robot_id", "requested_action", "provider"):
+        if isinstance(plan.get(k), str):
+            out[k] = plan[k][:64]
+    caps = plan.get("required_capabilities")
+    if isinstance(caps, list):
+        out["required_capabilities"] = [c[:32] for c in caps[:4] if isinstance(c, str)]
+    hazards = plan.get("hazards")
+    if isinstance(hazards, list):
+        out["hazards"] = [h[:200] for h in hazards[:8] if isinstance(h, str)]
+    if isinstance(plan.get("human_confirmation_required"), bool):
+        out["human_confirmation_required"] = plan["human_confirmation_required"]
+    # Fixed key order, independent of attacker insertion order.
+    return {k: out[k] for k in PROPOSAL_KEYS if k in out}
 
 
 class MetaProviderError(RuntimeError):
@@ -115,6 +237,7 @@ class LiveMetaProvider:
         # untrusted provider output through verbatim.
         allowed_keys = {"summary", "robot_id", "requested_action", "required_capabilities", "hazards", "human_confirmation_required"}
         data = {k: v for k, v in data.items() if k in allowed_keys}
+        data = sanitize_proposal(data)  # bounded downstream-visible copy
         data["provider"] = "live"
         return data
 
@@ -133,8 +256,20 @@ def validate_plan(plan: Any, robot_id: str, stop_latched: bool) -> Dict[str, Any
             "allowed_as_proposal": False,
             "errors": ["plan is not an object"],
             "latch_blocks_task": bool(stop_latched),
+            "provenance_forgery_attempt": False,
+            "trusted_fields_rejected": [],
             "note": "Validation never resets the latch, grants a session capability, or commands hardware.",
         }
+    if find_nonfinite_values(plan):
+        # adv-08-*: NaN/Inf (incl. "NaN"/"Infinity"/"1e999" string forms)
+        # anywhere is a structured rejection, never rendered back (no 500).
+        errors.append("non-finite number not allowed")
+    trusted = find_trusted_looking_fields(plan)
+    # adv-03/05/09/10: forged secure_core.decision, stop_latched, and
+    # provenance/source/timestamp/sequence fields are NOT errors in the
+    # underlying advisory proposal: they are stripped from all
+    # downstream-visible data (sanitize_proposal), flagged here, and the
+    # /plan endpoint audits the attempt. They never influence validation.
     if plan.get("robot_id") != robot_id:
         errors.append("robot mismatch")
     action = plan.get("requested_action")
@@ -168,6 +303,9 @@ def validate_plan(plan: Any, robot_id: str, stop_latched: bool) -> Dict[str, Any
         "allowed_as_proposal": allowed,
         "errors": errors,
         "latch_blocks_task": bool(stop_latched),
+        "provenance_forgery_attempt": bool(trusted),
+        "trusted_fields_rejected": trusted,
+        "sanitized_proposal": sanitize_proposal(plan),
         "note": "Validation never resets the latch, grants a session capability, or commands hardware.",
     }
 
