@@ -66,7 +66,7 @@ def test_lane_d_discovery_is_evidenced_without_promotion():
         "src-magiclab-official-site", "src-magiclab-global-official-site",
         "src-apptronik-official-site", "src-agility-official-site",
     }
-    assert len(sources) == 19 and lane_d_source_ids <= source_ids and len(claims) == 12
+    assert len(sources) == 26 and lane_d_source_ids <= source_ids and len(claims) == 12
     for record_id in lane_d:
         rec = recs[record_id]
         assert rec["sources"] and set(rec["sources"]) <= source_ids
