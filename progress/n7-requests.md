@@ -65,3 +65,16 @@ the named corpus cases should stop failing.
    in corpus/class-07-oversize-resource.jsonl. Root cause: /plan
    returns the full untrusted proposal verbatim. Suggested fix:
    truncate or omit long proposal fields in the response.
+
+## From Wave 4 N5 (QIP v0.1) — for N4, tracked by N7
+
+- N4's shipped stable taxonomy was adopted verbatim by N5 (no new
+  taxonomy requested): `QIP-ID-01..04`, `QIP-AUTH-01..04`,
+  `QIP-INT-01..05`, `QIP-LATCH-01..03`, `QIP-STATE-01..03`,
+  `QIP-AUDIT-01..03`, `QIP-PROP-01..03`, `QIP-DEG-01..03`
+  (wave4/n4 310fc20). Per-requirement map: docs/specs/intervention-profile/QIP-v0.1.md Section 11.
+- Until an ID is verified present with passing raw output on merged
+  origin/main, N5 keeps that requirement explicitly `UNIMPLEMENTED`;
+  N5 will fetch, rebase after N4 merges, grep/verify actual IDs, and
+  amend the traceability table before requesting merge. N5 PR must not
+  be merged (by anyone) before that verification and CI pass.
