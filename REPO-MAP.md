@@ -1,0 +1,130 @@
+# REPO-MAP
+
+Generated deterministically by scripts/generate_repo_map.py
+from `git ls-files --cached`, sorted. Do not hand-edit.
+Regenerate: python3 scripts/generate_repo_map.py
+
+Tracked paths: 122
+
+- `.cargo/audit.toml` - TOML configuration
+- `.github/workflows/secure-core.yml` - YAML configuration
+- `.gitignore` - Tracked file
+- `BLOCKERS.md` - Markdown document
+- `Cargo.lock` - Cargo lock file
+- `Cargo.toml` - Cargo manifest
+- `DECISIONS.md` - Markdown document
+- `INVENTORY.md` - Markdown document
+- `MORNING-HANDOFF.md` - Markdown document
+- `Makefile` - Make build/test entry points
+- `README.md` - Markdown document
+- `REPO-MAP.md` - Markdown document
+- `ROLLBACK.md` - Markdown document
+- `TEST-RESULTS.md` - Markdown document
+- `adapters/__init__.py` - Python source
+- `adapters/display.py` - Python source
+- `adapters/gnss.py` - Python source
+- `adapters/isaac_sim.py` - Python source
+- `adapters/robot_sim.py` - Python source
+- `app/__init__.py` - Python source
+- `app/main.py` - Python source
+- `apps/quberon-secure-core-cli/Cargo.toml` - Cargo manifest
+- `apps/quberon-secure-core-cli/src/main.rs` - Rust source
+- `apps/quberon-secure-core-cli/tests/cli.rs` - Rust source
+- `artifacts/camera-after-display-refresh.jpg` - JPEG image
+- `artifacts/camera-display-working-enhanced.jpg` - JPEG image
+- `artifacts/camera-display-working.jpg` - JPEG image
+- `artifacts/camera-eink-view-long-exposure.jpg` - JPEG image
+- `artifacts/camera-eink-view.jpg` - JPEG image
+- `artifacts/control-url-qr.png` - PNG image
+- `artifacts/display-control-qr.png` - PNG image
+- `artifacts/quberon-ca.crt` - Certificate file
+- `checks.md` - Markdown document
+- `config/example.env` - Tracked file
+- `crates/quberon-secure-core/Cargo.toml` - Cargo manifest
+- `crates/quberon-secure-core/src/lib.rs` - Rust source
+- `deny.toml` - TOML configuration
+- `docs/BUILT-DURING-HACKATHON.md` - Markdown document
+- `docs/FRONTIER.md` - Markdown document
+- `docs/INTERVENTION-INPUTS.md` - Markdown document
+- `docs/ISAAC-SIM-INTEGRATION.md` - Markdown document
+- `docs/SECURE-CORE.md` - Markdown document
+- `docs/assets/architecture.svg` - SVG image
+- `docs/assets/test-evidence.svg` - SVG image
+- `docs/evidence/final-check.md` - Markdown document
+- `docs/evidence/lane-a-p0/SUMMARY.md` - Markdown document
+- `docs/evidence/lane-a-p0/flake-diagnosis.md` - Markdown document
+- `docs/evidence/lane-a-p0/fresh-clone-with-rust.log` - Tracked file
+- `docs/evidence/lane-a-p0/fresh-clone-without-rust.log` - Tracked file
+- `docs/evidence/lane-a-p0/main-fresh-clone-with-rust-python311.log` - Tracked file
+- `docs/evidence/lane-a-p0/main-fresh-clone-with-rust-python39-failed.log` - Tracked file
+- `docs/evidence/lane-a-p0/main-fresh-clone-without-rust-python311.log` - Tracked file
+- `docs/evidence/lane-a-p0/pi-readonly-inspection.log` - Tracked file
+- `docs/evidence/meta-live-local-contract.md` - Markdown document
+- `docs/evidence/meta-live.md` - Markdown document
+- `docs/evidence/pytest-final.txt` - Text file
+- `docs/frontier-phase1/BACKLOG.md` - Markdown document
+- `docs/frontier-phase1/LEGAL-RESEARCH-ROADMAP.md` - Markdown document
+- `docs/frontier-phase1/PROGRAM-PLAN.md` - Markdown document
+- `docs/frontier-phase1/VOICE-GESTURE-STOP-TRAINING-ROADMAP.md` - Markdown document
+- `docs/plans/2026-11-02-overnight-prototype.md` - Markdown document
+- `docs/specs/GRAPH-HARNESS.md` - Markdown document
+- `docs/specs/M2-ADVERSARIAL-CORPUS.md` - Markdown document
+- `fuzz/Cargo.lock` - Cargo lock file
+- `fuzz/Cargo.toml` - Cargo manifest
+- `fuzz/fuzz_targets/audit_record.rs` - Rust source
+- `fuzz/fuzz_targets/envelope_parse.rs` - Rust source
+- `graph.md` - Markdown document
+- `integrations/__init__.py` - Python source
+- `integrations/interventions.py` - Python source
+- `integrations/meta.py` - Python source
+- `integrations/recognizers.py` - Python source
+- `integrations/secure_core.py` - Python source
+- `progress.md` - Markdown document
+- `progress/N0-housekeeping.md` - Markdown document
+- `requirements.txt` - Text file
+- `research/humanoids/README.md` - Markdown document
+- `research/humanoids/cards/dataset-card.template.md` - Markdown document
+- `research/humanoids/cards/model-card.template.md` - Markdown document
+- `research/humanoids/examples/synthetic-company.example.json` - JSON data
+- `research/humanoids/registry/README.md` - Markdown document
+- `research/humanoids/registry/api-surfaces.jsonl` - JSON Lines data
+- `research/humanoids/registry/candidates.jsonl` - JSON Lines data
+- `research/humanoids/registry/compliance.jsonl` - JSON Lines data
+- `research/humanoids/registry/datasets.jsonl` - JSON Lines data
+- `research/humanoids/registry/index.json` - JSON data
+- `research/humanoids/registry/provenance-claims.jsonl` - JSON Lines data
+- `research/humanoids/registry/sources.jsonl` - JSON Lines data
+- `research/humanoids/schemas/api-surface.schema.json` - JSON data
+- `research/humanoids/schemas/company.schema.json` - JSON data
+- `research/humanoids/schemas/compliance-assessment.schema.json` - JSON data
+- `research/humanoids/schemas/dataset.schema.json` - JSON data
+- `research/humanoids/schemas/provenance-claim.schema.json` - JSON data
+- `research/humanoids/schemas/source.schema.json` - JSON data
+- `research/humanoids/tools/validate_registry.py` - Python source
+- `scripts/ap_rollback.sh` - Shell script
+- `scripts/create_user.py` - Python source
+- `scripts/deploy_pi.sh` - Shell script
+- `scripts/deploy_user_pi.sh` - Shell script
+- `scripts/display_live_update.sh` - Shell script
+- `scripts/fuzz-smoke.sh` - Shell script
+- `scripts/generate_qr.py` - Python source
+- `scripts/generate_repo_map.py` - Python source
+- `scripts/gnss_reader.py` - Python source
+- `scripts/healthcheck.sh` - Shell script
+- `scripts/live_blink.py` - Python source
+- `scripts/measure_latency.py` - Python source
+- `scripts/meta_live_evidence.py` - Python source
+- `scripts/render_display_image.py` - Python source
+- `scripts/render_live_display.py` - Python source
+- `scripts/sbom.sh` - Shell script
+- `scripts/setup_ap.sh` - Shell script
+- `scripts/setup_cellular.sh` - Shell script
+- `scripts/setup_display_env.sh` - Shell script
+- `scripts/show_qr_display.py` - Python source
+- `systemd/quberon-robot-interface.service` - Tracked file
+- `tests/__init__.py` - Python source
+- `tests/test_app.py` - Python source
+- `tests/test_humanoid_registry.py` - Python source
+- `tests/test_meta_live.py` - Python source
+- `tests/test_safety_inputs.py` - Python source
+- `tests/test_secure_core.py` - Python source
