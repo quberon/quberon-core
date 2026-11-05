@@ -1,0 +1,12 @@
+(
+    logging: (enable_task_logging: true, enable_keyframe_logging: true, keyframe_interval: 1),
+    tasks: [
+        (id: "intervention", type: "InterventionSource", run_in_sim: true),
+        (id: "authorization", type: "Authorization", run_in_sim: true),
+        (id: "actuator", type: "SimulatedActuator", run_in_sim: true),
+    ],
+    cnx: [
+        (src: "intervention", dst: "authorization", msg: "Intervention"),
+        (src: "authorization", dst: "actuator", msg: "AuthorizationDecision"),
+    ],
+)

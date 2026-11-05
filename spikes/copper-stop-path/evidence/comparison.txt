@@ -1,0 +1,7 @@
+command=STOP
+sequence=1
+authorized=true
+original_task_outputs_bytes=39
+replay_task_outputs_bytes=39
+byte_identical=true
+keyframe_byte_identical=true
