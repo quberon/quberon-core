@@ -3,6 +3,9 @@
 Systematic mutations of benign control payloads: field deletion,
 duplication, type swap, boundary lengths, encoding wrap, key reordering,
 whitespace injection. Deterministic in (base_index, mutation_index).
+In Wave 4 these mutations are executed through the actual /plan
+endpoint by run.py (not direct-only). Same weak-evidence warning as
+generate.py applies: templates/mutations and validator share an author.
 """
 import hashlib
 import itertools
