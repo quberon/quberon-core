@@ -1,81 +1,101 @@
-# Lane A P0 — fresh evidence summary
+# Lane A P0 — evidence summary
 
 Date (UTC): 2026-11-05
-Host: Mac (hostname `Mac`)
-Lane tip tested in fresh clones: a90daa5c4929c0dea461aa2084b7769cfb44af47
-Preserved prior commits: 317fbc2, 4d835b6, 0db0b09 (not rewritten).
+Host: Mac (hostname `Mac`, Darwin 24.3.0 arm64)
+Code tip tested in fresh clones: ca8cd4db1623b1c525e7aed46a70b631f0bf3abb
+  (evidence/docs commit on top adds only docs/evidence changes)
+Reviewer independent result (NOT a run by this agent): Python 3.12.7 —
+  reviewer reported the suite passing on Python 3.12.7. Recorded as
+  independent reviewer evidence only; all runs below are Python 3.11.15
+  on this Mac unless stated otherwise.
 
-## Fresh clones
+## Rebase onto current main
 
-Both clones were created fresh in scratch from the lane tip, with no
-pre-existing `.venv` and no pre-existing `target/` (recorded in the raw
-logs). Only `requirements.txt` was installed, inside each clone's own
-`.venv`. No reuse of the main worktree `.venv` or `target/`.
+Rebased onto origin/main 4d2ce60 (Merge PR #4, secure-core Increment 2,
+5995c0b). Pre-rebase lane commits 317fbc2/4d835b6/0db0b09/a90daa5/09d071d
+replayed as dc3cf2b/37e3783/4b39b08/312592f/8bce081; no history outside
+this lane was rewritten. No conflict markers remain, no rebase in progress.
 
-Documented commands run exactly as in README:
+Conflict resolution, file by file (overlapping files only):
+- app/main.py: Lane A degraded semantics re-applied on Increment 2's
+  client_from_env wiring. UNAVAILABLE (no client/binary): authenticated
+  STOP executes UNSIGNED, HTTP 200, secure_core.status="unavailable",
+  decision/sequence/audit_record null, audit UNSIGNED/core_unavailable,
+  latch retained. REJECTED (reachable core): adapter NOT invoked,
+  HTTP 503, secure_core.status="rejected", latch retained, observed
+  state UNKNOWN. Reset/simulated-task call require_secure_core_for_motion()
+  -> HTTP 503 without a core.
+- integrations/secure_core.py: Increment 2 client retained (production
+  external-key mode, development ephemeral keys, epoch/sequence/key-file
+  handling); Lane A distinction preserved — unavailable is not a
+  rejection, rejection fails closed.
+- tests/test_secure_core.py: Increment 2 tests retained; Lane A tests
+  assert the exact unavailable/rejected semantics above.
+- tests/test_app.py: kept Increment 2 dev-mode fixture
+  (QUBERON_SECURE_CORE_MODE=development); B5 tests added (below).
+- docs/SECURE-CORE.md, README.md: Increment 2 mode documentation kept;
+  Lane A degraded-mode wording and (README) B5 capability matrix added.
+  Inflated tests-passed badge removal (dc3cf2b) kept.
+- .github/workflows/secure-core.yml: upstream workflow kept; Lane A
+  python-without-rust degraded job kept. Push branches include lane-*;
+  PR to main triggers attached checks (verified on PR #5).
+- Makefile: no base conflict; python3.11 preference kept; B5 adds
+  CORE_CLI detection and the exact degraded demo message.
+- Rust crates/apps/fuzz/scripts: untouched by Lane A; taken from main.
 
-- With Rust: `make setup`, `make test`, `make core`,
-  `cargo test --workspace`, `make demo`
-- Without Rust: `make setup`, `make test`, `make demo`
-  (PATH restricted so `cargo`/`rustc` were absent; raw log records
-  `cargo: NO CARGO` and `rustc: NO RUSTC`)
+## B5 (commit ca8cd4d)
 
-`make demo` starts a blocking server; it was run as documented,
-probed with curl (HTTP 302 to login), then terminated. That
-termination is recorded in the raw logs.
+When the secure-core CLI is not built, `make demo` prints exactly:
+secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them.
+Status API exposes secure_core_available/secure_core_message; the
+operator page shows the same message and disables (not errors on) the
+simulated-task (taskBtn) and simulation-reset (resetBtn) controls.
+STOP remains available. README carries the full capability matrix
+(ACCEPTED / UNAVAILABLE / REJECTED x STOP / task / reset / attestation).
 
-### Results
+## Intermittent full-suite failure — diagnosis
 
-- With Rust — `fresh-clone-with-rust.log`
-  - Python: Makefile selected `/Users/quberon1/.local/bin/python3.11`
-    (Python 3.11.15). System `python3` is 3.9.6, which is why the
-    earlier (pre-fix) fresh run failed: code uses Python 3.10+
-    `X | None` annotations. `make setup` now prefers `python3.11`.
-  - cargo 1.99.1 / rustc 1.99.1 (Homebrew)
-  - Python tests: 38 passed
-  - Rust tests: 4 + 2 passed (plus 0-test suites), `cargo test --workspace` exit 0
-  - Demo probe: HTTP 302
+With-Rust suite run 11x consecutively in the worktree before the fix:
+48 passed every time. Exact B5 demo test standalone then exposed the
+leakage: one run passed in 0.23s instead of ~8s. Root cause is real, in
+test_b5_make_demo_prints_exact_degraded_message (pre-fix):
+subprocess.run(timeout=8) kills only `make`, orphaning its uvicorn
+child on port 8000; the next run passes spuriously via bind failure and
+leaks port state across runs (order/state leakage). Fixed by starting
+`make` with start_new_session=True and killing the whole process group
+(SIGTERM, SIGKILL fallback); the test itself is the regression cover.
+After fix: B5 test 6/6 with port 8000 free after each run; full suite
+48 passed x3 more in worktree, x2 in fresh with-Rust clone, no leaks.
 
-- Without Rust — `fresh-clone-without-rust.log`
-  - Python 3.11.15 via `python3.11`; no cargo, no rustc, no CLI
-  - `make setup` printed the documented degraded message:
-    `secure core not built - STOP will run with unsigned attestation; see docs/SECURE-CORE.md`
-  - Python tests: 32 passed, 6 skipped (Rust-dependent tests skip)
-  - Demo probe: HTTP 302
+## Gates run on this Mac (Python 3.11.15, cargo/rustc 1.99.1)
 
-Pre-fix fresh runs of 0db0b09 in both modes failed 1 test
-(`test_gnss_parser_no_fix_and_fix_and_bad_checksum`) under Python 3.9.6
-with `TypeError: unsupported operand type(s) for |`. That failure is
-why `Makefile` was changed; the fix was verified green in patched
-fresh clones before committing, then re-verified above in clean
-clones of the committed tip.
+- Rust: cargo fmt --all --check OK; cargo clippy --workspace
+  --all-targets --all-features -- -D warnings clean;
+  cargo test --workspace --all-features --locked: 17 passed
+  (14 core + 3 CLI integration).
+- Python with Rust: 48 passed (repeated, see above).
+- Python without Rust (built CLI hidden, cargo/rustc excluded from
+  PATH): 37 passed, 11 skipped. Named tests pass in this mode:
+  test_stop_executes_without_secure_core_but_reset_does_not,
+  test_stop_rejected_by_secure_core_does_not_invoke_adapter,
+  test_b5_degraded_ui_message_and_disabled_controls,
+  test_b5_make_demo_prints_exact_degraded_message (4 passed).
 
-## Pi read-only inspection
+## Fresh clones (raw logs beside this file)
 
-Raw output: `pi-readonly-inspection.log` (ssh BatchMode, grep/ls/ps
-only — no writes, restart, deploy, or config change).
-
-Evidence, exactly as observed on `quberon-pi` at
-2026-11-05T08:00:56Z:
-
-- Running process: `/home/quberon1/quberon-robot-interface/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8443 ...`
-  from deploy dir `/home/quberon1/quberon-robot-interface`
-- `grep secure_core|SecureCore|execute_stop|quberon-secure app/main.py`
-  → `NO_MATCH_app/main.py`
-- `integrations/` contains only `__init__.py`, `meta.py`, `__pycache__`;
-  same grep → `NO_MATCH_integrations`
-- No `target/debug/quberon-secure-core-cli` or
-  `target/release/quberon-secure-core-cli` on the Pi
-
-Conclusion limited to those files/process: the Pi-deployed app does
-NOT include the secure-core gate. No inference beyond the inspected
-files and process command is made. The secure-core gate is therefore
-repo/Mac-tested only; it is not deployed on the Pi. No Pi claim is
-supported.
+- fresh-clone-with-rust.log: fresh clone of ca8cd4d, no .venv/target;
+  make setup/test, cargo fmt/clippy/test (17 passed), Python 48 passed
+  x3 total, demo probe HTTP 200.
+- fresh-clone-without-rust.log: fresh clone, PATH with NO CARGO /
+  NO RUSTC, no CLI; make setup prints degraded message; 37 passed,
+  11 skipped; named Lane A + B5 tests 4 passed; demo probe HTTP 200
+  and prints the exact B5 degraded message.
+- pi-readonly-inspection.log: unchanged prior read-only Pi inspection
+  (no writes/deploy/restart). Conclusion unchanged: Pi-deployed app
+  has no secure-core gate; no Pi pass is claimed. A Mac pass is not a
+  Pi or Isaac-host pass.
 
 ## Historical commit note
 
-317fbc2 is a docs-only badge-removal commit made before the no-Rust
-failure was fixed; at that commit the Python suite was not green in
-the no-Rust/Python-3.9 fresh-clone sense demonstrated later. History
-was not rewritten to hide this.
+317fbc2 (rebased dc3cf2b) is a docs-only badge removal made before the
+no-Rust failure was fixed; history was not rewritten to hide this.
