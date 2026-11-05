@@ -64,6 +64,9 @@ This is NOT 28/28 and NOT standards conformance (R11 caveat).
 
 - Local: pytest conformance/ -q -> 27 passed, 1 skipped (with core);
   26 passed, 2 skipped (without core). See above.
-- Clean-clone-style and make test / CI: recorded in PR; report updated in a
-  follow-up commit on this branch if numbers differ. No claim ahead of that
+- Clean-clone-style (fresh git clone of origin wave4/n4 @ 310fc20,
+  fresh .venv from requirements.txt, cargo build --workspace):
+  pytest conformance/ -q -rs -> 27 passed, 1 skipped (QIP-DEG-03), 4.55s;
+  make test -> 107 passed, 1 skipped, 25.01s.
+- CI on the PR must also be green before merge; no claim ahead of that
   evidence (R-IMM-4).
