@@ -39,7 +39,6 @@
     "candidates": "registry/candidates.jsonl",
     "schemas": "schemas/",
     "empty_registries": [
-      "registry/sources.jsonl",
       "registry/datasets.jsonl",
       "registry/api-surfaces.jsonl",
       "registry/compliance.jsonl",
