@@ -1,0 +1,119 @@
+=== LANE A P0 FRESH CLONE EVIDENCE ===
+mode: without-rust
+clone_dir: /Users/quberon1/.hermes/cache/scratch/lane-a-p0-fresh/without-rust
+host: Mac
+utc_timestamp_start: 2026-11-05T08:00:34Z
+git_head: a90daa5c4929c0dea461aa2084b7769cfb44af47
+git_status: 0 dirty entries (pre-run)
+python3_resolved: /usr/bin/python3
+python3_version: Python 3.9.6
+python311_version: Python 3.11.15
+cargo: NO CARGO
+rustc: NO RUSTC
+venv_preexisting: NO
+target_preexisting: NO
+
+$ make setup
+/Users/quberon1/.local/bin/python3.11 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+Collecting fastapi==0.115.6 (from -r requirements.txt (line 1))
+  Using cached fastapi-0.115.6-py3-none-any.whl.metadata (27 kB)
+Collecting python-multipart==0.0.20 (from -r requirements.txt (line 2))
+  Using cached python_multipart-0.0.20-py3-none-any.whl.metadata (1.8 kB)
+Collecting uvicorn==0.34.0 (from -r requirements.txt (line 3))
+  Using cached uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting httpx==0.28.1 (from -r requirements.txt (line 4))
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting qrcode==8.0 (from -r requirements.txt (line 5))
+  Using cached qrcode-8.0-py3-none-any.whl.metadata (17 kB)
+Collecting Pillow==11.0.0 (from -r requirements.txt (line 6))
+  Using cached pillow-11.0.0-cp311-cp311-macosx_11_0_arm64.whl.metadata (9.1 kB)
+Collecting pytest==8.3.4 (from -r requirements.txt (line 7))
+  Using cached pytest-8.3.4-py3-none-any.whl.metadata (7.5 kB)
+Collecting starlette<0.42.0,>=0.40.0 (from fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached starlette-0.41.3-py3-none-any.whl.metadata (6.0 kB)
+Collecting pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4 (from fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached pydantic-2.14.2-py3-none-any.whl.metadata (137 kB)
+Collecting typing-extensions>=4.8.0 (from fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting click>=7.0 (from uvicorn==0.34.0->-r requirements.txt (line 3))
+  Using cached click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting h11>=0.8 (from uvicorn==0.34.0->-r requirements.txt (line 3))
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting anyio (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached anyio-4.16.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached certifi-2026.10.23-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpcore==1.* (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting idna (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting iniconfig (from pytest==8.3.4->-r requirements.txt (line 7))
+  Using cached iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+Collecting packaging (from pytest==8.3.4->-r requirements.txt (line 7))
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pluggy<2,>=1.5 (from pytest==8.3.4->-r requirements.txt (line 7))
+  Using cached pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting annotated-types>=0.6.0 (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.50.2 (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached pydantic_core-2.50.2-cp311-cp311-macosx_11_0_arm64.whl.metadata (6.5 kB)
+Collecting typing-inspection>=0.4.4 (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached typing_inspection-0.4.5-py3-none-any.whl.metadata (2.6 kB)
+Using cached fastapi-0.115.6-py3-none-any.whl (94 kB)
+Using cached python_multipart-0.0.20-py3-none-any.whl (24 kB)
+Using cached uvicorn-0.34.0-py3-none-any.whl (62 kB)
+Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Using cached qrcode-8.0-py3-none-any.whl (45 kB)
+Using cached pillow-11.0.0-cp311-cp311-macosx_11_0_arm64.whl (3.0 MB)
+Using cached pytest-8.3.4-py3-none-any.whl (343 kB)
+Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Using cached click-8.5.0-py3-none-any.whl (125 kB)
+Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Using cached pluggy-1.7.0-py3-none-any.whl (27 kB)
+Using cached pydantic-2.14.2-py3-none-any.whl (490 kB)
+Using cached pydantic_core-2.50.2-cp311-cp311-macosx_11_0_arm64.whl (2.1 MB)
+Using cached starlette-0.41.3-py3-none-any.whl (73 kB)
+Using cached anyio-4.16.0-py3-none-any.whl (134 kB)
+Using cached idna-3.20-py3-none-any.whl (69 kB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached certifi-2026.10.23-py3-none-any.whl (135 kB)
+Using cached iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Using cached annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Using cached typing_inspection-0.4.5-py3-none-any.whl (14 kB)
+Installing collected packages: typing-extensions, qrcode, python-multipart, pluggy, Pillow, packaging, iniconfig, idna, h11, click, certifi, annotated-types, uvicorn, typing-inspection, pytest, pydantic-core, httpcore, anyio, starlette, pydantic, httpx, fastapi
+Successfully installed Pillow-11.0.0 annotated-types-0.8.0 anyio-4.16.0 certifi-2026.10.23 click-8.5.0 fastapi-0.115.6 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pydantic-2.14.2 pydantic-core-2.50.2 pytest-8.3.4 python-multipart-0.0.20 qrcode-8.0 starlette-0.41.3 typing-extensions-4.16.0 typing-inspection-0.4.5 uvicorn-0.34.0
+
+[notice] A new release of pip is available: 24.0 -> 26.0.1
+[notice] To update, run: /Users/quberon1/.hermes/cache/scratch/lane-a-p0-fresh/without-rust/.venv/bin/python -m pip install --upgrade pip
+secure core not built - STOP will run with unsigned attestation; see docs/SECURE-CORE.md
+[exit_code=0]
+
+$ make test
+.venv/bin/python -m pytest -q
+...s.......s.s...................ss..s                                   [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/cache/scratch/lane-a-p0-fresh/without-rust/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+32 passed, 6 skipped, 1 warning in 2.58s
+[exit_code=0]
+
+$ make demo (backgrounded, probed, then terminated - server command itself is the documented one)
+demo_curl_probe:
+http_code=302
+--- demo server stdout/stderr ---
+.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+INFO:     Started server process [75514]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51388 - "GET / HTTP/1.1" 302 Found
+--- demo probe body (first 500 bytes) ---
+
+demo_process_terminated exit=143
+
+utc_timestamp_end: 2026-11-05T08:00:46Z

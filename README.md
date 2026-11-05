@@ -73,8 +73,12 @@ secure core not built - STOP will run with unsigned attestation; see docs/SECURE
 The suite is green in both modes: Rust-dependent reset/task tests are
 skipped when the CLI is not built, and the degraded unsigned-STOP path
 is exercised in both modes. Verified counts and raw output for both
-modes are recorded in `docs/evidence/lane-a-p0/`. A Mac test pass is
-not a Pi or Isaac-host test pass.
+modes are recorded in `docs/evidence/lane-a-p0/` (see `SUMMARY.md`).
+A Mac test pass is
+not a Pi or Isaac-host test pass. Read-only Pi inspection on
+2026-11-05 found the Pi-deployed `app/main.py`/`integrations/` contain
+no secure-core gate and no secure-core CLI, so the gate is not
+deployed on the Pi.
 
 Latest verified run (2026-11-05, local Mac, Increment 2 on main): **44 passed** Python (3.11, project `.venv`), **17 passed** Rust (14 core unit/property + 3 CLI integration, `cargo test --workspace --all-features`), `cargo fmt --check` and `cargo clippy --workspace --all-targets --all-features -- -D warnings` clean, `cargo audit` and `cargo deny check` ok, SBOM verified (98 components). Fuzz smoke: **not run** (cargo-fuzz unavailable, exit 77). Lane A re-verification after the rebase is recorded in `docs/evidence/lane-a-p0/SUMMARY.md`. A Mac test pass is not a Pi or Isaac-host test pass.
 
