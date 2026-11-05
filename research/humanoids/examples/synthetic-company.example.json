@@ -1,0 +1,31 @@
+{
+  "record_id": "cand-example-synthetic",
+  "record_kind": "humanoid_company_candidate",
+  "candidate_names": [
+    "Example Synthetic Robotics (fictional)"
+  ],
+  "aliases": [
+    "Example Synthetic Robotics (fictional)"
+  ],
+  "canonical_name": null,
+  "verification": {
+    "status": "candidate_unverified",
+    "basis": "Synthetic example for schema illustration only; not a real-world claim.",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "evidence_source_ids": []
+  },
+  "entity_scope": {
+    "humanoid_relevance": "unknown",
+    "scope_basis": null
+  },
+  "provenance_claim_ids": [],
+  "sources": [],
+  "products_claimed": [],
+  "relationships": [],
+  "review": {
+    "next_action": "await_human_review",
+    "priority": "P3",
+    "notes": "example.invalid-style fixture. Delete before any real research use."
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quberon.example.invalid/schemas/humanoids/1.0.0/compliance-assessment.schema.json",
+  "title": "Compliance research assessment (not legal advice)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assessment_id",
+    "record_kind",
+    "jurisdiction",
+    "framework",
+    "applicability",
+    "verification",
+    "research"
+  ],
+  "properties": {
+    "assessment_id": {
+      "type": "string",
+      "pattern": "^cmp-[a-z0-9-]+$"
+    },
+    "record_kind": {
+      "const": "compliance_assessment"
+    },
+    "jurisdiction": {
+      "enum": [
+        "EU",
+        "SE",
+        "US",
+        "UK",
+        "CN",
+        "JP",
+        "KR",
+        "CA",
+        "AU",
+        "other",
+        "unknown"
+      ]
+    },
+    "framework": {
+      "enum": [
+        "EU_AI_ACT",
+        "EU_MACHINERY_REGULATION",
+        "GDPR",
+        "EU_CYBER_RESILIENCE_ACT",
+        "EU_PRODUCT_SAFETY_GPSR",
+        "EU_PRODUCT_LIABILITY",
+        "STANDARDS_ISO_IEC",
+        "DATASET_COPYRIGHT_LICENSE",
+        "DATASET_PRIVACY",
+        "EXPORT_CONTROLS",
+        "WEBSITE_TERMS_ROBOTS",
+        "ELECTRONIC_SIGNATURE_OR_OTHER",
+        "OTHER"
+      ]
+    },
+    "applicability": {
+      "enum": [
+        "unknown",
+        "potentially_applicable",
+        "likely_applicable",
+        "likely_not_applicable",
+        "requires_qualified_legal_review"
+      ]
+    },
+    "subject": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "research": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_source_ids",
+        "status",
+        "not_legal_advice",
+        "open_questions",
+        "next_action"
+      ],
+      "properties": {
+        "primary_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "secondary_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "enum": [
+            "not_started",
+            "researching",
+            "draft_for_human_review",
+            "reviewed_by_human",
+            "requires_qualified_legal_review"
+          ]
+        },
+        "not_legal_advice": {
+          "const": true
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "next_action": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "reviewed_by_qualified_counsel": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000
+    },
+    "url_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "iso_date_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    }
+  }
+}

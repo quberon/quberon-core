@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quberon.example.invalid/schemas/humanoids/1.0.0/api-surface.schema.json",
+  "title": "API or SDK surface record (no fabricated endpoints)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "api_id",
+    "record_kind",
+    "name",
+    "company_record_id",
+    "surface_type",
+    "verification",
+    "documentation",
+    "endpoints",
+    "safety"
+  ],
+  "properties": {
+    "api_id": {
+      "type": "string",
+      "pattern": "^api-[a-z0-9-]+$"
+    },
+    "record_kind": {
+      "const": "api_surface"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "company_record_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^(cand-[a-z0-9-]+)?$"
+    },
+    "surface_type": {
+      "enum": [
+        "rest_api",
+        "sdk",
+        "ros_interface",
+        "simulation_interface",
+        "dataset_api",
+        "webhook",
+        "unknown"
+      ]
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source_ids",
+        "base_url"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "documented_in_official_source",
+            "verified_by_reading_official_docs",
+            "deprecated_in_official_source",
+            "not_found"
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          }
+        },
+        "base_url": {
+          "$ref": "#/$defs/url_or_null"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100
+        },
+        "authentication": {
+          "enum": [
+            "unknown",
+            "none_documented",
+            "api_key",
+            "oauth",
+            "other_documented"
+          ]
+        }
+      }
+    },
+    "endpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name_or_path",
+          "status",
+          "source_ids"
+        ],
+        "properties": {
+          "name_or_path": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "status": {
+            "enum": [
+              "candidate_unverified",
+              "documented_in_official_source",
+              "verified_by_reading_official_docs"
+            ]
+          },
+          "source_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "physical_control_capable",
+        "stop_or_reset_related",
+        "deployment_status"
+      ],
+      "properties": {
+        "physical_control_capable": {
+          "enum": [
+            "unknown",
+            "yes",
+            "no"
+          ]
+        },
+        "stop_or_reset_related": {
+          "type": "boolean"
+        },
+        "deployment_status": {
+          "const": "research_only_no_physical_control"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000
+    },
+    "url_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "iso_date_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    }
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quberon.example.invalid/schemas/humanoids/1.0.0/dataset.schema.json",
+  "title": "Dataset record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dataset_id",
+    "record_kind",
+    "name",
+    "verification",
+    "modality",
+    "custodian_claim",
+    "license",
+    "privacy",
+    "access",
+    "provenance_claim_ids"
+  ],
+  "properties": {
+    "dataset_id": {
+      "type": "string",
+      "pattern": "^ds-[a-z0-9-]+$"
+    },
+    "record_kind": {
+      "const": "dataset"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "modality": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "enum": [
+          "voice_audio",
+          "voice_transcript",
+          "hand_landmarks",
+          "video",
+          "image",
+          "motion_capture",
+          "robot_telemetry",
+          "text",
+          "other",
+          "unknown"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "custodian_claim": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 500
+    },
+    "version": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 100
+    },
+    "url": {
+      "$ref": "#/$defs/url_or_null"
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "spdx_or_name",
+        "redistribution",
+        "commercial_use",
+        "modification"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unknown",
+            "verified_permissive",
+            "verified_restrictive",
+            "verified_proprietary",
+            "no_license_found",
+            "conflicting"
+          ]
+        },
+        "spdx_or_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 200
+        },
+        "redistribution": {
+          "enum": [
+            "unknown",
+            "allowed",
+            "allowed_with_conditions",
+            "prohibited"
+          ]
+        },
+        "commercial_use": {
+          "enum": [
+            "unknown",
+            "allowed",
+            "prohibited"
+          ]
+        },
+        "modification": {
+          "enum": [
+            "unknown",
+            "allowed",
+            "allowed_with_conditions",
+            "prohibited"
+          ]
+        },
+        "license_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contains_personal_data",
+        "contains_biometrics_or_voiceprints",
+        "consent_basis",
+        "minors_possible"
+      ],
+      "properties": {
+        "contains_personal_data": {
+          "enum": [
+            "unknown",
+            "yes",
+            "no"
+          ]
+        },
+        "contains_biometrics_or_voiceprints": {
+          "enum": [
+            "unknown",
+            "yes",
+            "no"
+          ]
+        },
+        "consent_basis": {
+          "enum": [
+            "unknown",
+            "documented_consent",
+            "public_domain_asserted",
+            "legitimate_interest_claimed",
+            "not_applicable",
+            "none_documented"
+          ]
+        },
+        "minors_possible": {
+          "enum": [
+            "unknown",
+            "yes",
+            "no"
+          ]
+        },
+        "privacy_notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        }
+      }
+    },
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "download_status",
+        "terms_source_ids"
+      ],
+      "properties": {
+        "download_status": {
+          "enum": [
+            "not_downloaded",
+            "metadata_only",
+            "download_permitted_and_recorded",
+            "download_prohibited",
+            "unknown"
+          ]
+        },
+        "terms_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provenance_claim_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^claim-[a-z0-9-]+$"
+      },
+      "uniqueItems": true
+    },
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataset_card_path",
+        "known_biases",
+        "splits_documented"
+      ],
+      "properties": {
+        "dataset_card_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "known_biases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "splits_documented": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000
+    },
+    "url_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "iso_date_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    }
+  }
+}

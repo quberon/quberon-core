@@ -27,6 +27,7 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 | GNSS | ⚠️ Reader present, NO_FIX indoors, no RTK/accuracy claim |
 | Voice / gesture interventions | 🧪 Deterministic recognizers implemented for final transcript observations and normalized 21-point open-palm frames; authenticated STOP-only API, **no microphone/camera capture or physical control** (`docs/INTERVENTION-INPUTS.md`) |
 | Isaac Sim | 🧪 Versioned bridge contract + deterministic local transport + fail-closed adapter implemented; Isaac Sim itself not installed/run and adapter not runtime-enabled (`docs/ISAAC-SIM-INTEGRATION.md`) |
+| Frontier Phase 1 research | 🧪 Provenance-first humanoid registry scaffold: 6 schemas, 25 unverified seed candidates, stdlib validator, legal + voice/gesture-STOP roadmaps (`research/humanoids/`, `docs/frontier-phase1/`) — no verified companies, no universe-size claim, no physical control |
 
 ## 🌌 Pushing the Frontier — Building for Superintelligence
 
