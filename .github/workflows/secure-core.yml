@@ -1,7 +1,6 @@
 name: secure-core
 on:
   push:
-    branches: [meta/secure-core-rust-20261105-073231]
   pull_request:
 permissions:
   contents: read
@@ -9,31 +8,65 @@ jobs:
   rust-and-python:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      # All actions pinned to immutable commit SHAs (tag in comment).
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable branch @ 2026-11
         with:
+          toolchain: stable
           components: clippy, rustfmt
       - name: Format and lint
         run: |
           cargo fmt --all --check
-          cargo clippy --workspace --all-targets -- -D warnings
+          cargo clippy --workspace --all-targets --all-features -- -D warnings
       - name: Rust tests
-        run: cargo test --workspace --locked
-      - name: cargo audit (installs the tool; failure is visible, not hidden)
+        run: cargo test --workspace --all-features --locked
+      # Tool unavailability FAILS the build. No `|| echo success` patterns:
+      # a security check that did not run is a failed check.
+      - name: Install cargo-audit (failure fails CI)
+        run: cargo install cargo-audit --locked
+      - name: cargo audit
+        run: cargo audit
+      - name: Install cargo-deny (failure fails CI)
+        run: cargo install cargo-deny --locked
+      - name: cargo deny
+        run: cargo deny check
+      - name: Fuzz smoke (bounded; exit 77 = tool unavailable, surfaced in log)
         run: |
-          cargo install cargo-audit --locked || echo "cargo-audit install unavailable"
-          if command -v cargo-audit >/dev/null; then cargo audit; else echo "cargo audit NOT RUN: tool unavailable"; fi
-      - name: cargo deny (installs the tool; failure is visible, not hidden)
-        run: |
-          cargo install cargo-deny --locked || echo "cargo-deny install unavailable"
-          if command -v cargo-deny >/dev/null; then cargo deny check; else echo "cargo deny NOT RUN: tool unavailable"; fi
+          if sh scripts/fuzz-smoke.sh 30; then
+            echo "fuzz smoke ran"
+          else
+            rc=$?
+            if [ "$rc" -eq 77 ]; then
+              echo "::warning::FUZZ NOT RUN: cargo-fuzz unavailable; proptest suite is the executable evidence"
+            else
+              exit "$rc"
+            fi
+          fi
       - name: SBOM
-        run: |
-          sh scripts/sbom.sh sbom.cdx.json
-      - uses: actions/setup-python@v5
+        run: sh scripts/sbom.sh sbom.cdx.json
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cdx.json
+          if-no-files-found: error
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.11"
       - name: Python tests (Rust CLI built above is exercised by the app gate)
         run: |
           pip install -r requirements.txt
           python -m pytest -q
+  dependency-review:
+    # Dependency review needs PR context; least privilege for that job only.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure

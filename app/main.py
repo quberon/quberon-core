@@ -241,7 +241,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     app.state.gesture_recognizer = OpenPalmStopRecognizer()
     # Rust secure core: every STOP (button/voice/gesture/intervention) must be
     # authorized here before SimulatedRobotAdapter.stop is invoked. "auto"
-    # provisions an ephemeral simulation client; None/unavailable = fail closed.
+    # builds a client from env: production requires an external key,
+    # development explicitly allows ephemeral keys, no mode = fail closed.
     if secure_core == "auto":
         try:
             secure_core = client_from_env(ROBOT_ID, app_db_path=db_path)

@@ -1,15 +1,26 @@
-# cargo-deny configuration (Increment 1). Run: cargo deny check
-# If cargo-deny is unavailable, CI installs it; absence is reported, not hidden.
+# cargo-deny configuration (Increment 2). Run: cargo deny check
+# If cargo-deny is unavailable, CI must FAIL, not echo success.
+
 [advisories]
 version = 2
 
 [licenses]
 version = 2
-allow = ["MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Unicode-3.0", "Zlib", "MPL-2.0"]
+# Only licenses actually encountered in the locked dependency graph.
+# Increment 1 allowed ISC/Zlib/MPL-2.0 which no crate uses; removed.
+allow = ["MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "BSD-2-Clause", "BSD-3-Clause", "Unicode-3.0"]
 
 [bans]
-multiple-versions = "warn"
+multiple-versions = "deny"
 wildcards = "deny"
+# Deliberate duplicate: `syn` has two majors in the locked graph and both
+# are load-bearing proc-macro infrastructure, not interchangeable:
+#   syn 2 <- curve25519-dalek-derive <- curve25519-dalek <- ed25519-dalek
+#            (the critical crypto dependency chain; pinned by upstream)
+#   syn 3 <- serde_derive <- serde (serialization chain)
+# Forcing one major would require forking upstream crates. We skip the
+# older entry explicitly so any *new* duplicate major fails the build.
+skip = [{ name = "syn", version = "<3" }]
 
 [sources]
 unknown-registry = "deny"

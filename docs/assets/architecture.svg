@@ -27,12 +27,12 @@
 
   <!-- Rust secure core -->
   <rect x="575" y="130" width="255" height="160" rx="14" fill="#fff1f2" stroke="#be123c" stroke-width="2.5"/>
-  <text x="702" y="163" font-size="16" font-weight="700" fill="#881337" text-anchor="middle">🦀 Rust Secure Core (Incr. 1) ✓ tested</text>
+  <text x="702" y="163" font-size="16" font-weight="700" fill="#881337" text-anchor="middle">🦀 Rust Secure Core (Incr. 2) ✓ tested</text>
   <text x="702" y="188" font-size="12" fill="#334155" text-anchor="middle">Ed25519 signed envelope · domain-separated</text>
-  <text x="702" y="208" font-size="12" fill="#334155" text-anchor="middle">STOP-only closed enum · exact scope</text>
-  <text x="702" y="228" font-size="12" fill="#334155" text-anchor="middle">Expiry / skew / payload-hash checks</text>
-  <text x="702" y="248" font-size="12" fill="#334155" text-anchor="middle">SQLite replay seq. + hash-chained audit</text>
-  <text x="702" y="268" font-size="12" fill="#334155" text-anchor="middle">Accept only after commit · subprocess CLI</text>
+  <text x="702" y="208" font-size="12" fill="#334155" text-anchor="middle">STOP-only closed enum · exact scope · epoch</text>
+  <text x="702" y="228" font-size="12" fill="#334155" text-anchor="middle">Key validity/revocation · expiry/skew checks</text>
+  <text x="702" y="248" font-size="12" fill="#334155" text-anchor="middle">SQLite replay + hash audit + external anchor</text>
+  <text x="702" y="268" font-size="12" fill="#334155" text-anchor="middle">Fault/capacity fail-closed · accept after commit</text>
   <text x="702" y="284" font-size="12" font-weight="700" fill="#b91c1c" text-anchor="middle">Decisions never claim physical state</text>
 
   <!-- Simulated adapter -->

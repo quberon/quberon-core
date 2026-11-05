@@ -7,6 +7,11 @@ from scripts.generate_qr import wifi_payload
 
 ROBOT = "quberon-demo-001"
 
+@pytest.fixture(autouse=True)
+def _dev_secure_core_mode(monkeypatch):
+    # Increment 2: ephemeral secure-core keys require explicit dev mode.
+    monkeypatch.setenv("QUBERON_SECURE_CORE_MODE", "development")
+
 def make_client(tmp_path, **kwargs):
     db = str(tmp_path / "test.db")
     app = create_app(db_path=db, **kwargs)
