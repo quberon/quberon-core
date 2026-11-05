@@ -10,7 +10,8 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 
 ![System architecture](docs/assets/architecture.svg)
 
-![Final-pass test evidence](docs/assets/test-evidence.svg)
+Claim-to-evidence map: `docs/DILIGENCE.md`; evidence index (what each
+item shows and does not show): `docs/evidence/README.md`.
 
 ## Current status (2026-11-05)
 
@@ -74,9 +75,10 @@ secure core not built - STOP will run with unsigned attestation; see docs/SECURE
 `make test` runs the Python suite (`.venv/bin/python -m pytest -q`).
 The suite is green in both modes: Rust-dependent reset/task tests are
 skipped when the CLI is not built, and the degraded unsigned-STOP path
-is exercised in both modes. Verified counts and raw output for both
-modes are recorded in `docs/evidence/lane-a-p0/` (see `SUMMARY.md`).
-A Mac test pass is
+is exercised in both modes. Test counts are commit-, host-, Python-
+and mode-specific and are not universalised here; reconciled counts
+and the exact clean-clone commands are in `docs/DILIGENCE.md`, raw
+historical runs in `docs/evidence/README.md`. A Mac test pass is
 not a Pi or Isaac-host test pass. Read-only Pi inspection on
 2026-11-05 found the Pi-deployed `app/main.py`/`integrations/` contain
 no secure-core gate and no secure-core CLI, so the gate is not
@@ -102,7 +104,9 @@ attestation and motion-permitting operations.
 | Simulation reset / latch clear | Allowed for admin (existing rules) | Blocked: HTTP 503, latch retained; UI control disabled | Latch retained; no unsigned reset |
 | Signed attestation | Yes (Rust ACCEPTED decision) | No — unsigned by design, never report as signed | No |
 
-Latest verified run (2026-11-05, local Mac, Increment 2 on main): **44 passed** Python (3.11, project `.venv`), **17 passed** Rust (14 core unit/property + 3 CLI integration, `cargo test --workspace --all-features`), `cargo fmt --check` and `cargo clippy --workspace --all-targets --all-features -- -D warnings` clean, `cargo audit` and `cargo deny check` ok, SBOM verified (98 components). Fuzz smoke: **not run** (cargo-fuzz unavailable, exit 77). Lane A re-verification after the rebase is recorded in `docs/evidence/lane-a-p0/SUMMARY.md`. A Mac test pass is not a Pi or Isaac-host test pass.
+Latest N7-verified run (2026-11-05, local Mac, Python 3.11.15, base baa18a1): 80 passed with Rust; 69 passed, 11 skipped without Rust; Rust 17 passed (14 core + 3 CLI), cargo fmt/clippy clean. These counts apply only to that commit/host/Python/mode - see `docs/DILIGENCE.md` for reconciliation of all historical counts (44/48/68/...) and exact clean-clone commands. cargo audit / cargo deny / SBOM are dated point-in-time records in `docs/SECURE-CORE.md`, not standing claims here; CI is the place to re-claim them. Fuzz smoke: not run, no result claimed. A Mac test pass is not a Pi or Isaac-host test pass.
+
+Wave 3 adversarial pilot caveat: its cases are same-agent deterministic templates, so it is weak evidence until an independent model adversary runs cases (`research/adversarial/evidence/adversarial-pilot.md`, indexed in `docs/evidence/README.md`).
 
 Rust secure core details: the Python client uses the built CLI at
 `target/debug/quberon-secure-core-cli` (or `target/release/...`, or
