@@ -1,0 +1,22 @@
+[package]
+name = "copper-stop-path"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+bincode = { package = "cu-bincode", version = "=2.2.0", features = ["derive"] }
+cu29 = "=1.3.0"
+cu29-derive = "=1.3.0"
+cu29-export = "=1.3.0"
+cu29-runtime = "=1.3.0"
+cu29-unifiedlog = "=1.3.0"
+serde = { version = "1", features = ["derive"] }
+
+[build-dependencies]
+cu29-build = "=1.3.0"
+
+[lints.rust]
+unsafe_code = "forbid"
