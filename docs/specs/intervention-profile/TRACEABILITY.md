@@ -23,3 +23,17 @@ Mapping rule: only exact test function names that exist at base `aab6496699490f8
 - R1-R9 and R11 have real project tests that can inform a later profile, with the limitations shown.
 - R10 is a hard evidence gap, not a failed inference.
 - The node-level full gate (“every requirement traceable to an observed manufacturer interface or a stated design decision”) cannot be closed for a normative profile until N4 supplies observed interfaces. Gate zero passes only as research and gap documentation: every outline item above is labelled either a stated design decision/test observation or an N4-dependent gap.
+
+## Wave 4 QIP v0.1 addendum (2026-11-05, N5)
+
+`QIP-v0.1.md` in this directory is the normative RFC 2119 profile built on
+the R1–R11 outline above. Its traceability does not reuse the test names
+in the table above as conformance evidence: every QIP MUST traces to a
+actual Wave 4 N4 stable test identifier shipped by N4
+(`QIP-ID-*`, `QIP-AUTH-*`, `QIP-INT-*`, `QIP-LATCH-*`, `QIP-STATE-*`,
+`QIP-AUDIT-*`, `QIP-PROP-*`, `QIP-DEG-*`; see QIP-v0.1.md Section 11) or
+carries the explicit marker `UNIMPLEMENTED` (18 of 34 at drafting, incl.
+all of R3, R10, R11); identifiers must be verified against merged N4 raw
+output (fetch, rebase, grep, amend) before the profile merges. The
+review-depth markers and the no-abstract-derived-requirement rule from
+PRIOR-ART.md are preserved in QIP-v0.1 Annex A.
