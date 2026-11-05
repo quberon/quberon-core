@@ -1,7 +1,8 @@
 # Quberon Robot Interface (quberon-core)
 
-![Tests](https://img.shields.io/badge/tests-27%20passed-16a34a)
+![Tests](https://img.shields.io/badge/tests-36%20passed-16a34a)
 ![Python](https://img.shields.io/badge/python-3.11-3776ab)
+![Rust](https://img.shields.io/badge/rust-secure%20core%20(increment%201)-dea584)
 ![Mode](https://img.shields.io/badge/robot-SIMULATION-b91c1c)
 ![Meta runtime](https://img.shields.io/badge/meta%20runtime-mock%20(advisory)-ea580c)
 ![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%20%2B%20e--ink-9333ea)
@@ -28,6 +29,7 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 | Voice / gesture interventions | 🧪 Deterministic recognizers implemented for final transcript observations and normalized 21-point open-palm frames; authenticated STOP-only API, **no microphone/camera capture or physical control** (`docs/INTERVENTION-INPUTS.md`) |
 | Isaac Sim | 🧪 Versioned bridge contract + deterministic local transport + fail-closed adapter implemented; Isaac Sim itself not installed/run and adapter not runtime-enabled (`docs/ISAAC-SIM-INTEGRATION.md`) |
 | Frontier Phase 1 research | 🧪 Provenance-first humanoid registry scaffold: 6 schemas, 25 unverified seed candidates, stdlib validator, legal + voice/gesture-STOP roadmaps (`research/humanoids/`, `docs/frontier-phase1/`) — no verified companies, no universe-size claim, no physical control |
+| Rust secure core (Increment 1) | 🧪 Implemented + tested on this branch: Ed25519-signed, scope-pinned, STOP-only envelope; durable SQLite replay + hash-chained audit; every `execute_stop` STOP (button/voice/gesture/intervention) requires a Rust ACCEPTED decision before `SimulatedRobotAdapter.stop()` — any core error = latch retained, UNKNOWN, no adapter call (`docs/SECURE-CORE.md`). **SIMULATION ONLY, STOP AUTHORIZATION ONLY, NO PHYSICAL CONTROL, NOT A SAFETY-RATED E-STOP.** Not externally reviewed, audited, or certified |
 
 ## 🌌 Pushing the Frontier — Building for Superintelligence
 
@@ -41,7 +43,9 @@ python3 -m venv .venv
 .venv/bin/python -m pytest -q
 ```
 
-Latest verified run: **27 passed** on Python 3.11 (Mac). A Mac test pass is not a Pi or Isaac-host test pass.
+Latest verified run: **36 passed** on Python 3.11 (Mac), plus Rust workspace tests (`cargo test --workspace`: core unit/property + CLI integration). A Mac test pass is not a Pi or Isaac-host test pass.
+
+Rust secure core: `cargo build --workspace && cargo test --workspace` (the Python STOP gate needs the built CLI at `target/debug/quberon-secure-core-cli` or `$QUBERON_SECURE_CORE_BIN`). See `docs/SECURE-CORE.md`.
 
 ## Deploy (from Mac, preserves Ethernet SSH at 10.77.0.2)
 
