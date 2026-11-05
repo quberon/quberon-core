@@ -1,0 +1,371 @@
+{
+  "by_category": {
+    "crossmodal:contradictory_signals": {
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "TP": 5,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 3,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 5,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "n": 8
+    },
+    "gesture:canonical_positive": {
+      "FN": 0,
+      "FP": 0,
+      "TN": 0,
+      "TP": 3,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 3,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "n": 3
+    },
+    "gesture:degraded_confidence": {
+      "FN": 7,
+      "FP": 0,
+      "TN": 0,
+      "TP": 3,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 10,
+        "numerator": 7,
+        "rate": 0.7
+      },
+      "n": 10
+    },
+    "gesture:false_trigger": {
+      "FN": 0,
+      "FP": 0,
+      "TN": 5,
+      "TP": 0,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 5,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "n": 5
+    },
+    "gesture:hold_frame_boundary": {
+      "FN": 5,
+      "FP": 0,
+      "TN": 0,
+      "TP": 2,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 7,
+        "numerator": 5,
+        "rate": 0.714286
+      },
+      "n": 7
+    },
+    "gesture:stale_replay": {
+      "FN": 3,
+      "FP": 0,
+      "TN": 0,
+      "TP": 2,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 5,
+        "numerator": 3,
+        "rate": 0.6
+      },
+      "n": 5
+    },
+    "voice:canonical_positive": {
+      "FN": 0,
+      "FP": 0,
+      "TN": 0,
+      "TP": 6,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 6,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "n": 6
+    },
+    "voice:degraded_confidence": {
+      "FN": 8,
+      "FP": 0,
+      "TN": 0,
+      "TP": 4,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 12,
+        "numerator": 8,
+        "rate": 0.666667
+      },
+      "n": 12
+    },
+    "voice:false_trigger": {
+      "FN": 0,
+      "FP": 1,
+      "TN": 16,
+      "TP": 0,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 17,
+        "numerator": 1,
+        "rate": 0.058824
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "n": 17
+    },
+    "voice:missed_trigger_boundary": {
+      "FN": 3,
+      "FP": 0,
+      "TN": 0,
+      "TP": 0,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 3,
+        "numerator": 3,
+        "rate": 1.0
+      },
+      "n": 3
+    },
+    "voice:stale_replay": {
+      "FN": 5,
+      "FP": 0,
+      "TN": 0,
+      "TP": 2,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 0,
+        "numerator": 0,
+        "rate": null
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 7,
+        "numerator": 5,
+        "rate": 0.714286
+      },
+      "n": 7
+    }
+  },
+  "by_modality": {
+    "crossmodal": {
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "TP": 5,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 3,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 5,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "n": 8
+    },
+    "gesture": {
+      "FN": 15,
+      "FP": 0,
+      "TN": 5,
+      "TP": 10,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 5,
+        "numerator": 0,
+        "rate": 0.0
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 25,
+        "numerator": 15,
+        "rate": 0.6
+      },
+      "n": 30
+    },
+    "voice": {
+      "FN": 16,
+      "FP": 1,
+      "TN": 16,
+      "TP": 12,
+      "false_trigger_rate_FP_over_FP_plus_TN": {
+        "denominator": 17,
+        "numerator": 1,
+        "rate": 0.058824
+      },
+      "missed_trigger_rate_FN_over_FN_plus_TP": {
+        "denominator": 28,
+        "numerator": 16,
+        "rate": 0.571429
+      },
+      "n": 45
+    }
+  },
+  "crossmodal_policy": "harness-only OR (no app fusion exists; separate endpoints in app)",
+  "false_trigger_ids": [
+    "V-NEG-08"
+  ],
+  "nontriggering_intended_stop_ids": [
+    "V-CONF-00",
+    "V-CONF-01",
+    "V-CONF-02",
+    "V-CONF-03",
+    "V-CONF-04",
+    "V-INVALIDCONF-00",
+    "V-INVALIDCONF-01",
+    "V-INVALIDCONF-02",
+    "V-INTERIM-00",
+    "V-INTERIM-01",
+    "V-INTERIM-02",
+    "V-STALE-00",
+    "V-STALE-01",
+    "V-STALE-02",
+    "V-REPLAY-01",
+    "V-REPLAY-02",
+    "G-HOLD-00",
+    "G-HOLD-01",
+    "G-HOLD-03",
+    "G-HOLD-04",
+    "G-HOLD-06",
+    "G-VIS-00",
+    "G-VIS-01",
+    "G-VIS-02",
+    "G-GEO-00",
+    "G-GEO-01",
+    "G-GEO-02",
+    "G-EMPTY-00",
+    "G-DUPTS-00",
+    "G-DUPTS-01",
+    "G-REPLAY-01"
+  ],
+  "qualification_claim": "NONE - synthetic deterministic boundary harness only; no sensor, microphone, camera, speaker, person, or learned-model qualification",
+  "recognizer_only_replay_and_stale_probe": [
+    {
+      "id": "V-STALE-00",
+      "pipeline_triggered": false,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "V-STALE-01",
+      "pipeline_triggered": false,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "V-STALE-02",
+      "pipeline_triggered": false,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "V-FRESH-00",
+      "pipeline_triggered": true,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "V-REPLAY-00",
+      "pipeline_triggered": true,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "V-REPLAY-01",
+      "pipeline_triggered": false,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "V-REPLAY-02",
+      "pipeline_triggered": false,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "G-DUPTS-00",
+      "pipeline_triggered": false,
+      "recognizer_triggered": false
+    },
+    {
+      "id": "G-DUPTS-01",
+      "pipeline_triggered": false,
+      "recognizer_triggered": false
+    },
+    {
+      "id": "G-REPLAY-00",
+      "pipeline_triggered": true,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "G-REPLAY-01",
+      "pipeline_triggered": false,
+      "recognizer_triggered": true
+    },
+    {
+      "id": "G-ORDER-00",
+      "pipeline_triggered": true,
+      "recognizer_triggered": true
+    }
+  ],
+  "synthetic_only": true,
+  "system_under_test": "integrations.recognizers VoiceStopRecognizer(conf>=0.85,final,standalone STOP/STOPP) + OpenPalmStopRecognizer(vis>=0.8,>=3 consecutive,>=700ms), unmodified; harness layers: InterventionEvent freshness (stale>300s, future<-30s) + event_id replay guard (harness-only)",
+  "thresholds": {
+    "gesture_min_frames": 3,
+    "gesture_min_hold_ms": 700,
+    "gesture_min_visibility": 0.8,
+    "max_event_age_seconds": 300,
+    "max_future_skew_seconds": 30,
+    "voice_min_confidence": 0.85
+  },
+  "total": {
+    "FN": 31,
+    "FP": 1,
+    "TN": 24,
+    "TP": 27,
+    "false_trigger_rate_FP_over_FP_plus_TN": {
+      "denominator": 25,
+      "numerator": 1,
+      "rate": 0.04
+    },
+    "missed_trigger_rate_FN_over_FN_plus_TP": {
+      "denominator": 58,
+      "numerator": 31,
+      "rate": 0.534483
+    },
+    "n": 83
+  }
+}
