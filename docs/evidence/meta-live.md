@@ -4,8 +4,8 @@ Status: BLOCKED / FAILED
 
 - Provider: live
 - Exact model ID: (not configured)
-- UTC timestamp: 2026-11-05T12:21:23.368103Z
-- Tested commit: 6ed6d175d0db0c94757b7baa67501dd6fb96d11b (HEAD at evidence-run time; the commit containing this file may be a later evidence-only commit)
+- UTC timestamp: 2026-11-05T12:22:02.864447Z
+- Tested commit: 96a5af2a99c0487824da0762c245f7a370549001 (HEAD at evidence-run time; the commit containing this file may be a later evidence-only commit)
 - Robot ID: quberon-demo-001
 - Provider planning calls made: 0 (exactly one when configured; zero when blocked)
 - Planner boundary: advisory only. This call cannot reset the latch, grant a capability, invoke an adapter, or permit motion (see named tests in tests/test_meta_live.py).
