@@ -30,7 +30,7 @@ Environment=QUBERON_DB_PATH=%h/.local/share/quberon-robot-interface/quberon.db
 Environment=ALLOWED_HOSTS=localhost,127.0.0.1,10.77.0.2,10.99.0.1,quberon-pi.local
 Environment=META_MODE=mock
 Environment=DEMO_INSECURE_HTTP=false
-ExecStart=%h/quberon-robot-interface/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-certfile %h/.config/quberon-robot-interface/server.crt --ssl-keyfile %h/.config/quberon-robot-interface/server.key
+ExecStart=%h/quberon-robot-interface/.venv/bin/uvicorn app.main:asgi_app --factory --host 0.0.0.0 --port 8443 --ssl-certfile %h/.config/quberon-robot-interface/server.crt --ssl-keyfile %h/.config/quberon-robot-interface/server.key
 Restart=on-failure
 RestartSec=3
 [Install]

@@ -1,4 +1,5 @@
-import os, shutil, sys, time
+from pathlib import Path
+import os, shutil, stat, subprocess, sys, time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import pytest
 from fastapi.testclient import TestClient
@@ -24,6 +25,49 @@ def make_client(tmp_path, **kwargs):
     s.create_user("operator1", "operator-password-123", "operator")
     s.create_user("admin1", "admin-password-123", "admin")
     return TestClient(app, base_url="https://testserver"), db
+
+
+def test_import_app_main_is_filesystem_inert(tmp_path):
+    probe = tmp_path / "probe"
+    probe.mkdir()
+    before = sorted(str(p.relative_to(probe)) for p in probe.rglob("*"))
+    env = os.environ.copy()
+    env["HOME"] = str(probe)
+    env["XDG_CACHE_HOME"] = str(tmp_path / "cache")
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    env.pop("QUBERON_DB_PATH", None)
+    subprocess.run([sys.executable, "-c", "import app.main"], cwd=os.path.join(os.path.dirname(__file__), ".."), env=env, check=True)
+    after = sorted(str(p.relative_to(probe)) for p in probe.rglob("*"))
+    assert after == before
+
+
+def test_state_paths_are_private_and_instance_scoped(tmp_path, monkeypatch):
+    monkeypatch.setenv("QUBERON_SECURE_CORE_MODE", "development")
+    db = tmp_path / "instance-a" / "app.db"
+    app = create_app(db_path=str(db))
+    assert app.state.db_path == str(db.resolve())
+    assert stat.S_IMODE(db.parent.stat().st_mode) == 0o700
+    assert stat.S_IMODE(db.stat().st_mode) == 0o600
+    for suffix in ("-wal", "-shm"):
+        sidecar = Path(str(db) + suffix)
+        if sidecar.exists():
+            assert stat.S_IMODE(sidecar.stat().st_mode) == 0o600
+    core = app.state.secure_core
+    if core is not None:
+        expected = db.with_name("app-secure-core.db")
+        assert core.db_path == str(expected.resolve())
+        assert core._seq_path == Path(str(expected.resolve()) + ".seq")
+        assert core._epoch_path == Path(str(expected.resolve()) + ".epoch")
+        assert stat.S_IMODE(Path(core.db_path).parent.stat().st_mode) == 0o700
+        assert stat.S_IMODE(core._epoch_path.stat().st_mode) == 0o600
+
+
+def test_legacy_explicit_db_path_remains_compatible(tmp_path):
+    legacy = tmp_path / "legacy" / "quberon-robot-interface.db"
+    Store(str(legacy)).create_user("legacy-user", "legacy-password-123", "viewer")
+    app = create_app(db_path=str(legacy), secure_core=None)
+    assert app.state.db_path == str(legacy.resolve())
+    assert app.state.store.get_user("legacy-user")["role"] == "viewer"
 
 def login(c, user, pw):
     r = c.post("/auth/login", data={"username": user, "password": pw}, follow_redirects=False)

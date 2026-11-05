@@ -1,0 +1,151 @@
+MODE: without-rust
+START_UTC: 2026-11-05T17:33:38.940238+00:00
+PYTHON: Python 3.11.15
+RUST_CLI_PRESENT: False
+RUNS_REQUIRED: 10
+
+===== NAMED GATE TESTS (-v) =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -v tests/test_app.py::test_import_app_main_is_filesystem_inert tests/test_app.py::test_state_paths_are_private_and_instance_scoped tests/test_secure_core.py::test_stop_executes_without_secure_core_but_reset_does_not tests/test_secure_core.py::test_stop_rejected_by_secure_core_does_not_invoke_adapter
+============================= test session starts ==============================
+platform darwin -- Python 3.11.15, pytest-8.3.4, pluggy-1.7.0 -- /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2
+plugins: anyio-4.16.0
+collecting ... collected 4 items
+
+tests/test_app.py::test_import_app_main_is_filesystem_inert PASSED       [ 25%]
+tests/test_app.py::test_state_paths_are_private_and_instance_scoped PASSED [ 50%]
+tests/test_secure_core.py::test_stop_executes_without_secure_core_but_reset_does_not PASSED [ 75%]
+tests/test_secure_core.py::test_stop_rejected_by_secure_core_does_not_invoke_adapter PASSED [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================= 4 passed, 1 warning in 0.35s =========================
+[exit=0]
+
+===== RUN 1/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.80s
+[exit=0]
+
+===== RUN 2/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.85s
+[exit=0]
+
+===== RUN 3/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.72s
+[exit=0]
+
+===== RUN 4/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.79s
+[exit=0]
+
+===== RUN 5/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.80s
+[exit=0]
+
+===== RUN 6/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.82s
+[exit=0]
+
+===== RUN 7/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.67s
+[exit=0]
+
+===== RUN 8/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.94s
+[exit=0]
+
+===== RUN 9/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.87s
+[exit=0]
+
+===== RUN 10/10 =====
+$ /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/bin/python -m pytest -q
+......s.......s.s......................................ss..ss..ss.ss     [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/wave3-n2/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 11 skipped, 1 warning in 18.91s
+[exit=0]
+
+END_UTC: 2026-11-05T17:36:48.921608+00:00
+RESULT: 10 consecutive full-suite runs passed
