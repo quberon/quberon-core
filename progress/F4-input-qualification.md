@@ -51,4 +51,8 @@ traceability status unchanged (UNIMPLEMENTED in profile terms).
 
 ## PR
 
-To be appended with PR URL / CI / merge commit after self-merge.
+PR #31 https://github.com/quberon/quberon-core/pull/31 — CI green on attempt 1
+(dependency-review pass, python-without-rust pass 54s, rust-and-python pass
+5m28s), self-merged as 6433a53. Ancestry verified post-merge:
+`git merge-base --is-ancestor 35ee2ae origin/main` OK and
+`git merge-base --is-ancestor 30a176b origin/main` OK.
