@@ -1,0 +1,20 @@
+[package]
+name = "quberon-evidence-bundle"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+rust-version = "1.74"
+description = "Versioned portable evidence bundle format (simulation STOP only). No physical control, no certification claim."
+# Standalone workspace: deliberately NOT a member of the root workspace
+# (R-IMM-5 / task scope). Root Cargo.toml / Cargo.lock are untouched.
+[workspace]
+
+[dependencies]
+ed25519-dalek = "2.2"
+flate2 = "1"
+hex = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[profile.release]
