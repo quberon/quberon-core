@@ -34,11 +34,23 @@ def test_registry_validates_clean():
 def test_seed_names_preserved_exactly_and_unverified():
     recs = candidates()
     assert sorted(r["candidate_names"][0] for r in recs) == sorted(SEEDS)
+    expected_discovery_sources = {
+        "cand-leju-robot": ["src-leju-robot-official-site"],
+        "cand-kepler": ["src-kepler-official-about"],
+        "cand-tesla-optimus": ["src-tesla-optimus-official-ai"],
+        "cand-sanctuary-ai": ["src-sanctuary-ai-official-about"],
+        "cand-fourier": ["src-fourier-gr1-official-docs"],
+        "cand-boston-dynamics": ["src-boston-dynamics-atlas-official"],
+    }
     for r in recs:
         assert r["candidate_names"][0] in r["aliases"]
         assert r["verification"]["status"] == "candidate_unverified"
         assert r["canonical_name"] is None
         assert r["verification"]["evidence_source_ids"] == []
+        expected = expected_discovery_sources.get(r["record_id"])
+        if expected is not None:
+            assert r["sources"] == expected
+            assert r["provenance_claim_ids"] == []
 
 
 def test_lane_d_discovery_is_evidenced_without_promotion():
@@ -54,7 +66,7 @@ def test_lane_d_discovery_is_evidenced_without_promotion():
         "src-magiclab-official-site", "src-magiclab-global-official-site",
         "src-apptronik-official-site", "src-agility-official-site",
     }
-    assert len(sources) == 13 and lane_d_source_ids <= source_ids and len(claims) == 12
+    assert len(sources) == 19 and lane_d_source_ids <= source_ids and len(claims) == 12
     for record_id in lane_d:
         rec = recs[record_id]
         assert rec["sources"] and set(rec["sources"]) <= source_ids
