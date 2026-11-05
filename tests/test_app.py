@@ -260,6 +260,42 @@ def test_transcript_matcher_policy():
     assert match_transcript("keep going") is None
 
 
+def _open_palm_frame(timestamp_ms):
+    points = [{"x": 0.5, "y": 0.85, "visibility": 1.0} for _ in range(21)]
+    points[0] = {"x": 0.5, "y": 0.9, "visibility": 1.0}
+    for chain, x in zip(((5, 6, 7, 8), (9, 10, 11, 12), (13, 14, 15, 16), (17, 18, 19, 20)), (0.38, 0.47, 0.56, 0.65)):
+        for index, y in zip(chain, (0.62, 0.49, 0.36, 0.22)):
+            points[index] = {"x": x, "y": y, "visibility": 1.0}
+    points[4] = {"x": 0.25, "y": 0.48, "visibility": 1.0}
+    return {"timestamp_ms": timestamp_ms, "landmarks": points}
+
+
+def test_voice_safety_endpoint_is_authenticated_conservative_and_idempotent(tmp_path):
+    c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123")
+    url = f"/api/robots/{ROBOT}/safety-inputs/voice"
+    assert c.post(url, json={"event_id": "v0", "transcript": "STOP", "confidence": 1.0}).status_code == 403
+    low = c.post(url, json={"event_id": "v1", "transcript": "STOP", "confidence": 0.4}, headers={"X-CSRF-Token": csrf})
+    assert low.status_code == 200 and low.json()["stop_triggered"] is False
+    body = {"event_id": "v2", "transcript": "STOP", "confidence": 0.99, "final": True}
+    first = c.post(url, json=body, headers={"X-CSRF-Token": csrf})
+    assert first.status_code == 200 and first.json()["stop_triggered"] is True
+    duplicate = c.post(url, json=body, headers={"X-CSRF-Token": csrf})
+    assert duplicate.json()["duplicate"] is True and duplicate.json()["command_id"] == first.json()["command_id"]
+    conflict = c.post(url, json={**body, "transcript": "STOPP"}, headers={"X-CSRF-Token": csrf})
+    assert conflict.status_code == 409
+
+
+def test_gesture_safety_endpoint_stops_but_cannot_reset(tmp_path):
+    c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123")
+    url = f"/api/robots/{ROBOT}/safety-inputs/gesture"
+    body = {"event_id": "g-detected", "frames": [_open_palm_frame(0), _open_palm_frame(350), _open_palm_frame(700)]}
+    result = c.post(url, json=body, headers={"X-CSRF-Token": csrf})
+    assert result.status_code == 200 and result.json()["stop_triggered"] is True
+    assert status(c)["stop_latched"] is True
+    reset = c.post(f"/api/robots/{ROBOT}/simulation-reset", json={"confirm": "RESET_SIMULATION"}, headers={"X-CSRF-Token": csrf})
+    assert reset.status_code == 403
+
+
 def test_planner_gate_busy_and_page_polling(tmp_path):
     c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123")
     sem = getattr(c.app, "state").plan_semaphore

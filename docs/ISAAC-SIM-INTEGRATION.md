@@ -1,28 +1,45 @@
-# Isaac Sim integration — PLANNED (not implemented, Isaac Sim not run)
+# Isaac Sim-compatible simulation bridge
 
-Status: **design only. Isaac Sim has not been installed or run for this project.**
+Status: **the versioned bridge contract, deterministic local transport, fail-closed adapter, and tests are implemented. Isaac Sim itself is not installed or run in this repository.**
 
-Isaac Sim's official requirements target Windows/Linux GPU systems (supported ARM builds on NVIDIA DGX Spark); macOS/Apple Silicon and Raspberry Pi are not listed supported targets. Plan a separate supported simulator host; do not install Isaac Sim on the demo Mac or Pi.
+Isaac Sim should run on a separately supported GPU host. The web application and Raspberry Pi remain free of Isaac SDK dependencies.
 
-## Planned architecture
+## Contract
 
+`adapters/isaac_sim.py` defines `quberon.isaac-sim.v1` request/response dataclasses and an `IsaacBridgeTransport` protocol. A request binds:
+
+- simulator, robot, and scene IDs;
+- command ID and monotonic sequence;
+- issued and expiry timestamps;
+- an allow-listed command (`STOP` only in this increment).
+
+An acknowledgement is accepted only when the response matches protocol, command, sequence, and scene; reports `applied=true`; and reports observed state `ISAAC_SIM_STOPPED`. Timeouts, exceptions, mismatches, stale messages, replays, wrong scenes, and unobserved results return `UNKNOWN`.
+
+## Deterministic development transport
+
+`DeterministicIsaacTransport` provides a dependency-free controller for tests and local development. It rejects wrong simulator/robot/scene identifiers, stale/future commands, sequence replay, and commands other than STOP. Exact command-ID retries return the recorded response.
+
+```python
+from adapters.isaac_sim import DeterministicIsaacTransport, IsaacSimBridgeAdapter
+
+transport = DeterministicIsaacTransport(
+    simulator_id="isaac-host-1",
+    robot_id="quberon-demo-001",
+    scene_id="warehouse-a",
+)
+adapter = IsaacSimBridgeAdapter(
+    transport,
+    simulator_id="isaac-host-1",
+    robot_id="quberon-demo-001",
+    scene_id="warehouse-a",
+)
+result = adapter.stop("command-id")
 ```
-phone button / experimental voice or gesture input
-  -> authenticated intervention API on Pi
-  -> deterministic persistent STOP service
-  -> selected adapter
-       current: SimulatedRobotAdapter
-       future:  authenticated bridge to a separate Isaac Sim host
-  -> acknowledgement + observed simulation state + audit event
-```
 
-## Bridge requirements (for later implementation)
+The bridge adapter intentionally refuses task and reset commands. It is not selected by the production app yet; `SimulatedRobotAdapter` remains the only enabled runtime adapter.
 
-- Messages identify simulator instance, robot, scene/session, command ID, expiry and sequence. Authenticate the bridge; bind commands to the selected simulated robot; reject stale/replayed/wrong-scene messages; never accept arbitrary executable code in a message.
-- An acknowledgement must follow the receiving controller **applying** the command and **observing** the relevant simulated state. HTTP 200, a frozen viewer, or a paused timeline does not prove simulated dynamics stopped.
-- Connection loss/timeout means `UNKNOWN` or inhibited task acceptance — never a "stopped" claim.
-- Reset is a separate explicit authorized action, never automatic. Stopping a simulator is not a physical emergency-stop integration; a physical humanoid adapter needs manufacturer-specific safety architecture and supervised engineering. Do not invent Isaac SDK calls; pin the Isaac version first.
+## Isaac host implementation requirements
 
-## Acceptance scenarios (later)
+A future Isaac extension/service should implement `IsaacBridgeTransport.exchange` over an authenticated channel and translate only the versioned JSON contract. It must keep controller updates running while latched, measure simulated motion, and respond only after STOP has been applied and zero-motion state observed. It must never evaluate code or accept arbitrary USD/ROS commands from the request.
 
-Normal command/ack, wrong robot, stale/replay, bridge disconnect, repeated STOP, reset authorization, scene reload, ongoing controller updates while latched, telemetry showing actual motion state. Until then the honest sentence is: "contract planned; Isaac Sim not run."
+This bridge is simulation-only. It is not a physical emergency-stop integration or manufacturer safety architecture.

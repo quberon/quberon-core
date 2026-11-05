@@ -1,24 +1,43 @@
-# Intervention inputs — EXPERIMENTAL (event path implemented; recognizers are not)
+# Intervention inputs — deterministic safety recognition
 
-Status: **the typed event contract, transcript matcher, and authenticated `/interventions` route through the single STOP service are implemented and tested.** No voice *recognizer* or gesture *detector* exists; synthetic/browser/device values are labels, not provenance proof. See `integrations/interventions.py`.
+Status: **implemented and tested for simulation.** The application accepts bounded, authenticated voice transcript observations and normalized hand-landmark frames. It does not capture microphone or camera data and does not control physical hardware.
 
-## Contract (`integrations/interventions.py`)
+## Safety invariants
 
-Typed event: robot ID, event ID, timestamp, input kind, source status, optional bounded evidence text.
-Kinds: `BUTTON`, `VOICE_STOP`, `GESTURE_STOP`, `PANIC_CANDIDATE`.
-Source status must record whether an event was synthetic, browser-recognized, or device-recognized. A client-supplied label is **not** proof of sensor provenance or user authority.
+- Recognition can only request `STOP`; it cannot reset/unlatch, resume, start a task, or issue motion.
+- Every accepted result converges on the existing authenticated, CSRF-protected, idempotent, persistently latched STOP service.
+- Low-confidence, interim, negated, malformed, stale, or insufficient observations do nothing.
+- Source labels remain descriptive, not proof of authority. Session role and CSRF establish authority.
+- Adapter failure remains `UNKNOWN`; recognition never upgrades an unconfirmed stop to success.
 
-Rules for any future implementation:
+## Voice input
 
-- All accepted interventions go through the existing STOP service: authenticated capability check, CSRF for browser sessions, idempotency, persistent latch, actual adapter result. No second, weaker stop route.
-- Generating an event never grants reset/resume or movement permission.
-- No anonymous physical stop access. A guest demo, if ever designed, is isolated to a simulated robot with an explicit policy.
-- Minimum tests before claiming anything: duplicates converge; wrong robot rejected; unauthorized source/session rejected; stale events rejected or labelled; model failure does not block STOP; injected event cannot clear latch; adapter failure remains `UNKNOWN`; source label cannot bypass authority.
+`POST /api/robots/{robot_id}/safety-inputs/voice`
 
-## Voice
+```json
+{
+  "event_id": "microphone-session-42-final-7",
+  "transcript": "STOP",
+  "confidence": 0.97,
+  "final": true
+}
+```
 
-A deterministic transcript matcher (standalone `STOP`, optionally documented Swedish `STOPP`; no substring matching — `nonstop` must not trigger) tests the matcher only. Synthetic fixtures are not proof a microphone works. Browser SpeechRecognition, if added, must be opt-in, show consent/listening/failure states, and is not Meta-powered unless a real Meta transcription service is actually called. Panic recognition stays roadmap: a loud sound or text label does not establish distress or acceptable error rates.
+`VoiceStopRecognizer` requires a final transcript, confidence of at least `0.85`, and the existing conservative standalone `STOP`/`STOPP` matcher. `nonstop`, `do not stop`, and interim or low-confidence results are rejected.
 
-## Gesture
+## Gesture input
 
-Defined gesture (e.g. open palm held to camera) with visibility/distance/duration conditions. Until a detector is implemented and tested with measured false/missed detections, only explicitly labelled synthetic `GESTURE_STOP` fixtures may exercise the event path. A button labelled "inject gesture event" is a developer test control, not gesture recognition.
+`POST /api/robots/{robot_id}/safety-inputs/gesture`
+
+The body contains an event ID and up to 60 frames. Each frame has a monotonic millisecond timestamp and exactly 21 normalized hand landmarks (`x`, `y`, `visibility`). `OpenPalmStopRecognizer` requires:
+
+- all landmarks visible at `>= 0.8`;
+- an upright, extended four-finger geometry and separated thumb;
+- at least three consecutive qualifying frames;
+- a hold duration of at least 700 ms.
+
+This is a deterministic geometry recognizer for recorded/device/Isaac-derived observations, not a claim that camera capture or field accuracy has been validated. Thresholds require dataset calibration before any broader use.
+
+## Existing generic event route
+
+`POST /api/robots/{robot_id}/interventions` remains available for synthetic fixtures and upstream recognizers. `PANIC_CANDIDATE` remains audit-only and never triggers or clears STOP.
