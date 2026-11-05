@@ -330,3 +330,43 @@ def test_meta_validator_rejects_bad_schema_and_live_unconfigured(monkeypatch):
         monkeypatch.delenv(var, raising=False)
     with pytest.raises(MetaProviderError):
         LiveMetaProvider()
+
+DEGRADED_MSG = "secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them."
+
+def test_b5_degraded_ui_message_and_disabled_controls(tmp_path):
+    c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123", secure_core=None)
+    st = status(c)
+    assert st["secure_core_available"] is False
+    assert st["secure_core_message"] == DEGRADED_MSG
+    page = c.get(f"/robots/{ROBOT}").text
+    assert DEGRADED_MSG in page
+    assert "id='taskBtn'" in page and "id='resetBtn'" in page
+    # UI disables (not errors on) the motion-permitting controls when degraded.
+    assert "document.getElementById('taskBtn').disabled=degraded" in page
+    assert "document.getElementById('resetBtn').disabled=degraded" in page
+    assert "secure_core_available===false" in page
+
+def test_b5_make_demo_prints_exact_degraded_message():
+    # Regression: subprocess.run(timeout=...) kills only `make`, orphaning
+    # the uvicorn child on port 8000 (state leakage: the next run then
+    # passes in <1s via bind failure instead of serving). Start `make`
+    # in its own process group and kill the whole group after probing.
+    import signal, subprocess
+    repo = os.path.join(os.path.dirname(__file__), "..")
+    proc = subprocess.Popen(
+        ["make", "demo", "CORE_CLI=", f"VENV_PY={sys.executable}"],
+        cwd=repo, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True, start_new_session=True,
+    )
+    try:
+        try:
+            text, _ = proc.communicate(timeout=3)
+        except subprocess.TimeoutExpired:
+            # Server is blocking as documented; message was printed first.
+            os.killpg(proc.pid, signal.SIGTERM)
+            text, _ = proc.communicate(timeout=5)
+    finally:
+        if proc.poll() is None:
+            os.killpg(proc.pid, signal.SIGKILL)
+            proc.wait(timeout=5)
+    assert DEGRADED_MSG in text.splitlines(), text[-2000:]

@@ -80,6 +80,26 @@ not a Pi or Isaac-host test pass. Read-only Pi inspection on
 no secure-core gate and no secure-core CLI, so the gate is not
 deployed on the Pi.
 
+### Degraded-mode capability matrix (secure core not built)
+
+When the secure-core CLI is not built, `make demo` prints exactly:
+
+```text
+secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them.
+```
+
+The operator UI displays the same message and disables the
+simulated-task and simulation-reset controls instead of erroring on
+click. STOP itself stays available in every row below; what changes is
+attestation and motion-permitting operations.
+
+| Capability | Core built, ACCEPTED | Core unavailable (not built / no client) | Core reachable, REJECTED |
+|---|---|---|---|
+| Authenticated STOP | Adapter invoked, HTTP 200, `secure_core.status="accepted"` with decision/sequence/audit_record, audit `allowed` | Adapter invoked, HTTP 200, `secure_core.status="unavailable"`, decision/sequence/audit_record null, audit `UNSIGNED/core_unavailable`, latch retained | Adapter **not** invoked, HTTP 503, `secure_core.status="rejected"`, latch retained, observed state `UNKNOWN` |
+| Simulated task | Allowed when not latched (existing rules) | Blocked: HTTP 503; UI control disabled | Blocked while latch retained (STOP rejection retains the latch) |
+| Simulation reset / latch clear | Allowed for admin (existing rules) | Blocked: HTTP 503, latch retained; UI control disabled | Latch retained; no unsigned reset |
+| Signed attestation | Yes (Rust ACCEPTED decision) | No — unsigned by design, never report as signed | No |
+
 Latest verified run (2026-11-05, local Mac, Increment 2 on main): **44 passed** Python (3.11, project `.venv`), **17 passed** Rust (14 core unit/property + 3 CLI integration, `cargo test --workspace --all-features`), `cargo fmt --check` and `cargo clippy --workspace --all-targets --all-features -- -D warnings` clean, `cargo audit` and `cargo deny check` ok, SBOM verified (98 components). Fuzz smoke: **not run** (cargo-fuzz unavailable, exit 77). Lane A re-verification after the rebase is recorded in `docs/evidence/lane-a-p0/SUMMARY.md`. A Mac test pass is not a Pi or Isaac-host test pass.
 
 Rust secure core details: the Python client uses the built CLI at
