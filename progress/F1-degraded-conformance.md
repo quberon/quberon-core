@@ -100,5 +100,13 @@ F1 does not edit it. This is NOT standards conformance (R11).
 ## Verification (filled with raw output before merge)
 
 - Local: 28 passed conformance (core built); 144 passed full. See above.
-- Clean-clone-style: PENDING at first commit; filled before merge.
-- CI: must be green before merge; no claim ahead of that evidence.
+- Clean-clone-style (fresh clone of origin wave5/f1 @ 74a90d7, fresh
+  .venv from requirements.txt, cargo build --workspace):
+  pytest conformance/ -q -rs -> 28 passed, 1 warning in 8.77s;
+  pytest -q -> 144 passed, 2 warnings in 30.69s.
+  Same clone with the core binary removed:
+  pytest conformance/ -q -rs -> 27 passed, 1 skipped (QIP-LATCH-03
+  NOT TESTED: secure-core binary unavailable), 1 warning in 4.01s.
+  QIP-DEG-03 passes in both configurations.
+- CI: PR #27 checks must be green before merge (verified at merge time;
+  no claim ahead of that evidence, R-IMM-4).
