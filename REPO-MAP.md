@@ -4,7 +4,7 @@ Generated deterministically by scripts/generate_repo_map.py
 from `git ls-files --cached`, sorted. Do not hand-edit.
 Regenerate: python3 scripts/generate_repo_map.py
 
-Tracked paths: 122
+Tracked paths: 269
 
 - `.cargo/audit.toml` - TOML configuration
 - `.github/workflows/secure-core.yml` - YAML configuration
@@ -40,16 +40,36 @@ Tracked paths: 122
 - `artifacts/quberon-ca.crt` - Certificate file
 - `checks.md` - Markdown document
 - `config/example.env` - Tracked file
+- `conformance/README.md` - Markdown document
+- `conformance/__init__.py` - Python source
+- `conformance/adapter_interface.py` - Python source
+- `conformance/conftest.py` - Python source
+- `conformance/quberon_adapter.py` - Python source
+- `conformance/test_conformance.py` - Python source
+- `crates/quberon-evidence-bundle/.gitignore` - Tracked file
+- `crates/quberon-evidence-bundle/Cargo.lock` - Cargo lock file
+- `crates/quberon-evidence-bundle/Cargo.toml` - Cargo manifest
+- `crates/quberon-evidence-bundle/README.md` - Markdown document
+- `crates/quberon-evidence-bundle/SPEC.md` - Markdown document
+- `crates/quberon-evidence-bundle/scripts/build-fixture.py` - Python source
+- `crates/quberon-evidence-bundle/src/lib.rs` - Rust source
+- `crates/quberon-evidence-bundle/src/main.rs` - Rust source
+- `crates/quberon-evidence-bundle/tests/validate_fixture.rs` - Rust source
 - `crates/quberon-secure-core/Cargo.toml` - Cargo manifest
 - `crates/quberon-secure-core/src/lib.rs` - Rust source
 - `deny.toml` - TOML configuration
 - `docs/BUILT-DURING-HACKATHON.md` - Markdown document
+- `docs/DILIGENCE.md` - Markdown document
 - `docs/FRONTIER.md` - Markdown document
 - `docs/INTERVENTION-INPUTS.md` - Markdown document
 - `docs/ISAAC-SIM-INTEGRATION.md` - Markdown document
 - `docs/SECURE-CORE.md` - Markdown document
 - `docs/assets/architecture.svg` - SVG image
 - `docs/assets/test-evidence.svg` - SVG image
+- `docs/assurance/CLAIM-TO-EVIDENCE.md` - Markdown document
+- `docs/assurance/README.md` - Markdown document
+- `docs/assurance/RESEARCH-QUESTIONS.md` - Markdown document
+- `docs/evidence/README.md` - Markdown document
 - `docs/evidence/final-check.md` - Markdown document
 - `docs/evidence/lane-a-p0/SUMMARY.md` - Markdown document
 - `docs/evidence/lane-a-p0/flake-diagnosis.md` - Markdown document
@@ -62,6 +82,8 @@ Tracked paths: 122
 - `docs/evidence/meta-live-local-contract.md` - Markdown document
 - `docs/evidence/meta-live.md` - Markdown document
 - `docs/evidence/pytest-final.txt` - Text file
+- `docs/evidence/wave3-n2/with-rust-10x.log` - Tracked file
+- `docs/evidence/wave3-n2/without-rust-10x.log` - Tracked file
 - `docs/frontier-phase1/BACKLOG.md` - Markdown document
 - `docs/frontier-phase1/LEGAL-RESEARCH-ROADMAP.md` - Markdown document
 - `docs/frontier-phase1/PROGRAM-PLAN.md` - Markdown document
@@ -69,6 +91,21 @@ Tracked paths: 122
 - `docs/plans/2026-11-02-overnight-prototype.md` - Markdown document
 - `docs/specs/GRAPH-HARNESS.md` - Markdown document
 - `docs/specs/M2-ADVERSARIAL-CORPUS.md` - Markdown document
+- `docs/specs/intervention-profile/OUTLINE.md` - Markdown document
+- `docs/specs/intervention-profile/PRIOR-ART.md` - Markdown document
+- `docs/specs/intervention-profile/QIP-v0.1.md` - Markdown document
+- `docs/specs/intervention-profile/TRACEABILITY.md` - Markdown document
+- `evidence-bundle-conformance/README.md` - Markdown document
+- `evidence-bundle-conformance/bundle_check.py` - Python source
+- `evidence-bundle-conformance/generate_vectors.py` - Python source
+- `evidence-bundle-conformance/test_bundle_conformance.py` - Python source
+- `evidence-bundle-conformance/vectors.json` - JSON data
+- `fleet-sim/DESIGN.md` - Markdown document
+- `fleet-sim/FAILURE-TABLE.md` - Markdown document
+- `fleet-sim/README.md` - Markdown document
+- `fleet-sim/fleet_sim.py` - Python source
+- `fleet-sim/run.py` - Python source
+- `fleet-sim/test_fleet_sim.py` - Python source
 - `fuzz/Cargo.lock` - Cargo lock file
 - `fuzz/Cargo.toml` - Cargo manifest
 - `fuzz/fuzz_targets/audit_record.rs` - Rust source
@@ -79,10 +116,80 @@ Tracked paths: 122
 - `integrations/meta.py` - Python source
 - `integrations/recognizers.py` - Python source
 - `integrations/secure_core.py` - Python source
+- `loadtest/README.md` - Markdown document
+- `loadtest/__init__.py` - Python source
+- `loadtest/harness.py` - Python source
+- `loadtest/results/attempt1.json` - JSON data
+- `loadtest/results/attempt2.json` - JSON data
+- `loadtest/results/attempt3.json` - JSON data
+- `loadtest/run.py` - Python source
+- `loadtest/test_loadtest.py` - Python source
 - `progress.md` - Markdown document
+- `progress/F1-degraded-conformance.md` - Markdown document
+- `progress/F2-bundle-vectors.md` - Markdown document
+- `progress/F3-stop-load.md` - Markdown document
+- `progress/F4-input-qualification.md` - Markdown document
+- `progress/F5-fleet-latch.md` - Markdown document
+- `progress/F6-capability-tuples.md` - Markdown document
+- `progress/F7-repro-assurance.md` - Markdown document
+- `progress/F8-meta-runner.md` - Markdown document
 - `progress/N0-housekeeping.md` - Markdown document
+- `progress/N1-adversarial-hardening.md` - Markdown document
+- `progress/N2-full-adversarial.md` - Markdown document
+- `progress/N2-lifecycle.md` - Markdown document
+- `progress/N3-copper.md` - Markdown document
+- `progress/N3-evidence-bundle.md` - Markdown document
+- `progress/N4-conformance.md` - Markdown document
+- `progress/N4-registry-dedup.md` - Markdown document
+- `progress/N5-adversarial.md` - Markdown document
+- `progress/N5-qip-v01.md` - Markdown document
+- `progress/N6-profile-draft.md` - Markdown document
+- `progress/N6-registry-decisions.md` - Markdown document
+- `progress/N7-diligence.md` - Markdown document
+- `progress/Wave5-assembly.md` - Markdown document
+- `progress/n7-requests.md` - Markdown document
 - `requirements.txt` - Text file
+- `research/adversarial/corpus/class-01-direct-instruction-injection.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-02-capability-escalation.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-03-latch-reset-targeting.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-04-type-confusion.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-05-envelope-schema-abuse.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-06-encoding-homoglyph.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-07-oversize-resource.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-08-malformed-nonobject-json.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-09-authority-social-framing.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-10-provenance-spoofing.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-11-multilingual-obfuscated.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-12-plausible-out-of-scope.jsonl` - JSON Lines data
+- `research/adversarial/corpus/class-13-benign-control.jsonl` - JSON Lines data
+- `research/adversarial/corpus/hand-written.jsonl` - JSON Lines data
+- `research/adversarial/corpus/mutations.jsonl` - JSON Lines data
+- `research/adversarial/evidence/adversarial-full.md` - Markdown document
+- `research/adversarial/evidence/adversarial-pilot.md` - Markdown document
+- `research/adversarial/evidence/adversarial-postmerge.md` - Markdown document
+- `research/adversarial/evidence/full-run.txt` - Text file
+- `research/adversarial/evidence/generate-full.txt` - Text file
+- `research/adversarial/evidence/generate.txt` - Text file
+- `research/adversarial/evidence/hand-run.txt` - Text file
+- `research/adversarial/evidence/invariant-failing-fixtures.txt` - Text file
+- `research/adversarial/evidence/nan-root-cause.txt` - Text file
+- `research/adversarial/evidence/postmerge-full-run.txt` - Text file
+- `research/adversarial/generate.py` - Python source
+- `research/adversarial/invariants.py` - Python source
+- `research/adversarial/mutate.py` - Python source
+- `research/adversarial/results/hand-results.jsonl` - JSON Lines data
+- `research/adversarial/results/hand-summary.json` - JSON data
+- `research/adversarial/results/postmerge-summary.json` - JSON data
+- `research/adversarial/results/results.jsonl` - JSON Lines data
+- `research/adversarial/results/summary.json` - JSON data
+- `research/adversarial/run.py` - Python source
+- `research/adversarial/tests/test_harness.py` - Python source
+- `research/adversarial/tests/test_invariants.py` - Python source
+- `research/humanoids/DECISION-PACKET.md` - Markdown document
 - `research/humanoids/README.md` - Markdown document
+- `research/humanoids/capability-tuples/README.md` - Markdown document
+- `research/humanoids/capability-tuples/capability-tuple.schema.json` - JSON data
+- `research/humanoids/capability-tuples/capability-tuples.jsonl` - JSON Lines data
 - `research/humanoids/cards/dataset-card.template.md` - Markdown document
 - `research/humanoids/cards/model-card.template.md` - Markdown document
 - `research/humanoids/examples/synthetic-company.example.json` - JSON data
@@ -100,7 +207,18 @@ Tracked paths: 122
 - `research/humanoids/schemas/dataset.schema.json` - JSON data
 - `research/humanoids/schemas/provenance-claim.schema.json` - JSON data
 - `research/humanoids/schemas/source.schema.json` - JSON data
+- `research/humanoids/tests/test_capability_tuples.py` - Python source
 - `research/humanoids/tools/validate_registry.py` - Python source
+- `research/safety-inputs/README.md` - Markdown document
+- `research/safety-inputs/datasets/crossmodal.jsonl` - JSON Lines data
+- `research/safety-inputs/datasets/gesture.jsonl` - JSON Lines data
+- `research/safety-inputs/datasets/voice.jsonl` - JSON Lines data
+- `research/safety-inputs/generate.py` - Python source
+- `research/safety-inputs/harness.py` - Python source
+- `research/safety-inputs/results/report.md` - Markdown document
+- `research/safety-inputs/results/results.jsonl` - JSON Lines data
+- `research/safety-inputs/results/summary.json` - JSON data
+- `research/safety-inputs/tests/test_safety_input_harness.py` - Python source
 - `scripts/ap_rollback.sh` - Shell script
 - `scripts/create_user.py` - Python source
 - `scripts/deploy_pi.sh` - Shell script
@@ -116,15 +234,44 @@ Tracked paths: 122
 - `scripts/meta_live_evidence.py` - Python source
 - `scripts/render_display_image.py` - Python source
 - `scripts/render_live_display.py` - Python source
+- `scripts/run_meta_live_evidence.sh` - Shell script
 - `scripts/sbom.sh` - Shell script
 - `scripts/setup_ap.sh` - Shell script
 - `scripts/setup_cellular.sh` - Shell script
 - `scripts/setup_display_env.sh` - Shell script
 - `scripts/show_qr_display.py` - Python source
+- `scripts/wave3_n2_evidence.py` - Python source
+- `spikes/copper-stop-path/.gitignore` - Tracked file
+- `spikes/copper-stop-path/Cargo.lock` - Cargo lock file
+- `spikes/copper-stop-path/Cargo.toml` - Cargo manifest
+- `spikes/copper-stop-path/README.md` - Markdown document
+- `spikes/copper-stop-path/build.rs` - Rust source
+- `spikes/copper-stop-path/copper.ron` - Tracked file
+- `spikes/copper-stop-path/evidence/comparison.txt` - Text file
+- `spikes/copper-stop-path/evidence/evidence-run.stderr.log` - Tracked file
+- `spikes/copper-stop-path/evidence/evidence-run.stdout.log` - Tracked file
+- `spikes/copper-stop-path/evidence/original-task-outputs.bin` - Tracked file
+- `spikes/copper-stop-path/evidence/original_0.copper` - Tracked file
+- `spikes/copper-stop-path/evidence/replay-task-outputs.bin` - Tracked file
+- `spikes/copper-stop-path/evidence/replay_0.copper` - Tracked file
+- `spikes/copper-stop-path/evidence/verify.log` - Tracked file
+- `spikes/copper-stop-path/rust-toolchain.toml` - TOML configuration
+- `spikes/copper-stop-path/src/main.rs` - Rust source
+- `spikes/copper-stop-path/verify.py` - Python source
 - `systemd/quberon-robot-interface.service` - Tracked file
 - `tests/__init__.py` - Python source
+- `tests/test_adversarial_hardening.py` - Python source
 - `tests/test_app.py` - Python source
 - `tests/test_humanoid_registry.py` - Python source
 - `tests/test_meta_live.py` - Python source
 - `tests/test_safety_inputs.py` - Python source
 - `tests/test_secure_core.py` - Python source
+- `tools/quberon-verify/.gitignore` - Tracked file
+- `tools/quberon-verify/README.md` - Markdown document
+- `tools/quberon-verify/quberon-verify` - Tracked file
+- `tools/quberon-verify/tests/fixtures/simulated-stop.qeb` - Tracked file
+- `tools/quberon-verify/tests/fixtures/tampered-replay.qeb` - Tracked file
+- `tools/quberon-verify/tests/test_verify.py` - Python source
+- `tools/repro/README.md` - Markdown document
+- `tools/repro/repro.py` - Python source
+- `tools/repro/tests/test_repro.py` - Python source

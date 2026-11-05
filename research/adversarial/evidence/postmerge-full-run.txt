@@ -1,0 +1,20 @@
+mutations_generated=50000
+cases=56506 unique_payloads=56332 paths=direct,endpoint
+progress cases=10000/56506 results=16506 elapsed_s=20.1
+progress cases=20000/56506 results=26506 elapsed_s=77.8
+progress cases=30000/56506 results=36506 elapsed_s=199.0
+progress cases=40000/56506 results=46506 elapsed_s=407.7
+progress cases=50000/56506 results=56506 elapsed_s=756.1
+{
+  "total_results": 63012,
+  "escapes": 0,
+  "overblocked": 0,
+  "benign": {
+    "results": 37697,
+    "accept_expected": 22692,
+    "rejected_in_error": 0,
+    "false_reject_rate": 0.0
+  },
+  "s0": 0
+}
+RC=0
