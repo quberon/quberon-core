@@ -50,7 +50,7 @@ def test_seed_names_preserved_exactly_and_unverified():
         expected = expected_discovery_sources.get(r["record_id"])
         if expected is not None:
             assert r["sources"] == expected
-            assert r["provenance_claim_ids"] == []
+            assert r["provenance_claim_ids"]  # N4: classified, still unverified
 
 
 def test_lane_d_discovery_is_evidenced_without_promotion():
@@ -66,7 +66,7 @@ def test_lane_d_discovery_is_evidenced_without_promotion():
         "src-magiclab-official-site", "src-magiclab-global-official-site",
         "src-apptronik-official-site", "src-agility-official-site",
     }
-    assert len(sources) == 26 and lane_d_source_ids <= source_ids and len(claims) == 12
+    assert len(sources) == 26 and lane_d_source_ids <= source_ids and len(claims) == 38
     for record_id in lane_d:
         rec = recs[record_id]
         assert rec["sources"] and set(rec["sources"]) <= source_ids
@@ -77,6 +77,41 @@ def test_lane_d_discovery_is_evidenced_without_promotion():
     assert alias_claims <= claim_ids
     assert all(next(c for c in claims if c["claim_id"] == cid)["status"] == "supported_by_primary_source"
                for cid in alias_claims)
+
+
+def test_n4_dedup_scope_proposals_only_no_promotion():
+    registry = ROOT / "research/humanoids/registry"
+    sources = [json.loads(l) for l in (registry / "sources.jsonl").read_text().splitlines() if l.strip()]
+    claims = [json.loads(l) for l in (registry / "provenance-claims.jsonl").read_text().splitlines() if l.strip()]
+    by_id = {s["source_id"]: s for s in sources}
+    recs = candidates()
+    assert len(recs) == 25
+    # Every claim assertion resolves to an official https source URL.
+    for c in claims:
+        assert c["source_ids"], c["claim_id"]
+        for sid in c["source_ids"]:
+            assert by_id[sid]["source_type"] in {"official_site", "official_docs"}
+            assert by_id[sid]["url"].startswith("https://")
+            if c["status"] == "supported_by_primary_source":
+                assert by_id[sid]["provenance"]["evidence_strength"] == "primary_official"
+                assert by_id[sid]["access"]["method"] != "not_accessed"
+    # Tesla source was not accessed: its claim must not assert support.
+    tesla = next(c for c in claims if c["claim_id"] == "claim-tesla-optimus-entity-classification")
+    assert tesla["status"] == "candidate_unverified"
+    # All 25 classified for human review; none promoted.
+    for r in recs:
+        assert r["provenance_claim_ids"] and r["sources"]
+        assert r["verification"]["status"] == "candidate_unverified"
+        assert r["canonical_name"] is None
+        assert "proposed disposition=" in r["review"]["notes"]
+    out = sorted(r["record_id"] for r in recs if "proposed disposition=out_of_scope" in r["review"]["notes"])
+    assert out == ["cand-physicalintelligence", "cand-romela"]
+    index = json.loads((registry / "index.json").read_text())
+    assert index["universe_size_claim"] is None
+    assert index["discovery_progress"]["duplicate_candidate_pairs_proposed"] == 0
+    assert index["discovery_progress"]["out_of_scope_candidates_proposed"] == 2
+    assert index["discovery_progress"]["provenance_claim_records"] == len(claims) == 38
+    assert index["discovery_progress"]["official_source_records"] == len(sources) == 26
 
 
 def test_index_makes_no_universe_size_claim():
