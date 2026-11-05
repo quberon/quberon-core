@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 from adapters.robot_sim import SimulatedRobotAdapter
 from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan
 from integrations.interventions import InterventionEvent, InterventionKind, SourceStatus, STOP_KINDS
-from integrations.secure_core import SecureCoreError, client_from_env
+from integrations.secure_core import SecureCoreError, SecureCoreRejected, SecureCoreUnavailable, client_from_env
 from integrations.recognizers import (
     GestureFrame,
     HandLandmark,
@@ -239,16 +239,37 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     app.state.plan_semaphore = threading.BoundedSemaphore(2)
     app.state.voice_recognizer = VoiceStopRecognizer()
     app.state.gesture_recognizer = OpenPalmStopRecognizer()
-    # Rust secure core: every STOP (button/voice/gesture/intervention) must be
-    # authorized here before SimulatedRobotAdapter.stop is invoked. "auto"
-    # builds a client from env: production requires an external key,
-    # development explicitly allows ephemeral keys, no mode = fail closed.
+    # Rust secure core: STOP should obtain a signed ACCEPTED decision here
+    # before SimulatedRobotAdapter.stop is invoked as a signed stop. If the
+    # core is unavailable, an authenticated STOP still executes UNSIGNED
+    # (latch retained, audit-marked); a reachable rejection fails closed.
+    # Reset / simulated-task (motion-permitting) require core availability.
+    # "auto" builds a client from env: production requires an external key,
+    # development explicitly allows ephemeral keys, no mode = no client
+    # (which the STOP path above treats as unavailable, not as a rejection).
     if secure_core == "auto":
         try:
             secure_core = client_from_env(ROBOT_ID, app_db_path=db_path)
         except Exception:
             secure_core = None
     app.state.secure_core = secure_core
+
+    def secure_core_available() -> bool:
+        """Motion-permitting ops require a present core client/binary."""
+        client = app.state.secure_core
+        if client is None:
+            return False
+        binary = getattr(client, "binary", None)
+        if binary is None:
+            return True
+        try:
+            return Path(str(binary)).is_file()
+        except Exception:
+            return False
+
+    def require_secure_core_for_motion():
+        if not secure_core_available():
+            raise HTTPException(503, "secure core unavailable; latch retained and motion-permitting operation blocked (unsigned reset/task not permitted)")
 
     @app.exception_handler(sqlite3.Error)
     async def sqlite_degraded(request: Request, exc: sqlite3.Error):
@@ -365,29 +386,42 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                     # Historical duplicate: report the recorded result as history,
                     # never as a claim about the simulator's CURRENT state (fix A).
                     return {"command_id": existing["id"], "command_state": existing["command_state"], "observed_state": existing["observed_state"], "historical_duplicate": True, "current_stop_latched": bool(store.stop_latched), "current_observed_state": store.observed_state, "stop_latched": bool(store.stop_latched), "duplicate": True}
-                # Rust secure-core gate (Increment 1): no Rust ACCEPTED
-                # decision => no adapter invocation, latch retained, UNKNOWN.
+                # Rust secure-core attestation: ACCEPTED = signed stop.
+                # Core unavailable: authenticated simulation STOP still
+                # executes UNSIGNED (adapter invoked, latch retained,
+                # audit UNSIGNED/core_unavailable). Reachable REJECTED:
+                # fail closed, no adapter, latch retained, UNKNOWN.
                 core_client = app.state.secure_core
+                core_decision = {}
+                secure_core_obj = {"status": "unavailable", "decision": None, "sequence": None, "audit_record": None, "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}
+                auth_result = "UNSIGNED/core_unavailable"
+                detail_prefix = "UNSIGNED core_unavailable: no signed secure-core decision; authenticated simulation STOP executed without attestation; "
                 try:
                     if core_client is None:
-                        raise SecureCoreError("secure core unavailable")
+                        raise SecureCoreUnavailable("secure core unavailable")
                     core_decision = core_client.authorize_stop(subject=actor_username)
+                    secure_core_obj = {"status": "accepted", "decision": core_decision.get("code"), "sequence": core_decision.get("sequence"), "audit_record": core_decision.get("audit_record"), "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}
+                    auth_result = "allowed"
+                    detail_prefix = ""
+                except SecureCoreUnavailable:
+                    pass
                 except Exception as exc:
-                    code = str(exc) if isinstance(exc, SecureCoreError) else type(exc).__name__
+                    decision = exc.decision if isinstance(exc, SecureCoreRejected) else {}
+                    code = decision.get("code") or (str(exc) if isinstance(exc, SecureCoreError) else type(exc).__name__)
                     eid = secrets.token_urlsafe(16)
                     db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, "secure_core_rejected", idempotency_key, payload_hash, "UNKNOWN", "UNKNOWN", f"secure core did not authorize STOP; adapter not invoked; {code}"))
                     store.set_state(db, True, "UNKNOWN")
                     db.execute("COMMIT")
-                    raise HTTPException(503, "secure core did not authorize STOP; latch retained, state UNKNOWN, adapter not invoked")
+                    return JSONResponse(status_code=503, content={"detail": "secure core rejected STOP; latch retained, state UNKNOWN, adapter not invoked", "command_id": eid, "command_state": "UNKNOWN", "observed_state": "UNKNOWN", "stop_latched": True, "secure_core": {"status": "rejected", "decision": code, "sequence": decision.get("sequence"), "audit_record": decision.get("audit_record"), "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}})
                 result = adapter.stop()
                 eid = secrets.token_urlsafe(16)
-                db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, "allowed", idempotency_key, payload_hash, result.command_state, result.observed_state, result.detail))
+                db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, auth_result, idempotency_key, payload_hash, result.command_state, result.observed_state, detail_prefix + (result.detail or "")))
                 if result.command_state == "ACKNOWLEDGED":
                     store.set_state(db, True, result.observed_state)
                 else:
                     store.set_state(db, True, "UNKNOWN")
                 db.execute("COMMIT")
-                return {"command_id": eid, "command_state": result.command_state, "observed_state": store.observed_state, "stop_latched": True, "detail": result.detail, "secure_core": {"decision": core_decision.get("code"), "audit_record": core_decision.get("audit_record"), "sequence": core_decision.get("sequence"), "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}}
+                return {"command_id": eid, "command_state": result.command_state, "observed_state": store.observed_state, "stop_latched": True, "detail": result.detail, "secure_core": secure_core_obj}
 
     @app.post("/api/robots/{robot_id}/stop")
     def stop(robot_id: str, body: StopBody, request: Request, idempotency_key: str = Header(..., alias="Idempotency-Key")):
@@ -428,6 +462,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
             return {"event_id": eid, "kind": kind.value, "stop_triggered": False, "stop_latched": bool(store.stop_latched), "note": "PANIC_CANDIDATE is recorded for human review only; it is not panic detection and never triggers or clears a stop."}
         payload_hash = hashlib.sha256(f"{kind.value}|{source.value}|{body.evidence_text}".encode()).hexdigest()
         result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label=kind.value)
+        if isinstance(result, JSONResponse):
+            return result
         result.update({"kind": kind.value, "source_status": source.value, "stop_triggered": True})
         return result
 
@@ -441,6 +477,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
             return {"event_id": body.event_id, "stop_triggered": False, "reason": decision.reason, "stop_latched": bool(store.stop_latched)}
         payload_hash = hashlib.sha256(f"VOICE_STOP|{body.transcript}|{body.confidence}|{body.final}".encode()).hexdigest()
         result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label="VOICE_STOP")
+        if isinstance(result, JSONResponse):
+            return result
         result.update({"kind": "VOICE_STOP", "source_status": "DEVICE_RECOGNIZED", "stop_triggered": True, "matched_token": decision.matched_token})
         return result
 
@@ -456,6 +494,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
         canonical = json.dumps(body.model_dump(), sort_keys=True, separators=(",", ":"))
         payload_hash = hashlib.sha256(canonical.encode()).hexdigest()
         result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label="GESTURE_STOP")
+        if isinstance(result, JSONResponse):
+            return result
         result.update({"kind": "GESTURE_STOP", "source_status": "DEVICE_RECOGNIZED", "stop_triggered": True, "qualifying_frames": decision.qualifying_frames, "held_ms": decision.held_ms})
         return result
 
@@ -470,6 +510,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                 raise HTTPException(503, "persistence degraded")
             if store.stop_latched:
                 raise HTTPException(409, "STOP latch is active; simulated task rejected")
+            require_secure_core_for_motion()
             if idempotency_key:
                 # Fix F: exact retry returns the previous result WITHOUT invoking
                 # the adapter again; same key + different action is a conflict.
@@ -494,6 +535,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
             raise HTTPException(400, "explicit confirmation required")
         if not store.persistence_ok:
             raise HTTPException(503, "persistence degraded; reset inhibited")
+        require_secure_core_for_motion()
         with store.lock:
             result = adapter.reset_simulation()
             eid = event(row["username"], robot_id, "SIMULATION_RESET", "allowed", None, None, result)

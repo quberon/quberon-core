@@ -6,6 +6,10 @@ from app.main import create_app, Store
 from scripts.generate_qr import wifi_payload
 
 ROBOT = "quberon-demo-001"
+BIN = os.path.join(os.path.dirname(__file__), "..", "target", "debug", "quberon-secure-core-cli")
+# Reset/task-after-reset require secure-core availability (fail-closed
+# without it); STOP itself runs unsigned. See docs/SECURE-CORE.md.
+needs_rust = pytest.mark.skipif(not os.path.isfile(BIN), reason="Rust CLI not built: reset/task require secure core")
 
 @pytest.fixture(autouse=True)
 def _dev_secure_core_mode(monkeypatch):
@@ -62,6 +66,7 @@ def test_csrf_required_and_operator_stop_idempotent_conflict(tmp_path):
     assert conflict.status_code == 409
     assert status(c)["stop_latched"] is True
 
+@needs_rust
 def test_task_blocked_latched_admin_reset_no_task_started(tmp_path):
     c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123")
     r = c.post(f"/api/robots/{ROBOT}/simulated-task", json={"action": "SIMULATE_INSPECTION"}, headers={"X-CSRF-Token": csrf})
@@ -132,6 +137,7 @@ def test_gnss_parser_no_fix_and_fix_and_bad_checksum():
     assert abs(st.latitude - 48.1173) < 1e-4 and abs(st.longitude - 11.516667) < 1e-4
     assert not parse_sentence("$GNGGA,badchecksum*00", st)
 
+@needs_rust
 def test_stale_stop_replay_after_reset_and_task(tmp_path):
     # Full A sequence on ONE shared DB.
     c, db = make_client(tmp_path)
@@ -174,6 +180,7 @@ def test_runtime_db_failure_fails_closed(tmp_path):
     assert hz["ok"] is False and hz["persistence_ok"] is False
 
 
+@needs_rust
 def test_duplicate_task_key_does_not_reinvoke_or_500(tmp_path):
     # Fix F: need unlatched app -> admin reset first on shared DB.
     c, db = make_client(tmp_path)

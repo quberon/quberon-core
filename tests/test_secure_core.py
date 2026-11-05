@@ -1,4 +1,4 @@
-import os, stat, sys, time
+import os, sqlite3, stat, sys, time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import pytest
 from fastapi.testclient import TestClient
@@ -6,14 +6,14 @@ from fastapi.testclient import TestClient
 from adapters.robot_sim import SimulatedRobotAdapter
 from app.main import create_app, Store
 from integrations.secure_core import (PriorityRateLimiter, SecureCoreError,
-                                      SecureCoreClient, client_from_env,
-                                      generate_keypair, load_key_file,
-                                      provision_ephemeral)
+                                      SecureCoreRejected, SecureCoreClient,
+                                      client_from_env, generate_keypair,
+                                      load_key_file, provision_ephemeral)
 
 ROBOT = "quberon-demo-001"
 BIN = os.path.join(os.path.dirname(__file__), "..", "target", "debug", "quberon-secure-core-cli")
 
-pytestmark = pytest.mark.skipif(not os.path.isfile(BIN), reason="Rust CLI not built: cargo build --workspace")
+needs_rust = pytest.mark.skipif(not os.path.isfile(BIN), reason="Rust CLI not built: cargo build --workspace")
 
 
 @pytest.fixture(autouse=True)
@@ -26,14 +26,16 @@ def make(tmp_path, **kw):
     app = create_app(db_path=db, **kw)
     s = Store(db)
     s.create_user("operator1", "operator-password-123", "operator")
+    s.create_user("admin1", "admin-password-123", "admin")
     return TestClient(app, base_url="https://testserver"), app
 
 
-def login(c):
-    assert c.post("/auth/login", data={"username": "operator1", "password": "operator-password-123"}, follow_redirects=False).status_code == 303
+def login(c, user="operator1", pw="operator-password-123"):
+    assert c.post("/auth/login", data={"username": user, "password": pw}, follow_redirects=False).status_code == 303
     return c.get(f"/api/robots/{ROBOT}/status").json()["csrf_token"]
 
 
+@needs_rust
 def test_client_accepts_stop_and_rejected_client_fails_closed(tmp_path):
     client = provision_ephemeral(BIN, str(tmp_path / "core.db"), ROBOT)
     d = client.authorize_stop("operator1", now_unix=1_800_000_000)
@@ -46,7 +48,8 @@ def test_client_accepts_stop_and_rejected_client_fails_closed(tmp_path):
         bad.authorize_stop("operator1")
 
 
-def test_app_stop_requires_rust_and_core_error_never_invokes_adapter(tmp_path, monkeypatch):
+@needs_rust
+def test_app_stop_with_secure_core_accepted(tmp_path, monkeypatch):
     calls = []
     orig = SimulatedRobotAdapter.stop
     def counting(self):
@@ -56,18 +59,91 @@ def test_app_stop_requires_rust_and_core_error_never_invokes_adapter(tmp_path, m
     c, app = make(tmp_path)
     csrf = login(c)
     r = c.post(f"/api/robots/{ROBOT}/stop", json={"note": "a"}, headers={"X-CSRF-Token": csrf, "Idempotency-Key": "k1"})
-    assert r.status_code == 200 and r.json()["secure_core"]["decision"] == "ACCEPTED_SIMULATION_STOP_AUTHORIZATION"
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["secure_core"]["status"] == "accepted"
+    assert body["secure_core"]["decision"] == "ACCEPTED_SIMULATION_STOP_AUTHORIZATION"
+    assert body["secure_core"]["sequence"] is not None
+    assert "audit_record" in body["secure_core"]
     assert len(calls) == 1
 
-    c2, app2 = make(tmp_path / "second", secure_core=None)
-    csrf2 = login(c2)
-    r = c2.post(f"/api/robots/{ROBOT}/stop", json={}, headers={"X-CSRF-Token": csrf2, "Idempotency-Key": "k2"})
-    assert r.status_code == 503
-    st = c2.get(f"/api/robots/{ROBOT}/status").json()
+
+def test_stop_executes_without_secure_core_but_reset_does_not(tmp_path, monkeypatch):
+    stop_calls, reset_calls = [], []
+    orig_stop, orig_reset = SimulatedRobotAdapter.stop, SimulatedRobotAdapter.reset_simulation
+    def counting_stop(self):
+        stop_calls.append(1)
+        return orig_stop(self)
+    def counting_reset(self):
+        reset_calls.append(1)
+        return orig_reset(self)
+    monkeypatch.setattr(SimulatedRobotAdapter, "stop", counting_stop)
+    monkeypatch.setattr(SimulatedRobotAdapter, "reset_simulation", counting_reset)
+
+    c, app = make(tmp_path, secure_core=None)
+    csrf = login(c)
+    r = c.post(f"/api/robots/{ROBOT}/stop", json={"note": "a"}, headers={"X-CSRF-Token": csrf, "Idempotency-Key": "k-no-core"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["command_state"] == "ACKNOWLEDGED"
+    assert body["stop_latched"] is True
+    assert body["secure_core"] == {"status": "unavailable", "decision": None, "sequence": None, "audit_record": None, "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}
+    assert len(stop_calls) == 1, "authenticated STOP must execute without the optional Rust attestation"
+
+    # Application audit must mark the stop UNSIGNED / core_unavailable.
+    db_path = str(tmp_path / "test.db")
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute("SELECT auth_result, detail FROM events WHERE action='STOP'").fetchall()
+    assert rows and rows[0][0] == "UNSIGNED/core_unavailable"
+    assert "UNSIGNED" in rows[0][1] and "core_unavailable" in rows[0][1]
+
+    st = c.get(f"/api/robots/{ROBOT}/status").json()
+    assert st["stop_latched"] is True
+
+    # Clearing the latch (and any motion-permitting op) stays blocked.
+    c2 = TestClient(app, base_url="https://testserver")
+    csrf_admin = login(c2, "admin1", "admin-password-123")
+    rr = c2.post(f"/api/robots/{ROBOT}/simulation-reset", json={"confirm": "RESET_SIMULATION"}, headers={"X-CSRF-Token": csrf_admin})
+    assert rr.status_code == 503, rr.text
+    assert len(reset_calls) == 0, "reset adapter must not run without the secure core"
+    st2 = c2.get(f"/api/robots/{ROBOT}/status").json()
+    assert st2["stop_latched"] is True, "latch must be retained when reset is blocked"
+    tr = c2.post(f"/api/robots/{ROBOT}/simulated-task", json={"action": "SIMULATE_INSPECTION"}, headers={"X-CSRF-Token": csrf_admin})
+    assert tr.status_code in (409, 503)  # latched (409) / core-gated (503); never motion
+    assert c2.get(f"/api/robots/{ROBOT}/status").json()["stop_latched"] is True
+
+
+def test_stop_rejected_by_secure_core_does_not_invoke_adapter(tmp_path, monkeypatch):
+    calls = []
+    orig = SimulatedRobotAdapter.stop
+    def counting(self):
+        calls.append(1)
+        return orig(self)
+    monkeypatch.setattr(SimulatedRobotAdapter, "stop", counting)
+
+    class RejectingCore:
+        binary = BIN  # present-or-not is irrelevant: a decision was reached
+        def authorize_stop(self, subject, now_unix=None):
+            raise SecureCoreRejected(
+                "secure core rejected STOP: REPLAY_REJECTED",
+                decision={"code": "REPLAY_REJECTED", "sequence": 7, "audit_record": "deadbeef"},
+            )
+
+    c, app = make(tmp_path, secure_core=RejectingCore())
+    csrf = login(c)
+    r = c.post(f"/api/robots/{ROBOT}/stop", json={}, headers={"X-CSRF-Token": csrf, "Idempotency-Key": "k-rejected"})
+    assert r.status_code == 503, r.text
+    body = r.json()
+    assert body["secure_core"]["status"] == "rejected"
+    assert body["secure_core"]["decision"] == "REPLAY_REJECTED"
+    assert body["secure_core"]["sequence"] == 7
+    assert body["secure_core"]["audit_record"] == "deadbeef"
+    assert len(calls) == 0, "adapter must not be invoked when a reachable core rejects STOP"
+    st = c.get(f"/api/robots/{ROBOT}/status").json()
     assert st["stop_latched"] is True and st["observed_state"] == "UNKNOWN"
-    assert len(calls) == 1, "adapter must not be invoked when the Rust core does not accept"
 
 
+@needs_rust
 def test_scope_mismatch_client_rejected(tmp_path):
     keys = generate_keypair(BIN)
     trusted = [{"kid": "k1", "issuer": "quberon-simulation-issuer", "robot_id": ROBOT,
@@ -88,6 +164,7 @@ def _counting_adapter(monkeypatch):
     return calls
 
 
+@needs_rust
 def test_sqlite_failure_never_invokes_adapter(tmp_path, monkeypatch):
     """Deterministic fault injection at the app boundary: the Rust core DB
     lives in a nonexistent directory, so every authorize fails closed."""
@@ -133,6 +210,7 @@ def test_rate_limiter_stop_isolated_from_other_traffic():
     assert lim.try_acquire("STOP") is True
 
 
+@needs_rust
 def test_bounded_subject_rejected(tmp_path):
     client = provision_ephemeral(BIN, str(tmp_path / "core.db"), ROBOT)
     with pytest.raises(SecureCoreError):
@@ -141,6 +219,7 @@ def test_bounded_subject_rejected(tmp_path):
         client.authorize_stop("bad subject with spaces")
 
 
+@needs_rust
 def test_epoch_advances_across_clients_sequence_preserved(tmp_path):
     db = str(tmp_path / "core.db")
     c1 = provision_ephemeral(BIN, db, ROBOT)
@@ -168,6 +247,7 @@ def test_production_mode_fails_closed_without_external_key(tmp_path, monkeypatch
     assert client_from_env(ROBOT, app_db_path=str(tmp_path / "app.db")) is None
 
 
+@needs_rust
 def test_key_file_permissions_enforced(tmp_path):
     keys = generate_keypair(BIN)
     kf = tmp_path / "signing.hex"
@@ -179,6 +259,7 @@ def test_key_file_permissions_enforced(tmp_path):
     assert load_key_file(kf) == keys["signing_key_hex"]
 
 
+@needs_rust
 def test_production_mode_with_key_file_accepts(tmp_path, monkeypatch):
     keys = generate_keypair(BIN)
     kf = tmp_path / "signing.hex"
