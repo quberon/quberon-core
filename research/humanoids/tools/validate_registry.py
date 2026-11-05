@@ -104,7 +104,8 @@ def validate(root: Path = ROOT) -> dict:
             if rid in all_ids:
                 errors.append(f"{label}: duplicate record id")
             all_ids.add(rid)
-            check_verification(rec, label, errors)
+            if kind != "provenance_claim":
+                check_verification(rec, label, errors)
             if kind == "company":
                 names = rec.get("candidate_names") or []
                 seed_names.extend(names)
@@ -139,6 +140,24 @@ def validate(root: Path = ROOT) -> dict:
         errors.append("candidate_names in candidates.jsonl do not exactly match index seed list")
     if len(seed_names) != len(set(seed_names)):
         errors.append("duplicate seed names in candidates.jsonl")
+
+    source_ids = {
+        rec.get("source_id")
+        for rec in load_jsonl(root / "registry" / "sources.jsonl")[0]
+    }
+    claim_ids = {
+        rec.get("claim_id")
+        for rec in load_jsonl(root / "registry" / "provenance-claims.jsonl")[0]
+    }
+    company_records = load_jsonl(root / "registry" / "candidates.jsonl")[0]
+    for rec in company_records:
+        label = f"candidates.jsonl:{rec.get('record_id')}"
+        missing_sources = set(rec.get("sources") or []) - source_ids
+        missing_claims = set(rec.get("provenance_claim_ids") or []) - claim_ids
+        if missing_sources:
+            errors.append(f"{label}: unknown source references: {sorted(missing_sources)}")
+        if missing_claims:
+            errors.append(f"{label}: unknown claim references: {sorted(missing_claims)}")
 
     return {"ok": not errors, "errors": errors, "counts": counts,
             "verified_companies": 0 if index.get("verified_count") == 0 else index.get("verified_count")}

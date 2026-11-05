@@ -41,8 +41,13 @@
     "empty_registries": [
       "registry/datasets.jsonl",
       "registry/api-surfaces.jsonl",
-      "registry/compliance.jsonl",
-      "registry/provenance-claims.jsonl"
+      "registry/compliance.jsonl"
     ]
+  },
+  "discovery_progress": {
+    "official_source_records": 6,
+    "provenance_claim_records": 12,
+    "lane_d_candidates_reviewed": 5,
+    "note": "Discovery evidence only. Candidate verification statuses and verified_count remain unchanged pending human review."
   }
 }

@@ -39,7 +39,27 @@ def test_seed_names_preserved_exactly_and_unverified():
         assert r["verification"]["status"] == "candidate_unverified"
         assert r["canonical_name"] is None
         assert r["verification"]["evidence_source_ids"] == []
-        assert r["sources"] == [] and r["provenance_claim_ids"] == []
+
+
+def test_lane_d_discovery_is_evidenced_without_promotion():
+    registry = ROOT / "research/humanoids/registry"
+    sources = [json.loads(l) for l in (registry / "sources.jsonl").read_text().splitlines() if l.strip()]
+    claims = [json.loads(l) for l in (registry / "provenance-claims.jsonl").read_text().splitlines() if l.strip()]
+    source_ids = {r["source_id"] for r in sources}
+    claim_ids = {r["claim_id"] for r in claims}
+    lane_d = {"cand-jaka-robotics", "cand-agibot", "cand-magiclab", "cand-apptronik", "cand-agility"}
+    recs = {r["record_id"]: r for r in candidates()}
+    assert len(sources) == 6 and len(claims) == 12
+    for record_id in lane_d:
+        rec = recs[record_id]
+        assert rec["sources"] and set(rec["sources"]) <= source_ids
+        assert rec["provenance_claim_ids"] and set(rec["provenance_claim_ids"]) <= claim_ids
+        assert rec["verification"]["status"] == "candidate_unverified"
+        assert rec["canonical_name"] is None
+    alias_claims = {"claim-magiclab-site-alias", "claim-agility-name-alias"}
+    assert alias_claims <= claim_ids
+    assert all(next(c for c in claims if c["claim_id"] == cid)["status"] == "supported_by_primary_source"
+               for cid in alias_claims)
 
 
 def test_index_makes_no_universe_size_claim():
