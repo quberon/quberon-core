@@ -79,8 +79,26 @@ uncommitted F7 files present so manifest dirty=true):
   repro-out/ and target/ were deleted after recording (generated
      output is not committed).
 
-Clean-clone run (attempt 2): PENDING - filled with raw output after
-the branch is pushed and cloned fresh.
+Clean-clone run (attempt 2, raw): fresh `git clone -b wave5/f7` at
+e449fca9cb4ea49e8615c43fe919aabedeee0205 into /tmp/f7-clean,
+manifest git.dirty=false, then default full mode:
+  python3.11 tools/repro/repro.py --out repro-out -> exit 0;
+  runs={setup: PASS (11.256s), python_tests: PASS (34.022s),
+        cargo_tests: PASS (8.023s), sbom: PASS}
+  python_tests.log tail: 148 passed, 1 skipped (with-Rust mode;
+     counts are host/mode-specific, not universalised)
+  cargo_tests.log: test result ok 14 passed + 3 passed (other suites 0)
+  sbom.log: wrote sbom.cdx.json with 98 components
+  artifacts: repro-out/sbom.cdx.json sha256=
+     5797672cbbfcfc5d0326f685ae35c1025d05ba2ae573ede22a23710c8634ad1d
+     (byte-identical SBOM hash to the attempt-1 worktree run);
+     target/debug/quberon-secure-core-cli sha256=
+     33eabdd644ef0ddcf0a30db665073b953a85078fb779699659cacc4870eb64cf
+     (binary hash differs across build dirs - recorded, no
+     byte-reproducible-binary claim is made)
+  checklist status counts: EVIDENCE_PRESENT 11,
+     NOT_CLONE_VERIFIABLE 5, TRACE_PRESENT_NO_CLASS_CLAIM 16,
+     UNSUPPORTED_EXPLICIT 18, SUPPORTED_FOR_THIS_RUN 1 (total 51)
 
 ## Claim discipline
 
