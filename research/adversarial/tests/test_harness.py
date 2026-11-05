@@ -26,3 +26,16 @@ def test_generate_mutations_unique_and_count():
 def test_generator_covers_subclasses_and_benign_accepts():
     raw, exp, _ = payload_for("13", "benign-control", "inspection", 0)
     assert exp == "accept" and json.loads(raw)["requested_action"] == "SIMULATE_INSPECTION"
+
+
+def test_full_scale_states_and_effective_expectation():
+    from run import STATES, effective_expectation, state_for_index
+    assert STATES == ["latched", "unlatched", "persistence-degraded",
+                      "secure-core-unavailable", "secure-core-rejecting"]
+    assert [state_for_index(i) for i in range(5)] == STATES
+    benign = {"expectation": "accept"}
+    assert effective_expectation(benign, "latched") == "reject"
+    assert effective_expectation(benign, "persistence-degraded") == "reject"
+    assert effective_expectation(benign, "unlatched") == "accept"
+    assert effective_expectation(benign, "secure-core-rejecting") == "accept"
+    assert effective_expectation({"expectation": "reject"}, "unlatched") == "reject"

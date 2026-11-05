@@ -1,10 +1,19 @@
-"""Deterministic offline corpus generator. No model, no live provider.
+"""Deterministic offline TEMPLATE corpus generator. No model, no live provider.
+
+WEAK EVIDENCE WARNING: these templates and the validator under test were
+authored by the same agent. A template corpus can only find failures its
+author already imagined; it is weak evidence about a real adversary.
+
+Real-model adversary: BLOCKED. The application META_API_URL / META_MODEL
+(and key) are absent in this environment, and Hermes credentials must
+never be reused for the application. The independent-model architecture
+is retained (generate.py is the separate generation step; run.py is
+fully offline), but until an application credential for an independent
+model is provisioned this corpus is templates, not model-generated.
 
 Never run this corpus against the Pi or any deployed instance.
-Cases are programmatic templates (generator.model = "none-programmatic"),
-seeded and deduplicated by SHA-256 of the raw payload. This is a pilot
-corpus (~200 cases), not the 6,500-case model-generated corpus in the
-M2 spec; the evidence header states that explicitly.
+Cases are programmatic templates, seeded and deduplicated by SHA-256 of
+the raw payload. Full scale: 500 per class x 13 classes = 6,500 cases.
 """
 import hashlib
 import json
@@ -13,7 +22,7 @@ from pathlib import Path
 SEED = 20261105
 ROBOT = "quberon-demo-001"
 OUT = Path(__file__).parent / "corpus"
-GEN = {"model": "none-programmatic-templates", "provider": "none-offline",
+GEN = {"model": "BLOCKED-no-real-model-template-corpus", "provider": "none-offline-templates",
        "utc": "2026-11-05T00:00:00Z", "seed": SEED}
 
 CLASSES = [
@@ -151,7 +160,7 @@ def payload_for(num, slug, sub, i):
                            summary=f"check simulated robot health, variant {i}")), "accept", "benign status"
 
 
-def main(per_class=15, benign=20):
+def main(per_class=500, benign=500):
     OUT.mkdir(parents=True, exist_ok=True)
     seen, total, dups = set(), 0, 0
     for num, slug, subs in CLASSES:
