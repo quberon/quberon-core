@@ -1,8 +1,8 @@
-# Intervention inputs — EXPERIMENTAL / PLANNED (not implemented)
+# Intervention inputs — EXPERIMENTAL (event path implemented; recognizers are not)
 
-Status: **roadmap only.** No voice recognizer, gesture detector, or intervention-event module was implemented in the final pass. This document defines the contract so future work cannot quietly become a weaker second stop path.
+Status: **the typed event contract, transcript matcher, and authenticated `/interventions` route through the single STOP service are implemented and tested.** No voice *recognizer* or gesture *detector* exists; synthetic/browser/device values are labels, not provenance proof. See `integrations/interventions.py`.
 
-## Contract (planned `integrations/interventions.py`)
+## Contract (`integrations/interventions.py`)
 
 Typed event: robot ID, event ID, timestamp, input kind, source status, optional bounded evidence text.
 Kinds: `BUTTON`, `VOICE_STOP`, `GESTURE_STOP`, `PANIC_CANDIDATE`.

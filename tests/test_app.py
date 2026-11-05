@@ -217,6 +217,62 @@ def test_meta_validator_type_unsafe_inputs_do_not_raise():
     assert validate_plan(good, ROBOT, stop_latched=True)["allowed_as_proposal"] is False
 
 
+def test_intervention_voice_stop_converges_and_panic_is_audit_only(tmp_path):
+    c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123")
+    h = {"X-CSRF-Token": csrf}
+    body = {"kind": "VOICE_STOP", "source_status": "SYNTHETIC", "event_id": "ev-1", "evidence_text": "STOP"}
+    r1 = c.post(f"/api/robots/{ROBOT}/interventions", json=body, headers=h)
+    assert r1.status_code == 200 and r1.json()["stop_triggered"] is True and r1.json()["stop_latched"] is True
+    r2 = c.post(f"/api/robots/{ROBOT}/interventions", json=body, headers=h)
+    assert r2.json()["duplicate"] is True and r2.json()["command_id"] == r1.json()["command_id"]
+    # Non-stop transcript rejected; matcher unit policy
+    bad = c.post(f"/api/robots/{ROBOT}/interventions", json={**body, "event_id": "ev-2", "evidence_text": "nonstop please"}, headers=h)
+    assert bad.status_code == 400
+    # PANIC label never triggers or clears
+    p = c.post(f"/api/robots/{ROBOT}/interventions", json={"kind": "PANIC_CANDIDATE", "source_status": "CLIENT_LABELLED", "event_id": "ev-3", "evidence_text": "loud noise"}, headers=h)
+    assert p.status_code == 200 and p.json()["stop_triggered"] is False
+    assert status(c)["stop_latched"] is True  # unchanged by panic label
+
+
+def test_intervention_viewer_rejected_stale_rejected_wrong_robot(tmp_path):
+    c, _ = make_client(tmp_path)
+    login(c, "viewer1", "viewer-password-123")
+    csrf = status(c)["csrf_token"]
+    r = c.post(f"/api/robots/{ROBOT}/interventions", json={"kind": "GESTURE_STOP", "source_status": "SYNTHETIC", "event_id": "g1"}, headers={"X-CSRF-Token": csrf})
+    assert r.status_code == 403
+    # Switch to operator on the same client/DB for stale + wrong-robot checks:
+    c.post("/auth/logout", headers={"X-CSRF-Token": csrf})
+    login(c, "operator1", "operator-password-123")
+    csrf_o = status(c)["csrf_token"]
+    stale = c.post(f"/api/robots/{ROBOT}/interventions", json={"kind": "GESTURE_STOP", "source_status": "SYNTHETIC", "event_id": "g-old", "timestamp": "2020-01-01T00:00:00Z"}, headers={"X-CSRF-Token": csrf_o})
+    assert stale.status_code == 400 and "stale" in stale.text
+    wrong = c.post("/api/robots/other/interventions", json={"kind": "GESTURE_STOP", "source_status": "SYNTHETIC", "event_id": "g2"}, headers={"X-CSRF-Token": csrf_o})
+    assert wrong.status_code == 404
+
+
+def test_transcript_matcher_policy():
+    from integrations.interventions import match_transcript
+    assert match_transcript("STOP") == "stop"
+    assert match_transcript("please stopp now") == "stopp"
+    assert match_transcript("nonstop") is None
+    assert match_transcript("do not stop") is None
+    assert match_transcript("inte stopp") is None
+    assert match_transcript("keep going") is None
+
+
+def test_planner_gate_busy_and_page_polling(tmp_path):
+    c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123")
+    sem = getattr(c.app, "state").plan_semaphore
+    assert sem.acquire(blocking=False) and sem.acquire(blocking=False)
+    try:
+        r = c.post(f"/api/robots/{ROBOT}/plan", json={"text": "check status"}, headers={"X-CSRF-Token": csrf})
+        assert r.status_code == 200 and r.json()["provider_status"] == "busy" and r.json()["stop_unaffected"] is True
+    finally:
+        sem.release(); sem.release()
+    page = c.get(f"/robots/{ROBOT}").text
+    assert "setInterval(load,2000)" in page and "STALE / UNCONFIRMED" in page and "Experimental intervention inputs" in page
+
+
 def test_meta_validator_rejects_bad_schema_and_live_unconfigured(monkeypatch):
     from integrations.meta import validate_plan, LiveMetaProvider, MetaProviderError
     bad = {"robot_id": "other", "requested_action": "MOVE_REAL_ROBOT", "required_capabilities": ["fly"], "human_confirmation_required": False}

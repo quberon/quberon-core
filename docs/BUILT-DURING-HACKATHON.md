@@ -21,3 +21,12 @@ Voice recognition, gesture recognition, Isaac Sim bridge, live Meta inference �
 - System design, hardware (Pi, e-ink, cellular, GNSS), deployment and all pre-`c92f707` code: Rasmus (project author), per project records.
 - This final pass: implemented with AI development assistance (Muse Wonder 1.0 via Hermes, as reported by the user) — a **development-time** contribution. No AI system is claimed at runtime except the labelled mock planner / unverified live adapter.
 - No chronology beyond this session is asserted; commit history is the record for earlier work.
+
+## Frontier pass (theme: Pushing the Frontier — build for superintelligence)
+
+- `integrations/interventions.py`: typed multimodal intervention events (BUTTON/VOICE_STOP/GESTURE_STOP/PANIC_CANDIDATE), source-status labels, staleness policy, deterministic transcript matcher (standalone STOP/STOPP; `nonstop` and negations rejected).
+- `POST /interventions` requires operator capability + CSRF; stop kinds reuse the single `execute_stop` core (refactored from `/stop`, same behavior + tests); PANIC_CANDIDATE is audit-only.
+- Fix D: dedicated planner concurrency limiter (2), `busy` response on saturation.
+- UI: 2 s polling with STALE/UNCONFIRMED degradation, audit-event rendering, labelled synthetic intervention controls.
+- `docs/FRONTIER.md`: the governance thesis — model proposes, deterministic law disposes.
+- Tests: 17 → 21 passing.

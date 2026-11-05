@@ -25,3 +25,11 @@
 - No voice/gesture recognizer, no Isaac Sim integration — roadmap docs only.
 - No Pi redeploy, no phone re-test, no recording. Deployed version was not changed by this pass.
 - Commit/push performed only after explicit authorization from the project author.
+
+## Frontier pass addendum (later, same day)
+
+- Interventions implemented: `integrations/interventions.py` + `POST /api/robots/{robot_id}/interventions` converging on the shared `execute_stop` core; PANIC_CANDIDATE audit-only; transcript matcher policy tested (`nonstop`/negations rejected).
+- Review item D now implemented: planner has its own 2-slot concurrency limiter; saturated planner returns `provider_status: busy` with `stop_unaffected: true` (best-effort, not real-time).
+- UI: 2 s status polling, `STALE / UNCONFIRMED` on fetch failure, recent audit events, clearly labelled experimental intervention controls (synthetic, NOT recognition).
+- Test suite now **21 passed** (same command/interpreter, Mac only). Thesis doc: `docs/FRONTIER.md`.
+- Still not done/claimed: live Meta inference, microphone/camera recognition, Isaac Sim run, Pi redeploy of these changes.

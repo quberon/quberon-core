@@ -1,8 +1,8 @@
-.................                                                        [100%]
+.....................                                                    [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/testclient.py:40
   /Users/quberon1/quberon-robot-interface/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
     _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-17 passed, 1 warning in 1.38s
+21 passed, 1 warning in 1.66s

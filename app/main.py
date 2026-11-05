@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from adapters.robot_sim import SimulatedRobotAdapter
 from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan
+from integrations.interventions import InterventionEvent, InterventionKind, SourceStatus, STOP_KINDS
 
 ROBOT_ID = os.environ.get("ROBOT_ID", "quberon-demo-001")
 ROLES = {"viewer": {"read"}, "operator": {"read", "stop", "task", "plan"}, "admin": {"read", "stop", "task", "plan", "admin"}}
@@ -171,14 +172,22 @@ class PlanBody(BaseModel):
     text: str = Field(min_length=1, max_length=1000)
 
 
+class InterventionBody(BaseModel):
+    kind: str = Field(max_length=32)
+    source_status: str = Field(default="CLIENT_LABELLED", max_length=32)
+    event_id: str = Field(min_length=1, max_length=128)
+    evidence_text: str = Field(default="", max_length=200)
+    timestamp: str = Field(default="", max_length=64)
+
+
 INDEX_HTML = """<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>Quberon Robot Control</title><style>body{font-family:system-ui;margin:0;background:#101418;color:#fff}.wrap{max-width:760px;margin:auto;padding:20px}.banner{background:#7f1d1d;padding:14px;border-radius:12px;font-weight:800}.card{background:#1c2530;border-radius:16px;padding:18px;margin:16px 0}button{font-size:20px;padding:16px;border:0;border-radius:12px;width:100%;margin:8px 0}.stop{background:#dc2626;color:white;font-size:28px;font-weight:900}input,textarea{width:100%;box-sizing:border-box;padding:12px;margin:6px 0;border-radius:8px}pre{white-space:pre-wrap}.muted{color:#cbd5e1}</style></head>
 <body><div class='wrap'><div class='banner'>SIMULATED ROBOT - NOT AN EMERGENCY STOP</div><div class='card'><h1>__ROBOT__</h1><p class='muted'>Log in to request STOP. The QR code identifies this robot; it does not authorize you.</p>
 <form method='post' action='/auth/login'><input name='username' autocomplete='username' placeholder='Username' required><input name='password' type='password' autocomplete='current-password' placeholder='Password' required><button>Log in</button></form></div>
-<div class='card'><h2>Control</h2><div id='status'>Loading status after login...</div><button class='stop' onclick='stopRobot()'>STOP request</button><button onclick='task()'>Request simulated task</button><button id='resetBtn' onclick='resetSim()'>Admin: reset simulation latch</button><form onsubmit='plan(event)'><textarea id='planText' placeholder='Describe a simulated job...'></textarea><button>Request Meta plan proposal</button></form><pre id='out'></pre><button onclick='logout()'>Log out</button></div></div>
-<script>let csrf='';async function load(){let r=await fetch('/api/robots/__ROBOT__/status');let j=await r.json();document.getElementById('status').textContent=JSON.stringify(j,null,2);csrf=j.csrf_token||'';document.getElementById('resetBtn').style.display=(j.capabilities||[]).includes('admin')?'block':'none'}
+<div class='card'><h2>Control</h2><div id='status'>Loading status after login...</div><button class='stop' onclick='stopRobot()'>STOP request</button><button onclick='task()'>Request simulated task</button><button id='resetBtn' onclick='resetSim()'>Admin: reset simulation latch</button><form onsubmit='plan(event)'><textarea id='planText' placeholder='Describe a simulated job...'></textarea><button>Request Meta plan proposal</button></form><h3>Experimental intervention inputs (NOT recognition)</h3><input id='intervText' placeholder='Transcript for matcher test, e.g. STOP or STOPP'><button onclick='interv("VOICE_STOP")'>Test transcript matcher → STOP</button><button onclick='interv("GESTURE_STOP")'>Inject SYNTHETIC gesture event → STOP</button><button onclick='interv("PANIC_CANDIDATE")'>Record PANIC_CANDIDATE (audit only)</button><pre id='out'></pre><h3>Recent audit events</h3><pre id='events'>—</pre><button onclick='logout()'>Log out</button></div></div>
+<script>let csrf='';let lastOk=0;async function load(){try{let r=await fetch('/api/robots/__ROBOT__/status');if(!r.ok)throw new Error(r.status);let j=await r.json();lastOk=Date.now();document.getElementById('status').textContent=JSON.stringify(j,null,2)+'\nLast update: '+new Date(lastOk).toLocaleTimeString();csrf=j.csrf_token||'';document.getElementById('resetBtn').style.display=(j.capabilities||[]).includes('admin')?'block':'none';let ev=await (await fetch('/api/robots/__ROBOT__/events')).json().catch(()=>[]);document.getElementById('events').textContent=(ev||[]).slice(0,8).map(e=>e.ts+' '+e.action+' '+e.auth_result+' '+(e.command_state||'')).join('\n')}catch(e){document.getElementById('status').textContent='STALE / UNCONFIRMED — status fetch failed ('+(lastOk?Math.round((Date.now()-lastOk)/1000)+'s since last update':'no successful update yet')+'). Do not assume robot state.'}}
 async function post(path,body,key){let r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'Idempotency-Key':key||crypto.randomUUID()},body:JSON.stringify(body)});let j=await r.json();document.getElementById('out').textContent=JSON.stringify(j,null,2);load()}
-function stopRobot(){post('/api/robots/__ROBOT__/stop',{note:'phone UI STOP request'})}function task(){post('/api/robots/__ROBOT__/simulated-task',{action:'SIMULATE_INSPECTION'})}function resetSim(){if(confirm('Reset simulated latch? This does not start a task.'))post('/api/robots/__ROBOT__/simulation-reset',{confirm:'RESET_SIMULATION'})}async function plan(e){e.preventDefault();post('/api/robots/__ROBOT__/plan',{text:document.getElementById('planText').value})}async function logout(){await fetch('/auth/logout',{method:'POST',headers:{'X-CSRF-Token':csrf}});location.reload()}load()</script></body></html>"""
+function stopRobot(){post('/api/robots/__ROBOT__/stop',{note:'phone UI STOP request'})}async function interv(kind){let r=await fetch('/api/robots/__ROBOT__/interventions',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({kind:kind,source_status:'SYNTHETIC',event_id:crypto.randomUUID(),evidence_text:document.getElementById('intervText').value})});let j=await r.json();document.getElementById('out').textContent=JSON.stringify(j,null,2);load()}function task(){post('/api/robots/__ROBOT__/simulated-task',{action:'SIMULATE_INSPECTION'})}function resetSim(){if(confirm('Reset simulated latch? This does not start a task.'))post('/api/robots/__ROBOT__/simulation-reset',{confirm:'RESET_SIMULATION'})}async function plan(e){e.preventDefault();post('/api/robots/__ROBOT__/plan',{text:document.getElementById('planText').value})}async function logout(){await fetch('/auth/logout',{method:'POST',headers:{'X-CSRF-Token':csrf}});location.reload()}load();setInterval(load,2000)</script></body></html>"""
 
 
 def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provider=None) -> FastAPI:
@@ -196,6 +205,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
         meta = MockMetaProvider()
     app = FastAPI(title="Quberon Robot Interface", docs_url=None, redoc_url=None, openapi_url=None)
     app.state.store = store
+    app.state.plan_semaphore = threading.BoundedSemaphore(2)
 
     @app.exception_handler(sqlite3.Error)
     async def sqlite_degraded(request: Request, exc: sqlite3.Error):
@@ -294,20 +304,18 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
         data.update({"actor": row["username"], "role": row["role"], "capabilities": sorted(ROLES[row["role"]]), "csrf_token": row["csrf"]})
         return data
 
-    @app.post("/api/robots/{robot_id}/stop")
-    def stop(robot_id: str, body: StopBody, request: Request, idempotency_key: str = Header(..., alias="Idempotency-Key")):
-        row = require(request, "stop", robot_id)
-        csrf(request, row)
-        if not idempotency_key or len(idempotency_key) > 128:
-            raise HTTPException(400, "valid Idempotency-Key required")
-        payload_hash = hashlib.sha256(body.model_dump_json().encode()).hexdigest()
+    def execute_stop(actor_username: str, robot_id: str, idempotency_key: str, payload_hash: str, action_label: str = "STOP"):
+        """The ONE stop path. Button, voice, gesture and future inputs all
+        converge here: persistence check, idempotency, adapter result,
+        persistent latch, audit event. No input modality gets a weaker route,
+        and no intervention can clear the latch through this function."""
         with store.lock:
             if not store.persistence_ok:
                 store.stop_latched = True
                 raise HTTPException(503, "persistence degraded; task acceptance inhibited and durability not claimed")
             with store._db() as db:
                 db.execute("BEGIN IMMEDIATE")
-                existing = db.execute("SELECT * FROM events WHERE actor=? AND robot_id=? AND idempotency_key=?", (row["username"], robot_id, idempotency_key)).fetchone()
+                existing = db.execute("SELECT * FROM events WHERE actor=? AND robot_id=? AND idempotency_key=?", (actor_username, robot_id, idempotency_key)).fetchone()
                 if existing:
                     if existing["payload_hash"] != payload_hash:
                         raise HTTPException(409, "idempotency key conflicts with a different payload")
@@ -316,13 +324,55 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                     return {"command_id": existing["id"], "command_state": existing["command_state"], "observed_state": existing["observed_state"], "historical_duplicate": True, "current_stop_latched": bool(store.stop_latched), "current_observed_state": store.observed_state, "stop_latched": bool(store.stop_latched), "duplicate": True}
                 result = adapter.stop()
                 eid = secrets.token_urlsafe(16)
-                db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), row["username"], robot_id, "STOP", "allowed", idempotency_key, payload_hash, result.command_state, result.observed_state, result.detail))
+                db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, "allowed", idempotency_key, payload_hash, result.command_state, result.observed_state, result.detail))
                 if result.command_state == "ACKNOWLEDGED":
                     store.set_state(db, True, result.observed_state)
                 else:
                     store.set_state(db, True, "UNKNOWN")
                 db.execute("COMMIT")
                 return {"command_id": eid, "command_state": result.command_state, "observed_state": store.observed_state, "stop_latched": True, "detail": result.detail}
+
+    @app.post("/api/robots/{robot_id}/stop")
+    def stop(robot_id: str, body: StopBody, request: Request, idempotency_key: str = Header(..., alias="Idempotency-Key")):
+        row = require(request, "stop", robot_id)
+        csrf(request, row)
+        if not idempotency_key or len(idempotency_key) > 128:
+            raise HTTPException(400, "valid Idempotency-Key required")
+        payload_hash = hashlib.sha256(body.model_dump_json().encode()).hexdigest()
+        return execute_stop(row["username"], robot_id, idempotency_key, payload_hash)
+
+    @app.post("/api/robots/{robot_id}/interventions")
+    def interventions(robot_id: str, body: InterventionBody, request: Request):
+        """Experimental multimodal intervention intake (see
+        docs/INTERVENTION-INPUTS.md). Authority = authenticated session +
+        CSRF, never the modality label. Stop kinds converge on execute_stop;
+        PANIC_CANDIDATE is audit-only and cannot trigger or clear anything."""
+        row = require(request, "stop", robot_id)
+        csrf(request, row)
+        try:
+            kind = InterventionKind(body.kind)
+            source = SourceStatus(body.source_status)
+        except ValueError:
+            raise HTTPException(400, "unknown intervention kind or source_status")
+        ts = None
+        if body.timestamp:
+            try:
+                ts = datetime.fromisoformat(body.timestamp.replace("Z", "+00:00"))
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+            except ValueError:
+                raise HTTPException(400, "timestamp must be ISO-8601")
+        ev = InterventionEvent(robot_id=robot_id, event_id=body.event_id, kind=kind, source_status=source, evidence_text=body.evidence_text, **({"timestamp": ts} if ts else {}))
+        errors = ev.validate(robot_id)
+        if errors:
+            raise HTTPException(400, "; ".join(errors))
+        if kind not in STOP_KINDS:
+            eid = event(row["username"], robot_id, kind.value, "audit_only", None, None, None, detail=f"client_event_id={body.event_id}; source={source.value}; no stop triggered by label alone")
+            return {"event_id": eid, "kind": kind.value, "stop_triggered": False, "stop_latched": bool(store.stop_latched), "note": "PANIC_CANDIDATE is recorded for human review only; it is not panic detection and never triggers or clears a stop."}
+        payload_hash = hashlib.sha256(f"{kind.value}|{source.value}|{body.evidence_text}".encode()).hexdigest()
+        result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label=kind.value)
+        result.update({"kind": kind.value, "source_status": source.value, "stop_triggered": True})
+        return result
 
     @app.post("/api/robots/{robot_id}/simulated-task")
     def simulated_task(robot_id: str, body: TaskBody, request: Request, idempotency_key: str = Header(default="")):
@@ -378,15 +428,23 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     def plan(robot_id: str, body: PlanBody, request: Request):
         row = require(request, "plan", robot_id)
         csrf(request, row)
+        # Fix D: planner work is capped by its OWN small limiter. A saturated
+        # planner returns 'busy' immediately instead of consuming the shared
+        # sync-worker capacity that STOP depends on. Best-effort, not real-time.
+        if not app.state.plan_semaphore.acquire(blocking=False):
+            return {"provider_status": "busy", "error": "planner concurrency limit", "stop_unaffected": True}
         try:
-            proposal = meta.propose(robot_id, body.text)
-        except Exception as exc:
-            return {"provider_status": "unavailable", "error": type(exc).__name__, "stop_unaffected": True}
-        try:
-            validation = validate_plan(proposal, robot_id, store.stop_latched)
-        except Exception as exc:  # provider output must never escape as a 500 (fix C)
-            validation = {"allowed_as_proposal": False, "errors": [f"invalid proposal: {type(exc).__name__}"], "latch_blocks_task": bool(store.stop_latched)}
-        return {"provider": getattr(meta, "name", "unknown"), "proposal": proposal, "validation": validation}
+            try:
+                proposal = meta.propose(robot_id, body.text)
+            except Exception as exc:
+                return {"provider_status": "unavailable", "error": type(exc).__name__, "stop_unaffected": True}
+            try:
+                validation = validate_plan(proposal, robot_id, store.stop_latched)
+            except Exception as exc:  # provider output must never escape as a 500 (fix C)
+                validation = {"allowed_as_proposal": False, "errors": [f"invalid proposal: {type(exc).__name__}"], "latch_blocks_task": bool(store.stop_latched)}
+            return {"provider": getattr(meta, "name", "unknown"), "proposal": proposal, "validation": validation}
+        finally:
+            app.state.plan_semaphore.release()
 
     return app
 
