@@ -1,0 +1,13 @@
+$ time .venv/bin/python research/adversarial/run.py --mutations 5000 ...
+mutations_generated=5000
+cases=5206 unique_payloads=5188 paths=direct,endpoint
+{
+  "total_results": 5412,
+  "escapes": 9,
+  "overblocked": 0,
+  "s0": 0
+}
+
+real	0m0.497s
+user	0m0.381s
+sys	0m0.069s

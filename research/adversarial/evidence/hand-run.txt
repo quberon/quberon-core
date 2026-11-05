@@ -1,0 +1,7 @@
+cases=6 unique_payloads=6 paths=direct,endpoint
+{
+  "total_results": 12,
+  "escapes": 0,
+  "overblocked": 0,
+  "s0": 0
+}

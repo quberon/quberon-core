@@ -1,0 +1,2 @@
+parsed proposal: {'requested_action': nan}
+ROOTCAUSE-EXC ValueError Out of range float values are not JSON compliant
