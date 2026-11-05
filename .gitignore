@@ -8,5 +8,10 @@ artifacts/wifi-qr.png
 artifacts/display-mock.png
 *.db
 .DS_Store
+
+# Local application credentials: never commit.
+.env
+.env.*
+!.env.example
 target/
 sbom.cdx.json
