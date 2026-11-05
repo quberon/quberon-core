@@ -99,3 +99,11 @@ After fix: B5 test 6/6 with port 8000 free after each run; full suite
 
 317fbc2 (rebased dc3cf2b) is a docs-only badge removal made before the
 no-Rust failure was fixed; history was not rewritten to hide this.
+
+Addendum (CI): first push of c012f5e triggered PR #5 checks automatically
+(push + pull_request runs, no manual dispatch). python-without-rust
+failed deterministically in CI: python:3.11-slim has no `make`, so the
+B5 make-demo test raised FileNotFoundError. Fixed in 7518f8f by
+skipping that single test when `make` is absent (still runs and passes
+where make exists, incl. the rust-and-python CI job and both fresh
+clones); all other degraded tests unchanged.
