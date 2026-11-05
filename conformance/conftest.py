@@ -29,3 +29,19 @@ def adapter_no_core(tmp_path):
 def adapter_failing(tmp_path):
     """Adapter whose underlying robot adapter reports failure (STATE/DEGRADED)."""
     return make_quberon_adapter(tmp_path / "failing", adapter_fail=True)
+
+
+@pytest.fixture()
+def adapter_persistence_degraded(tmp_path):
+    """Adapter after neutral persistence-failure injection (QIP-DEG-03)."""
+    a = make_quberon_adapter(tmp_path / "persistfail")
+    a.inject_persistence_failure()
+    return a
+
+
+@pytest.fixture()
+def adapter_refusing_core(tmp_path):
+    """Adapter after neutral reachable-refusal injection (QIP-DEG-03)."""
+    a = make_quberon_adapter(tmp_path / "refusing", secure_core=None)
+    a.inject_secure_core_refusal()
+    return a

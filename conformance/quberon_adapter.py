@@ -13,6 +13,27 @@ from fastapi.testclient import TestClient
 
 from app.main import ROBOT_ID, Store, create_app
 from conformance.adapter_interface import AdapterUnderTest, NeutralResult
+from integrations.secure_core import SecureCoreRejected
+
+
+class _RefusingSecureCore:
+    """Reachable-but-refusing authority stub (conformance injection only).
+
+    This is NOT the Rust secure core and makes no signed-attestation claim.
+    It drives the app's already-existing reachable-refusal branch (which
+    raises/handles SecureCoreRejected) so the neutral suite can observe
+    refusal-vs-unavailability semantics. A real Rust-core rejection is
+    listed as NOT TESTED in README.md.
+    """
+
+    binary = None  # present/reachable at the app boundary, unlike no-core
+
+    def authorize_stop(self, subject=None, **_kw):
+        raise SecureCoreRejected(
+            "conformance-injected secure-core refusal",
+            decision={"code": "REFUSED_CONFORMANCE_INJECTION",
+                      "sequence": None, "audit_record": None},
+        )
 
 USERS = {
     "viewer": ("viewer1", "viewer-password-123", "viewer"),
@@ -70,7 +91,23 @@ class QuberonCoreAdapter(AdapterUnderTest):
         return {
             "secure_core_available": bool(status.get("secure_core_available")),
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
+            "persistence_failure_injectable": True,
+            "secure_core_refusal_injectable": True,
         }
+
+    # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
+    def inject_persistence_failure(self) -> None:
+        # Set the same degraded flag the app's own SQLite-error handler
+        # and Store init-failure path set (app.main: persistence_ok=False,
+        # latch retained, observed UNKNOWN). This does not simulate a real
+        # disk/SQLite failure; that remains NOT TESTED (README.md).
+        store = self._app.state.store
+        store.persistence_ok = False
+        store.stop_latched = True
+        store.observed_state = "UNKNOWN"
+
+    def inject_secure_core_refusal(self) -> None:
+        self._app.state.secure_core = _RefusingSecureCore()
 
     # -- neutral surface ---------------------------------------------------
     def status(self, role):

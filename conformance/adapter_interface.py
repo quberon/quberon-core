@@ -97,7 +97,45 @@ class AdapterUnderTest:
     def events(self, role: str) -> NeutralResult:
         raise NotImplementedError
 
+    # --- Implementation-neutral fault injection (QIP-DEG-03) -------------
+    # These are the injection points the original interface lacked. They
+    # name STATES, not mechanisms: how an adapter puts its system into the
+    # state is its own business (fault-injection hook, stub authority,
+    # broken backend, ...). The suite only observes the neutral results
+    # afterwards, exactly as for non-injected operations.
+    #
+    # Contract: call before the operation under test, on a fresh adapter.
+    # After injection the state must persist for the rest of that adapter's
+    # life (no auto-recovery inside the test). An adapter that cannot
+    # inject a state MUST leave the corresponding capability False and
+    # MUST raise NotImplementedError here; the suite then reports that
+    # state NOT TESTED (skip), never a pass.
+    def inject_persistence_failure(self) -> None:
+        """Put the system in its persistence-degraded state.
+
+        Expected neutral semantics afterwards are the adapter's own
+        degraded contract; for quberon-core: persistence is reported
+        not-ok, the latch is retained, and stop/task/reset are refused
+        with a non-2xx (503) result rather than claimed durable.
+        """
+        raise NotImplementedError
+
+    def inject_secure_core_refusal(self) -> None:
+        """Make the authorising authority REACHABLE but REFUSING.
+
+        This is distinct from unavailability (QIP-DEG-01/R-IMM-2): the
+        authority is contacted and returns a negative decision. Expected
+        neutral semantics afterwards (QIP-R7.4): the intervention is not
+        invoked, the latch is retained, command/observed state are
+        UNKNOWN, and secure_core_status is "rejected" -- never
+        "unavailable" and never "accepted".
+        """
+        raise NotImplementedError
+
     # Capability disclosure: adapters report what this run can exercise.
     # A False capability is a NOT TESTED gap in the report, never a pass.
     def capabilities(self) -> Dict[str, bool]:
-        return {}
+        return {
+            "persistence_failure_injectable": False,
+            "secure_core_refusal_injectable": False,
+        }
