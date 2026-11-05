@@ -46,7 +46,7 @@ def _redact_secret(value: Any, secret: str) -> Any:
     if isinstance(value, list):
         return [_redact_secret(v, secret) for v in value]
     if isinstance(value, dict):
-        return {k: _redact_secret(v, secret) for k, v in value.items()}
+        return {_redact_secret(k, secret): _redact_secret(v, secret) for k, v in value.items()}
     return value
 
 
@@ -110,6 +110,11 @@ class LiveMetaProvider:
             # may embed the request (and its Authorization header/key).
             raise MetaProviderError(f"Meta provider failed: {type(exc).__name__}") from None
         data = _redact_secret(data, self.key)
+        # Advisory-boundary hardening: drop any smuggled fields (latch,
+        # capability grants, adapter/motion commands) instead of passing
+        # untrusted provider output through verbatim.
+        allowed_keys = {"summary", "robot_id", "requested_action", "required_capabilities", "hazards", "human_confirmation_required"}
+        data = {k: v for k, v in data.items() if k in allowed_keys}
         data["provider"] = "live"
         return data
 
@@ -149,6 +154,15 @@ def validate_plan(plan: Any, robot_id: str, stop_latched: bool) -> Dict[str, Any
         errors.append("capabilities do not match requested action")
     if plan.get("human_confirmation_required") is not True:
         errors.append("human confirmation must be required")
+    # Optional descriptive fields, when present, must be bounded text;
+    # plans without them remain valid for the pre-existing validator tests.
+    if "summary" in plan and (not isinstance(plan["summary"], str) or not plan["summary"] or len(plan["summary"]) > 1000):
+        errors.append("summary is not bounded text")
+    if "hazards" in plan and (
+        not isinstance(plan["hazards"], list) or len(plan["hazards"]) > 8
+        or any(not isinstance(h, str) or len(h) > 200 for h in plan["hazards"])
+    ):
+        errors.append("hazards are not bounded text")
     allowed = not errors and not stop_latched
     return {
         "allowed_as_proposal": allowed,
