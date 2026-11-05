@@ -1,6 +1,5 @@
 # Quberon Robot Interface (quberon-core)
 
-![Tests](https://img.shields.io/badge/tests-44%20python%20%2B%2017%20rust%20passed-16a34a)
 ![Python](https://img.shields.io/badge/python-3.11-3776ab)
 ![Rust](https://img.shields.io/badge/rust-secure%20core%20(increment%202)-dea584)
 ![Mode](https://img.shields.io/badge/robot-SIMULATION-b91c1c)
