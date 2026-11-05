@@ -49,7 +49,12 @@ def test_lane_d_discovery_is_evidenced_without_promotion():
     claim_ids = {r["claim_id"] for r in claims}
     lane_d = {"cand-jaka-robotics", "cand-agibot", "cand-magiclab", "cand-apptronik", "cand-agility"}
     recs = {r["record_id"]: r for r in candidates()}
-    assert len(sources) == 6 and len(claims) == 12
+    lane_d_source_ids = {
+        "src-jaka-official-site", "src-agibot-official-site",
+        "src-magiclab-official-site", "src-magiclab-global-official-site",
+        "src-apptronik-official-site", "src-agility-official-site",
+    }
+    assert len(sources) == 13 and lane_d_source_ids <= source_ids and len(claims) == 12
     for record_id in lane_d:
         rec = recs[record_id]
         assert rec["sources"] and set(rec["sources"]) <= source_ids
