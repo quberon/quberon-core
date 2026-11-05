@@ -18,6 +18,13 @@ from pydantic import BaseModel, Field
 from adapters.robot_sim import SimulatedRobotAdapter
 from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan
 from integrations.interventions import InterventionEvent, InterventionKind, SourceStatus, STOP_KINDS
+from integrations.recognizers import (
+    GestureFrame,
+    HandLandmark,
+    OpenPalmStopRecognizer,
+    VoiceObservation,
+    VoiceStopRecognizer,
+)
 
 ROBOT_ID = os.environ.get("ROBOT_ID", "quberon-demo-001")
 ROLES = {"viewer": {"read"}, "operator": {"read", "stop", "task", "plan"}, "admin": {"read", "stop", "task", "plan", "admin"}}
@@ -180,6 +187,29 @@ class InterventionBody(BaseModel):
     timestamp: str = Field(default="", max_length=64)
 
 
+class VoiceSafetyBody(BaseModel):
+    event_id: str = Field(min_length=1, max_length=128)
+    transcript: str = Field(max_length=200)
+    confidence: float
+    final: bool = True
+
+
+class LandmarkBody(BaseModel):
+    x: float
+    y: float
+    visibility: float = 1.0
+
+
+class GestureFrameBody(BaseModel):
+    timestamp_ms: int = Field(ge=0)
+    landmarks: list[LandmarkBody] = Field(min_length=21, max_length=21)
+
+
+class GestureSafetyBody(BaseModel):
+    event_id: str = Field(min_length=1, max_length=128)
+    frames: list[GestureFrameBody] = Field(min_length=1, max_length=60)
+
+
 INDEX_HTML = """<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>Quberon Robot Control</title><style>body{font-family:system-ui;margin:0;background:#101418;color:#fff}.wrap{max-width:760px;margin:auto;padding:20px}.banner{background:#7f1d1d;padding:14px;border-radius:12px;font-weight:800}.card{background:#1c2530;border-radius:16px;padding:18px;margin:16px 0}button{font-size:20px;padding:16px;border:0;border-radius:12px;width:100%;margin:8px 0}.stop{background:#dc2626;color:white;font-size:28px;font-weight:900}input,textarea{width:100%;box-sizing:border-box;padding:12px;margin:6px 0;border-radius:8px}pre{white-space:pre-wrap}.muted{color:#cbd5e1}</style></head>
 <body><div class='wrap'><div class='banner'>SIMULATED ROBOT - NOT AN EMERGENCY STOP</div><div class='card'><h1>__ROBOT__</h1><p class='muted'>Log in to request STOP. The QR code identifies this robot; it does not authorize you.</p>
@@ -206,6 +236,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     app = FastAPI(title="Quberon Robot Interface", docs_url=None, redoc_url=None, openapi_url=None)
     app.state.store = store
     app.state.plan_semaphore = threading.BoundedSemaphore(2)
+    app.state.voice_recognizer = VoiceStopRecognizer()
+    app.state.gesture_recognizer = OpenPalmStopRecognizer()
 
     @app.exception_handler(sqlite3.Error)
     async def sqlite_degraded(request: Request, exc: sqlite3.Error):
@@ -372,6 +404,34 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
         payload_hash = hashlib.sha256(f"{kind.value}|{source.value}|{body.evidence_text}".encode()).hexdigest()
         result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label=kind.value)
         result.update({"kind": kind.value, "source_status": source.value, "stop_triggered": True})
+        return result
+
+    @app.post("/api/robots/{robot_id}/safety-inputs/voice")
+    def voice_safety_input(robot_id: str, body: VoiceSafetyBody, request: Request):
+        """Recognize a bounded transcript observation, then use the one STOP path."""
+        row = require(request, "stop", robot_id)
+        csrf(request, row)
+        decision = app.state.voice_recognizer.recognize(VoiceObservation(body.transcript, body.confidence, body.final))
+        if not decision.stop_requested:
+            return {"event_id": body.event_id, "stop_triggered": False, "reason": decision.reason, "stop_latched": bool(store.stop_latched)}
+        payload_hash = hashlib.sha256(f"VOICE_STOP|{body.transcript}|{body.confidence}|{body.final}".encode()).hexdigest()
+        result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label="VOICE_STOP")
+        result.update({"kind": "VOICE_STOP", "source_status": "DEVICE_RECOGNIZED", "stop_triggered": True, "matched_token": decision.matched_token})
+        return result
+
+    @app.post("/api/robots/{robot_id}/safety-inputs/gesture")
+    def gesture_safety_input(robot_id: str, body: GestureSafetyBody, request: Request):
+        """Recognize recorded normalized hand observations, then use STOP."""
+        row = require(request, "stop", robot_id)
+        csrf(request, row)
+        frames = [GestureFrame(f.timestamp_ms, [HandLandmark(p.x, p.y, p.visibility) for p in f.landmarks]) for f in body.frames]
+        decision = app.state.gesture_recognizer.recognize(frames)
+        if not decision.stop_requested:
+            return {"event_id": body.event_id, "stop_triggered": False, "reason": decision.reason, "qualifying_frames": decision.qualifying_frames, "held_ms": decision.held_ms, "stop_latched": bool(store.stop_latched)}
+        canonical = json.dumps(body.model_dump(), sort_keys=True, separators=(",", ":"))
+        payload_hash = hashlib.sha256(canonical.encode()).hexdigest()
+        result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label="GESTURE_STOP")
+        result.update({"kind": "GESTURE_STOP", "source_status": "DEVICE_RECOGNIZED", "stop_triggered": True, "qualifying_frames": decision.qualifying_frames, "held_ms": decision.held_ms})
         return result
 
     @app.post("/api/robots/{robot_id}/simulated-task")

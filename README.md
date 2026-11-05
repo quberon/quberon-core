@@ -1,6 +1,6 @@
 # Quberon Robot Interface (quberon-core)
 
-![Tests](https://img.shields.io/badge/tests-21%20passed-16a34a)
+![Tests](https://img.shields.io/badge/tests-27%20passed-16a34a)
 ![Python](https://img.shields.io/badge/python-3.11-3776ab)
 ![Mode](https://img.shields.io/badge/robot-SIMULATION-b91c1c)
 ![Meta runtime](https://img.shields.io/badge/meta%20runtime-mock%20(advisory)-ea580c)
@@ -25,8 +25,8 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 | Meta use in development | ✅ Development assistance via Hermes — separate from runtime claims (see `docs/BUILT-DURING-HACKATHON.md`) |
 | Cellular (Tele2 EC25) | ✅ Project-recorded HTTP 200 data test (row 28); no failover/continuous claim |
 | GNSS | ⚠️ Reader present, NO_FIX indoors, no RTK/accuracy claim |
-| Voice / gesture interventions | 🧪 Experimental event path implemented: typed events + transcript matcher (STOP/STOPP) + synthetic fixtures through the ONE STOP service; **no microphone/camera recognition** (`docs/INTERVENTION-INPUTS.md`) |
-| Isaac Sim | 📋 Design only, not run (`docs/ISAAC-SIM-INTEGRATION.md`) |
+| Voice / gesture interventions | 🧪 Deterministic recognizers implemented for final transcript observations and normalized 21-point open-palm frames; authenticated STOP-only API, **no microphone/camera capture or physical control** (`docs/INTERVENTION-INPUTS.md`) |
+| Isaac Sim | 🧪 Versioned bridge contract + deterministic local transport + fail-closed adapter implemented; Isaac Sim itself not installed/run and adapter not runtime-enabled (`docs/ISAAC-SIM-INTEGRATION.md`) |
 
 ## 🌌 Pushing the Frontier — Building for Superintelligence
 
@@ -40,7 +40,7 @@ python3 -m venv .venv
 .venv/bin/python -m pytest -q
 ```
 
-Latest verified run: **21 passed** on Python 3.11.15 (Mac) — exact output in `docs/evidence/pytest-final.txt`, context in `docs/evidence/final-check.md`. A Mac test pass is not a Pi test pass.
+Latest verified run: **27 passed** on Python 3.11 (Mac). A Mac test pass is not a Pi or Isaac-host test pass.
 
 ## Deploy (from Mac, preserves Ethernet SSH at 10.77.0.2)
 
