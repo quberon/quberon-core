@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quberon.example.invalid/schemas/humanoids/1.0.0/capability-tuple.schema.json",
+  "title": "Manufacturer capability tuple (QIP R10, Wave 5 F6)",
+  "description": "One tuple asserts exactly one capability for one candidate entity, bound to one adapter/API surface, firmware/docs version and environment, with explicit epistemic status. mapping_claimed must be false in this wave: QIP-R10.2 permits a manufacturer stop/status/reset mapping claim only where that interface was observed in manufacturer material recorded with its source, and no such QIP mapping is claimed here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tuple_id", "record_kind", "entity", "product", "capability", "adapter", "firmware_or_docs_version", "environment", "epistemic_status", "qip_r10", "evidence", "notes"],
+  "properties": {
+    "tuple_id": {"type": "string", "pattern": "^cap-[a-z0-9-]+$"},
+    "record_kind": {"const": "manufacturer_capability_tuple"},
+    "entity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_id", "seed_name", "canonical_name", "entity_verification_status"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^cand-[a-z0-9-]+$"},
+        "seed_name": {"type": "string", "minLength": 1},
+        "canonical_name": {"type": "null"},
+        "entity_verification_status": {"const": "candidate_unverified"}
+      }
+    },
+    "product": {"type": ["string", "null"], "maxLength": 300},
+    "capability": {"enum": ["intervention_stop", "status_observation", "latch_reset", "sdk_adapter_availability", "capability_declaration"]},
+    "adapter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "name", "api_or_method", "transport"],
+      "properties": {
+        "type": {"enum": ["python_sdk", "cpp_sdk", "dds_client", "ros2_sdk", "official_docs", "none_found_in_recorded_sources", "unknown"]},
+        "name": {"type": ["string", "null"], "maxLength": 300},
+        "api_or_method": {"type": ["string", "null"], "maxLength": 500},
+        "transport": {"type": ["string", "null"], "maxLength": 300}
+      }
+    },
+    "firmware_or_docs_version": {"type": ["string", "null"], "maxLength": 200},
+    "environment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["os", "language", "network_or_domain", "notes"],
+      "properties": {
+        "os": {"type": ["string", "null"], "maxLength": 200},
+        "language": {"type": ["string", "null"], "maxLength": 100},
+        "network_or_domain": {"type": ["string", "null"], "maxLength": 300},
+        "notes": {"type": ["string", "null"], "maxLength": 1000}
+      }
+    },
+    "epistemic_status": {"enum": ["observed", "inferred", "unknown", "not_found"]},
+    "qip_r10": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mapping_claimed", "mapping_status", "declaration_status"],
+      "properties": {
+        "mapping_claimed": {"const": false},
+        "mapping_status": {"enum": ["not_claimed", "inferred_not_claimed", "observed_manufacturer_command_not_qip_claimed"]},
+        "declaration_status": {"enum": ["declared_unsupported_in_recorded_sources", "declared_unknown", "manufacturer_method_observed_no_qip_mapping_claimed"]}
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_strength", "existing_registry_source_ids", "source_url", "source_title", "source_type", "access_method", "accessed_at", "locator"],
+      "properties": {
+        "evidence_strength": {"enum": ["primary_official", "unassessed"]},
+        "existing_registry_source_ids": {"type": "array", "items": {"type": "string", "pattern": "^src-[a-z0-9-]+$"}, "uniqueItems": true},
+        "source_url": {"type": "string", "pattern": "^https://", "maxLength": 2048},
+        "source_title": {"type": ["string", "null"], "maxLength": 500},
+        "source_type": {"enum": ["official_site", "official_docs", "github_official"]},
+        "access_method": {"enum": ["manual_browser_review", "permitted_fetch", "metadata_only", "not_accessed"]},
+        "accessed_at": {"type": "string", "format": "date-time"},
+        "locator": {"type": "string", "minLength": 1, "maxLength": 2000}
+      }
+    },
+    "notes": {"type": "string", "minLength": 1, "maxLength": 2000}
+  }
+}

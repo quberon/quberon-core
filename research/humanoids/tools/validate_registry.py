@@ -225,7 +225,79 @@ def validate(root: Path = ROOT) -> dict:
     if progress.get("candidates_classified_for_human_review") != counts.get("company"):
         errors.append("index.json discovery_progress.candidates_classified_for_human_review does not match candidates.jsonl")
 
+    # --- Wave 5 F6: manufacturer capability tuples (QIP R10) ---
+    # Self-contained evidence (existing registry source_ids and/or newly
+    # fetched official URLs recorded per tuple); never promotes an entity.
+    from collections import Counter as _Counter
+    cap_counts: dict = {}
+    cap_dir = root / "capability-tuples"
+    cap_path = cap_dir / "capability-tuples.jsonl"
+    schema_path = cap_dir / "capability-tuple.schema.json"
+    try:
+        cap_schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        if cap_schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema" or not cap_schema.get("$id"):
+            errors.append("capability-tuple.schema.json: not a JSON Schema 2020-12 document with $id")
+        if cap_schema.get("$id") in ids:
+            errors.append("capability-tuple.schema.json: $id duplicates an existing schema $id")
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"capability-tuple.schema.json unreadable: {exc}")
+    tuples, cap_errs = load_jsonl(cap_path)
+    errors.extend(cap_errs)
+    counts["capability_tuple"] = len(tuples)
+    cap_counts = dict(sorted(_Counter(t.get("epistemic_status") for t in tuples).items()))
+    companies_by_id = {r.get("record_id"): r for r in company_records}
+    seen_tuples: set = set()
+    covered: set = set()
+    for t in tuples:
+        label = f"capability-tuples.jsonl:{t.get('tuple_id')}"
+        if not str(t.get("tuple_id", "")).startswith("cap-") or t.get("tuple_id") in seen_tuples:
+            errors.append(f"{label}: tuple_id must be unique and start with 'cap-'")
+        seen_tuples.add(t.get("tuple_id"))
+        ent = t.get("entity") or {}
+        cand = companies_by_id.get(ent.get("candidate_id"))
+        if cand is None:
+            errors.append(f"{label}: unknown candidate_id {ent.get('candidate_id')!r}")
+            continue
+        covered.add((ent.get("candidate_id"), t.get("capability")))
+        if ent.get("seed_name") != (cand.get("candidate_names") or [None])[0]:
+            errors.append(f"{label}: seed_name does not match candidate record (no promotion/renaming)")
+        if ent.get("canonical_name") is not None or ent.get("entity_verification_status") != "candidate_unverified":
+            errors.append(f"{label}: capability tuple must not promote entity (canonical_name=null, candidate_unverified)")
+        qip = t.get("qip_r10") or {}
+        if qip.get("mapping_claimed") is not False:
+            errors.append(f"{label}: qip_r10.mapping_claimed must be false in this wave (QIP-R10.2)")
+        ev = t.get("evidence") or {}
+        if not str(ev.get("source_url") or "").startswith("https://"):
+            errors.append(f"{label}: evidence.source_url must be an official https URL recorded with the tuple")
+        for sid in ev.get("existing_registry_source_ids") or []:
+            if sid not in source_ids:
+                errors.append(f"{label}: unknown existing registry source {sid}")
+        adapter = t.get("adapter") or {}
+        status = t.get("epistemic_status")
+        if status == "observed":
+            if ev.get("evidence_strength") != "primary_official" or ev.get("access_method") in {None, "not_accessed", "metadata_only"}:
+                errors.append(f"{label}: observed tuple requires primary_official evidence actually accessed")
+            if not adapter.get("api_or_method") or not ev.get("locator"):
+                errors.append(f"{label}: observed tuple requires adapter.api_or_method and evidence.locator")
+        elif status == "inferred":
+            if not adapter.get("api_or_method") or qip.get("mapping_status") != "inferred_not_claimed":
+                errors.append(f"{label}: inferred tuple requires an observed manufacturer method and mapping_status=inferred_not_claimed")
+        elif status in {"unknown", "not_found"}:
+            if adapter.get("api_or_method") is not None:
+                errors.append(f"{label}: {status} tuple must not name an api_or_method (fabrication guard)")
+            if status == "not_found" and "not_found in recorded sources only" not in str(t.get("notes") or ""):
+                errors.append(f"{label}: not_found must be scoped to recorded sources only")
+            if status == "unknown" and not str(t.get("notes") or "").startswith("unknown:"):
+                errors.append(f"{label}: unknown tuple must state the access reason in notes")
+        else:
+            errors.append(f"{label}: epistemic_status must be observed/inferred/unknown/not_found")
+    for cid in companies_by_id:
+        for cap in ("intervention_stop", "status_observation", "latch_reset"):
+            if (cid, cap) not in covered:
+                errors.append(f"capability-tuples.jsonl: candidate {cid} lacks an explicit {cap} tuple (unknown/not_found must be explicit, not omitted)")
+
     return {"ok": not errors, "errors": errors, "counts": counts,
+            "capability_tuple_epistemic_counts": cap_counts,
             "verified_companies": 0 if index.get("verified_count") == 0 else index.get("verified_count")}
 
 

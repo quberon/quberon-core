@@ -12,6 +12,10 @@ lab, duplicate, or out of scope; research decides, this scaffold does not.
 Layout:
   schemas/    JSON Schema 2020-12: company, source, dataset, api-surface,
               compliance-assessment, provenance-claim
+  capability-tuples/  Wave 5 F6 (QIP R10): capability-tuple schema +
+              78 manufacturer capability tuples (observed/inferred/
+              unknown/not_found; no QIP mapping claimed, no promotion).
+              See capability-tuples/README.md.
   registry/   candidates.jsonl (25 seeds) + empty source/dataset/api/
               compliance/claim registries + index.json
   cards/      dataset-card and model-card templates
