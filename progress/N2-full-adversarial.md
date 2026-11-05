@@ -53,7 +53,10 @@ results/{results.jsonl,summary.json}.
 ## Verification
 
 - .venv/bin/python -m pytest research/adversarial/tests/ -q -> 12 passed
-- make test -> 70 passed, 11 skipped (exit 0)
+- make test at a3df039 (Python 3.11.15, Darwin arm64) -> 70 passed, 11 skipped (exit 0)
+- make test at merged tip a510632 (after merging origin/main e7ff41e,
+  same host/interpreter) -> 96 passed, 13 skipped (exit 0); counts
+  differ because sibling Wave 4 nodes landed on main in between.
 - Attempts used: 2 of 3 (attempt 1: positional state rotation aliased
   subclasses to single states; fixed by case-ID hash, no gate weakened)
 
