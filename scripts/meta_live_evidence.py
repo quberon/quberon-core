@@ -17,6 +17,8 @@ patterns. Usage:
         .venv/bin/python scripts/meta_live_evidence.py [--output PATH]
 """
 import argparse
+import contextlib
+import importlib.util
 import json
 import os
 import re
@@ -46,6 +48,47 @@ def sanitize(text, secret=""):
     return text[:4000]
 
 
+def _httpx_available():
+    try:
+        return importlib.util.find_spec("httpx") is not None
+    except (ImportError, ValueError):
+        return False
+
+
+@contextlib.contextmanager
+def _provider_environ(environ):
+    """Make an explicitly supplied ``environ`` win over the process env.
+
+    LiveMetaProvider reads os.environ at construction (URL, model and the
+    key placed in the Authorization header). Previously run(environ=...)
+    checked/redacted that mapping while the provider silently used the
+    process environment, so a stale process value could select a different
+    endpoint and send a different Authorization header than the evidence
+    claimed to configure. Applying the mapping for construction *and* the
+    single propose() call fixes that precedence/header mismatch; the
+    process environment is restored afterwards, even on failure.
+    """
+    if environ is None or environ is os.environ:
+        yield
+        return
+    keys = REQUIRED_ENV + ("META_MODE", "ROBOT_ID")
+    saved = {k: os.environ.get(k) for k in keys}
+    try:
+        for key in keys:
+            value = environ.get(key)
+            if value:
+                os.environ[key] = str(value)
+            else:
+                os.environ.pop(key, None)
+        yield
+    finally:
+        for key, value in saved.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
 def _tested_commit():
     try:
         out = subprocess.run(
@@ -57,7 +100,8 @@ def _tested_commit():
         return "unknown"
 
 
-def run(output_path, environ=None, provider_factory=None, robot_id=None, now=None, commit=None):
+def run(output_path, environ=None, provider_factory=None, robot_id=None, now=None, commit=None,
+        httpx_available=None):
     environ = os.environ if environ is None else environ
     secret = environ.get("META_API_KEY", "")
     robot_id = robot_id or environ.get("ROBOT_ID", "") or DEFAULT_ROBOT_ID
@@ -75,17 +119,22 @@ def run(output_path, environ=None, provider_factory=None, robot_id=None, now=Non
 
     if missing:
         failure = "Blocked: missing required environment variable(s): " + ", ".join(missing) + ". No provider call was made."
+    elif not (_httpx_available() if httpx_available is None else httpx_available):
+        # LiveMetaProvider imports httpx inside propose(), before its own
+        # error wrapping; without a preflight that surfaces as a bare
+        # ImportError and was miscounted as a call. Block honestly, 0 calls.
+        failure = ("Blocked: missing Python dependency 'httpx' required for the live provider call. "
+                   "Install requirements.txt in the selected interpreter. "
+                   "No provider call was made and no Authorization header was sent.")
     else:
         factory = provider_factory or LiveMetaProvider
         try:
-            # Construct with the caller's environment honoured by the
-            # provider itself (LiveMetaProvider reads os.environ); tests
-            # inject a factory instead of touching process env/network.
-            provider = factory()
-            provider_label = f"live (endpoint host: {getattr(provider, 'endpoint_host', 'unknown')})"
-            model = getattr(provider, "model", model) or model
-            calls += 1  # exactly one planning call; no retries anywhere
-            plan = provider.propose(robot_id, PROMPT)
+            with _provider_environ(environ):
+                provider = factory()
+                provider_label = f"live (endpoint host: {getattr(provider, 'endpoint_host', 'unknown')})"
+                model = getattr(provider, "model", model) or model
+                calls += 1  # exactly one planning call; no retries anywhere
+                plan = provider.propose(robot_id, PROMPT)
             response_text = json.dumps(plan, indent=2, sort_keys=True, default=str)
             verdict = validate_plan(plan, robot_id, stop_latched=False)
             success = bool(verdict.get("allowed_as_proposal"))

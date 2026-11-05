@@ -84,7 +84,7 @@ class _FakeResponse:
 
 
 def test_live_provider_single_call_to_configured_endpoint_and_redacts_echo(monkeypatch):
-    import httpx
+    httpx = pytest.importorskip("httpx")
     calls = []
     payload = {"summary": f"echo {FAKE_KEY}", "robot_id": ROBOT,
                "requested_action": "SIMULATE_STATUS_CHECK", "required_capabilities": ["status"],
@@ -123,7 +123,7 @@ def test_live_provider_rejects_plain_http_remote_and_never_leaks_key_in_error(mo
         meta_mod.LiveMetaProvider()
     assert FAKE_KEY not in str(ei.value)
 
-    import httpx
+    httpx = pytest.importorskip("httpx")
     class BoomClient:
         def __init__(self, timeout=None): pass
         def __enter__(self): return self
@@ -256,6 +256,7 @@ def _valid_plan(**over):
 
 
 def _live_provider(monkeypatch, url):
+    pytest.importorskip("httpx")  # missing httpx: skip, never fake a pass
     monkeypatch.setenv("META_API_URL", url)
     monkeypatch.setenv("META_API_KEY", FAKE_KEY)
     monkeypatch.setenv("META_MODEL", "exact-test-model-1")
@@ -374,3 +375,63 @@ def test_contract_fake_success_cannot_reset_latch_grant_capability_invoke_adapte
     finally:
         srv.close()
     assert len(srv.requests) == 1  # exactly one live call for the whole flow
+
+
+# --- F8 runner repair: env precedence / Authorization header, httpx, shell --
+
+FAKE_KEY_B = "fake-test-key-B-not-a-real-credential"
+
+
+def test_evidence_environ_wins_over_process_env_for_endpoint_and_authorization(tmp_path, monkeypatch, capsys):
+    pytest.importorskip("httpx")
+    stale = _FakeServer(lambda req: (200, _envelope(_valid_plan())))
+    chosen = _FakeServer(lambda req: (200, _envelope(_valid_plan())))
+    # Stale process env would send key A to the stale endpoint/header.
+    monkeypatch.setenv("META_API_URL", stale.url)
+    monkeypatch.setenv("META_API_KEY", FAKE_KEY)
+    monkeypatch.setenv("META_MODEL", "stale-model")
+    env = {"META_API_URL": chosen.url, "META_API_KEY": FAKE_KEY_B, "META_MODEL": "exact-test-model-1"}
+    out = tmp_path / "meta-live.md"
+    try:
+        rc = meta_live_evidence.run(out, environ=env, commit="abc123", robot_id=ROBOT)
+    finally:
+        stale.close(); chosen.close()
+    captured = capsys.readouterr()
+    assert rc == 0
+    assert len(chosen.requests) == 1 and len(stale.requests) == 0
+    assert chosen.requests[0]["authorization"] == f"Bearer {FAKE_KEY_B}"
+    assert json.loads(chosen.requests[0]["body"])["model"] == "exact-test-model-1"
+    text = out.read_text()
+    assert FAKE_KEY_B not in text and FAKE_KEY not in text
+    assert FAKE_KEY_B not in captured.out and FAKE_KEY_B not in captured.err
+    # Process environment restored after the run.
+    assert os.environ["META_API_URL"] == stale.url and os.environ["META_API_KEY"] == FAKE_KEY
+
+
+def test_evidence_missing_httpx_blocks_before_any_call_and_writes_honest_record(tmp_path, capsys):
+    out = tmp_path / "meta-live.md"
+    calls = []
+    env = {"META_API_URL": "https://provider.example/v1/chat", "META_API_KEY": FAKE_KEY, "META_MODEL": "exact-test-model-1"}
+    rc = meta_live_evidence.run(out, environ=env, provider_factory=lambda: calls.append(1),
+                                commit="abc123", robot_id=ROBOT, httpx_available=False)
+    captured = capsys.readouterr()
+    text = out.read_text()
+    assert rc == 1 and calls == []
+    assert "missing Python dependency 'httpx'" in text
+    assert "Provider planning calls made: 0" in text
+    assert "Status: BLOCKED / FAILED" in text and "NOT verified" in text
+    assert FAKE_KEY not in text and FAKE_KEY not in captured.out
+
+
+def test_shell_wrapper_blocked_offline_preserves_exit_and_sets_no_defaults(tmp_path):
+    import subprocess
+    out = tmp_path / "meta-live.md"
+    env = {k: v for k, v in os.environ.items() if not k.startswith("META_")}
+    env["PYTHON"] = sys.executable
+    r = subprocess.run(["sh", "scripts/run_meta_live_evidence.sh", "--output", str(out)],
+                       cwd=os.path.join(os.path.dirname(__file__), ".."),
+                       env=env, capture_output=True, text=True, timeout=60)
+    assert r.returncode == 1
+    text = out.read_text()
+    assert "Status: BLOCKED / FAILED" in text and "Provider planning calls made: 0" in text
+    assert FAKE_KEY not in r.stdout and FAKE_KEY not in r.stderr
