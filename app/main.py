@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 from adapters.robot_sim import SimulatedRobotAdapter
 from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan
 from integrations.interventions import InterventionEvent, InterventionKind, SourceStatus, STOP_KINDS
-from integrations.secure_core import SecureCoreError, client_from_env
+from integrations.secure_core import SecureCoreError, SecureCoreRejected, SecureCoreUnavailable, client_from_env
 from integrations.recognizers import (
     GestureFrame,
     HandLandmark,
@@ -32,6 +32,7 @@ ROLES = {"viewer": {"read"}, "operator": {"read", "stop", "task", "plan"}, "admi
 ALLOWED_HOSTS = {h.strip().lower() for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,10.77.0.2,10.99.0.1,quberon-pi.local,testserver").split(",") if h.strip()}
 INSECURE_HTTP = os.environ.get("DEMO_INSECURE_HTTP", "false").lower() == "true"
 SESSION_COOKIE = "quberon_session"
+SECURE_CORE_NOT_BUILT_MESSAGE = "secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them."
 
 
 def utcnow() -> datetime:
@@ -215,8 +216,8 @@ INDEX_HTML = """<!doctype html><html lang='en'><head><meta charset='utf-8'><meta
 <title>Quberon Robot Control</title><style>body{font-family:system-ui;margin:0;background:#101418;color:#fff}.wrap{max-width:760px;margin:auto;padding:20px}.banner{background:#7f1d1d;padding:14px;border-radius:12px;font-weight:800}.card{background:#1c2530;border-radius:16px;padding:18px;margin:16px 0}button{font-size:20px;padding:16px;border:0;border-radius:12px;width:100%;margin:8px 0}.stop{background:#dc2626;color:white;font-size:28px;font-weight:900}input,textarea{width:100%;box-sizing:border-box;padding:12px;margin:6px 0;border-radius:8px}pre{white-space:pre-wrap}.muted{color:#cbd5e1}</style></head>
 <body><div class='wrap'><div class='banner'>SIMULATED ROBOT - NOT AN EMERGENCY STOP</div><div class='card'><h1>__ROBOT__</h1><p class='muted'>Log in to request STOP. The QR code identifies this robot; it does not authorize you.</p>
 <form method='post' action='/auth/login'><input name='username' autocomplete='username' placeholder='Username' required><input name='password' type='password' autocomplete='current-password' placeholder='Password' required><button>Log in</button></form></div>
-<div class='card'><h2>Control</h2><div id='status'>Loading status after login...</div><button class='stop' onclick='stopRobot()'>STOP request</button><button onclick='task()'>Request simulated task</button><button id='resetBtn' onclick='resetSim()'>Admin: reset simulation latch</button><form onsubmit='plan(event)'><textarea id='planText' placeholder='Describe a simulated job...'></textarea><button>Request Meta plan proposal</button></form><h3>Experimental intervention inputs (NOT recognition)</h3><input id='intervText' placeholder='Transcript for matcher test, e.g. STOP or STOPP'><button onclick='interv("VOICE_STOP")'>Test transcript matcher → STOP</button><button onclick='interv("GESTURE_STOP")'>Inject SYNTHETIC gesture event → STOP</button><button onclick='interv("PANIC_CANDIDATE")'>Record PANIC_CANDIDATE (audit only)</button><pre id='out'></pre><h3>Recent audit events</h3><pre id='events'>—</pre><button onclick='logout()'>Log out</button></div></div>
-<script>let csrf='';let lastOk=0;async function load(){try{let r=await fetch('/api/robots/__ROBOT__/status');if(!r.ok)throw new Error(r.status);let j=await r.json();lastOk=Date.now();document.getElementById('status').textContent=JSON.stringify(j,null,2)+'\nLast update: '+new Date(lastOk).toLocaleTimeString();csrf=j.csrf_token||'';document.getElementById('resetBtn').style.display=(j.capabilities||[]).includes('admin')?'block':'none';let ev=await (await fetch('/api/robots/__ROBOT__/events')).json().catch(()=>[]);document.getElementById('events').textContent=(ev||[]).slice(0,8).map(e=>e.ts+' '+e.action+' '+e.auth_result+' '+(e.command_state||'')).join('\n')}catch(e){document.getElementById('status').textContent='STALE / UNCONFIRMED — status fetch failed ('+(lastOk?Math.round((Date.now()-lastOk)/1000)+'s since last update':'no successful update yet')+'). Do not assume robot state.'}}
+<div class='card'><h2>Control</h2><div id='status'>Loading status after login...</div><div id='coreNotice'>__CORE_NOTICE__</div><button class='stop' onclick='stopRobot()'>STOP request</button><button id='taskBtn' onclick='task()'>Request simulated task</button><button id='resetBtn' onclick='resetSim()'>Admin: reset simulation latch</button><form onsubmit='plan(event)'><textarea id='planText' placeholder='Describe a simulated job...'></textarea><button>Request Meta plan proposal</button></form><h3>Experimental intervention inputs (NOT recognition)</h3><input id='intervText' placeholder='Transcript for matcher test, e.g. STOP or STOPP'><button onclick='interv("VOICE_STOP")'>Test transcript matcher → STOP</button><button onclick='interv("GESTURE_STOP")'>Inject SYNTHETIC gesture event → STOP</button><button onclick='interv("PANIC_CANDIDATE")'>Record PANIC_CANDIDATE (audit only)</button><pre id='out'></pre><h3>Recent audit events</h3><pre id='events'>—</pre><button onclick='logout()'>Log out</button></div></div>
+<script>let csrf='';let lastOk=0;async function load(){try{let r=await fetch('/api/robots/__ROBOT__/status');if(!r.ok)throw new Error(r.status);let j=await r.json();lastOk=Date.now();document.getElementById('status').textContent=JSON.stringify(j,null,2)+'\nLast update: '+new Date(lastOk).toLocaleTimeString();csrf=j.csrf_token||'';let degraded=j.secure_core_available===false;let notice=document.getElementById('coreNotice');notice.textContent=degraded?(j.secure_core_message||''):'';notice.style.display=degraded?'block':'none';document.getElementById('taskBtn').disabled=degraded;document.getElementById('resetBtn').disabled=degraded;document.getElementById('resetBtn').style.display=(j.capabilities||[]).includes('admin')?'block':'none';let ev=await (await fetch('/api/robots/__ROBOT__/events')).json().catch(()=>[]);document.getElementById('events').textContent=(ev||[]).slice(0,8).map(e=>e.ts+' '+e.action+' '+e.auth_result+' '+(e.command_state||'')).join('\n')}catch(e){document.getElementById('status').textContent='STALE / UNCONFIRMED — status fetch failed ('+(lastOk?Math.round((Date.now()-lastOk)/1000)+'s since last update':'no successful update yet')+'). Do not assume robot state.'}}
 async function post(path,body,key){let r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'Idempotency-Key':key||crypto.randomUUID()},body:JSON.stringify(body)});let j=await r.json();document.getElementById('out').textContent=JSON.stringify(j,null,2);load()}
 function stopRobot(){post('/api/robots/__ROBOT__/stop',{note:'phone UI STOP request'})}async function interv(kind){let r=await fetch('/api/robots/__ROBOT__/interventions',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({kind:kind,source_status:'SYNTHETIC',event_id:crypto.randomUUID(),evidence_text:document.getElementById('intervText').value})});let j=await r.json();document.getElementById('out').textContent=JSON.stringify(j,null,2);load()}function task(){post('/api/robots/__ROBOT__/simulated-task',{action:'SIMULATE_INSPECTION'})}function resetSim(){if(confirm('Reset simulated latch? This does not start a task.'))post('/api/robots/__ROBOT__/simulation-reset',{confirm:'RESET_SIMULATION'})}async function plan(e){e.preventDefault();post('/api/robots/__ROBOT__/plan',{text:document.getElementById('planText').value})}async function logout(){await fetch('/auth/logout',{method:'POST',headers:{'X-CSRF-Token':csrf}});location.reload()}load();setInterval(load,2000)</script></body></html>"""
 
@@ -239,16 +240,37 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     app.state.plan_semaphore = threading.BoundedSemaphore(2)
     app.state.voice_recognizer = VoiceStopRecognizer()
     app.state.gesture_recognizer = OpenPalmStopRecognizer()
-    # Rust secure core: every STOP (button/voice/gesture/intervention) must be
-    # authorized here before SimulatedRobotAdapter.stop is invoked. "auto"
-    # builds a client from env: production requires an external key,
-    # development explicitly allows ephemeral keys, no mode = fail closed.
+    # Rust secure core: STOP should obtain a signed ACCEPTED decision here
+    # before SimulatedRobotAdapter.stop is invoked as a signed stop. If the
+    # core is unavailable, an authenticated STOP still executes UNSIGNED
+    # (latch retained, audit-marked); a reachable rejection fails closed.
+    # Reset / simulated-task (motion-permitting) require core availability.
+    # "auto" builds a client from env: production requires an external key,
+    # development explicitly allows ephemeral keys, no mode = no client
+    # (which the STOP path above treats as unavailable, not as a rejection).
     if secure_core == "auto":
         try:
             secure_core = client_from_env(ROBOT_ID, app_db_path=db_path)
         except Exception:
             secure_core = None
     app.state.secure_core = secure_core
+
+    def secure_core_available() -> bool:
+        """Motion-permitting ops require a present core client/binary."""
+        client = app.state.secure_core
+        if client is None:
+            return False
+        binary = getattr(client, "binary", None)
+        if binary is None:
+            return True
+        try:
+            return Path(str(binary)).is_file()
+        except Exception:
+            return False
+
+    def require_secure_core_for_motion():
+        if not secure_core_available():
+            raise HTTPException(503, "secure core unavailable; latch retained and motion-permitting operation blocked (unsigned reset/task not permitted)")
 
     @app.exception_handler(sqlite3.Error)
     async def sqlite_degraded(request: Request, exc: sqlite3.Error):
@@ -312,7 +334,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     def robot_page(robot_id: str):
         if robot_id != ROBOT_ID:
             raise HTTPException(404, "robot not found")
-        return INDEX_HTML.replace("__ROBOT__", ROBOT_ID)
+        return INDEX_HTML.replace("__ROBOT__", ROBOT_ID).replace("__CORE_NOTICE__", "" if secure_core_available() else SECURE_CORE_NOT_BUILT_MESSAGE)
 
     @app.post("/auth/login")
     def login(username: str = Form(...), password: str = Form(...)):
@@ -344,7 +366,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     def status(robot_id: str, request: Request):
         row = require(request, "read", robot_id)
         data = store.status()
-        data.update({"actor": row["username"], "role": row["role"], "capabilities": sorted(ROLES[row["role"]]), "csrf_token": row["csrf"]})
+        data.update({"actor": row["username"], "role": row["role"], "capabilities": sorted(ROLES[row["role"]]), "csrf_token": row["csrf"], "secure_core_available": secure_core_available(), "secure_core_message": None if secure_core_available() else SECURE_CORE_NOT_BUILT_MESSAGE})
         return data
 
     def execute_stop(actor_username: str, robot_id: str, idempotency_key: str, payload_hash: str, action_label: str = "STOP"):
@@ -365,29 +387,42 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                     # Historical duplicate: report the recorded result as history,
                     # never as a claim about the simulator's CURRENT state (fix A).
                     return {"command_id": existing["id"], "command_state": existing["command_state"], "observed_state": existing["observed_state"], "historical_duplicate": True, "current_stop_latched": bool(store.stop_latched), "current_observed_state": store.observed_state, "stop_latched": bool(store.stop_latched), "duplicate": True}
-                # Rust secure-core gate (Increment 1): no Rust ACCEPTED
-                # decision => no adapter invocation, latch retained, UNKNOWN.
+                # Rust secure-core attestation: ACCEPTED = signed stop.
+                # Core unavailable: authenticated simulation STOP still
+                # executes UNSIGNED (adapter invoked, latch retained,
+                # audit UNSIGNED/core_unavailable). Reachable REJECTED:
+                # fail closed, no adapter, latch retained, UNKNOWN.
                 core_client = app.state.secure_core
+                core_decision = {}
+                secure_core_obj = {"status": "unavailable", "decision": None, "sequence": None, "audit_record": None, "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}
+                auth_result = "UNSIGNED/core_unavailable"
+                detail_prefix = "UNSIGNED core_unavailable: no signed secure-core decision; authenticated simulation STOP executed without attestation; "
                 try:
                     if core_client is None:
-                        raise SecureCoreError("secure core unavailable")
+                        raise SecureCoreUnavailable("secure core unavailable")
                     core_decision = core_client.authorize_stop(subject=actor_username)
+                    secure_core_obj = {"status": "accepted", "decision": core_decision.get("code"), "sequence": core_decision.get("sequence"), "audit_record": core_decision.get("audit_record"), "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}
+                    auth_result = "allowed"
+                    detail_prefix = ""
+                except SecureCoreUnavailable:
+                    pass
                 except Exception as exc:
-                    code = str(exc) if isinstance(exc, SecureCoreError) else type(exc).__name__
+                    decision = exc.decision if isinstance(exc, SecureCoreRejected) else {}
+                    code = decision.get("code") or (str(exc) if isinstance(exc, SecureCoreError) else type(exc).__name__)
                     eid = secrets.token_urlsafe(16)
                     db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, "secure_core_rejected", idempotency_key, payload_hash, "UNKNOWN", "UNKNOWN", f"secure core did not authorize STOP; adapter not invoked; {code}"))
                     store.set_state(db, True, "UNKNOWN")
                     db.execute("COMMIT")
-                    raise HTTPException(503, "secure core did not authorize STOP; latch retained, state UNKNOWN, adapter not invoked")
+                    return JSONResponse(status_code=503, content={"detail": "secure core rejected STOP; latch retained, state UNKNOWN, adapter not invoked", "command_id": eid, "command_state": "UNKNOWN", "observed_state": "UNKNOWN", "stop_latched": True, "secure_core": {"status": "rejected", "decision": code, "sequence": decision.get("sequence"), "audit_record": decision.get("audit_record"), "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}})
                 result = adapter.stop()
                 eid = secrets.token_urlsafe(16)
-                db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, "allowed", idempotency_key, payload_hash, result.command_state, result.observed_state, result.detail))
+                db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, auth_result, idempotency_key, payload_hash, result.command_state, result.observed_state, detail_prefix + (result.detail or "")))
                 if result.command_state == "ACKNOWLEDGED":
                     store.set_state(db, True, result.observed_state)
                 else:
                     store.set_state(db, True, "UNKNOWN")
                 db.execute("COMMIT")
-                return {"command_id": eid, "command_state": result.command_state, "observed_state": store.observed_state, "stop_latched": True, "detail": result.detail, "secure_core": {"decision": core_decision.get("code"), "audit_record": core_decision.get("audit_record"), "sequence": core_decision.get("sequence"), "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}}
+                return {"command_id": eid, "command_state": result.command_state, "observed_state": store.observed_state, "stop_latched": True, "detail": result.detail, "secure_core": secure_core_obj}
 
     @app.post("/api/robots/{robot_id}/stop")
     def stop(robot_id: str, body: StopBody, request: Request, idempotency_key: str = Header(..., alias="Idempotency-Key")):
@@ -428,6 +463,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
             return {"event_id": eid, "kind": kind.value, "stop_triggered": False, "stop_latched": bool(store.stop_latched), "note": "PANIC_CANDIDATE is recorded for human review only; it is not panic detection and never triggers or clears a stop."}
         payload_hash = hashlib.sha256(f"{kind.value}|{source.value}|{body.evidence_text}".encode()).hexdigest()
         result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label=kind.value)
+        if isinstance(result, JSONResponse):
+            return result
         result.update({"kind": kind.value, "source_status": source.value, "stop_triggered": True})
         return result
 
@@ -441,6 +478,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
             return {"event_id": body.event_id, "stop_triggered": False, "reason": decision.reason, "stop_latched": bool(store.stop_latched)}
         payload_hash = hashlib.sha256(f"VOICE_STOP|{body.transcript}|{body.confidence}|{body.final}".encode()).hexdigest()
         result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label="VOICE_STOP")
+        if isinstance(result, JSONResponse):
+            return result
         result.update({"kind": "VOICE_STOP", "source_status": "DEVICE_RECOGNIZED", "stop_triggered": True, "matched_token": decision.matched_token})
         return result
 
@@ -456,6 +495,8 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
         canonical = json.dumps(body.model_dump(), sort_keys=True, separators=(",", ":"))
         payload_hash = hashlib.sha256(canonical.encode()).hexdigest()
         result = execute_stop(row["username"], robot_id, body.event_id, payload_hash, action_label="GESTURE_STOP")
+        if isinstance(result, JSONResponse):
+            return result
         result.update({"kind": "GESTURE_STOP", "source_status": "DEVICE_RECOGNIZED", "stop_triggered": True, "qualifying_frames": decision.qualifying_frames, "held_ms": decision.held_ms})
         return result
 
@@ -470,6 +511,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                 raise HTTPException(503, "persistence degraded")
             if store.stop_latched:
                 raise HTTPException(409, "STOP latch is active; simulated task rejected")
+            require_secure_core_for_motion()
             if idempotency_key:
                 # Fix F: exact retry returns the previous result WITHOUT invoking
                 # the adapter again; same key + different action is a conflict.
@@ -494,6 +536,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
             raise HTTPException(400, "explicit confirmation required")
         if not store.persistence_ok:
             raise HTTPException(503, "persistence degraded; reset inhibited")
+        require_secure_core_for_motion()
         with store.lock:
             result = adapter.reset_simulation()
             eid = event(row["username"], robot_id, "SIMULATION_RESET", "allowed", None, None, result)

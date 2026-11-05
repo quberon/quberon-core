@@ -1,0 +1,35 @@
+LANE A FRESH CLONE WITH RUST
+UTC: 2026-11-05T09:00:16Z
+Host: Mac Darwin 24.3.0
+Tip tested: ca8cd4db1623b1c525e7aed46a70b631f0bf3abb
+Clone: fresh, no .venv, no target at clone time
+python3.11: /Users/quberon1/.local/bin/python3.11 Python 3.11.15
+cargo: cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)
+rustc: rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)
+=== make setup ===
+   Compiling rusqlite v0.32.1
+   Compiling quberon-secure-core v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/lane-a-fresh-1793869162/with-rust/crates/quberon-secure-core)
+   Compiling quberon-secure-core-cli v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/lane-a-fresh-1793869162/with-rust/apps/quberon-secure-core-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.82s
+=== make test ===
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+48 passed, 1 warning in 7.36s
+=== cargo fmt --check ===
+FMT-OK
+=== cargo clippy ===
+    Checking quberon-secure-core-cli v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/lane-a-fresh-1793869162/with-rust/apps/quberon-secure-core-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.27s
+=== cargo test ===
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+=== python suite repeat x2 ===
+48 passed, 1 warning in 6.24s
+48 passed, 1 warning in 6.27s
+=== make demo probe (documented make demo, probed then terminated) ===
+demo HTTP 200 ->
+/bin/bash: line 16: 84667 Terminated: 15          make demo > /tmp/demo-rust.log 2>&1
+.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+INFO:     Started server process [84670]
+INFO:     Waiting for application startup.

@@ -1,4 +1,4 @@
-import os, sys, time
+import os, shutil, sys, time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import pytest
 from fastapi.testclient import TestClient
@@ -6,6 +6,10 @@ from app.main import create_app, Store
 from scripts.generate_qr import wifi_payload
 
 ROBOT = "quberon-demo-001"
+BIN = os.path.join(os.path.dirname(__file__), "..", "target", "debug", "quberon-secure-core-cli")
+# Reset/task-after-reset require secure-core availability (fail-closed
+# without it); STOP itself runs unsigned. See docs/SECURE-CORE.md.
+needs_rust = pytest.mark.skipif(not os.path.isfile(BIN), reason="Rust CLI not built: reset/task require secure core")
 
 @pytest.fixture(autouse=True)
 def _dev_secure_core_mode(monkeypatch):
@@ -62,6 +66,7 @@ def test_csrf_required_and_operator_stop_idempotent_conflict(tmp_path):
     assert conflict.status_code == 409
     assert status(c)["stop_latched"] is True
 
+@needs_rust
 def test_task_blocked_latched_admin_reset_no_task_started(tmp_path):
     c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123")
     r = c.post(f"/api/robots/{ROBOT}/simulated-task", json={"action": "SIMULATE_INSPECTION"}, headers={"X-CSRF-Token": csrf})
@@ -132,6 +137,7 @@ def test_gnss_parser_no_fix_and_fix_and_bad_checksum():
     assert abs(st.latitude - 48.1173) < 1e-4 and abs(st.longitude - 11.516667) < 1e-4
     assert not parse_sentence("$GNGGA,badchecksum*00", st)
 
+@needs_rust
 def test_stale_stop_replay_after_reset_and_task(tmp_path):
     # Full A sequence on ONE shared DB.
     c, db = make_client(tmp_path)
@@ -174,6 +180,7 @@ def test_runtime_db_failure_fails_closed(tmp_path):
     assert hz["ok"] is False and hz["persistence_ok"] is False
 
 
+@needs_rust
 def test_duplicate_task_key_does_not_reinvoke_or_500(tmp_path):
     # Fix F: need unlatched app -> admin reset first on shared DB.
     c, db = make_client(tmp_path)
@@ -323,3 +330,44 @@ def test_meta_validator_rejects_bad_schema_and_live_unconfigured(monkeypatch):
         monkeypatch.delenv(var, raising=False)
     with pytest.raises(MetaProviderError):
         LiveMetaProvider()
+
+DEGRADED_MSG = "secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them."
+
+def test_b5_degraded_ui_message_and_disabled_controls(tmp_path):
+    c, _, csrf = auth_client(tmp_path, "operator1", "operator-password-123", secure_core=None)
+    st = status(c)
+    assert st["secure_core_available"] is False
+    assert st["secure_core_message"] == DEGRADED_MSG
+    page = c.get(f"/robots/{ROBOT}").text
+    assert DEGRADED_MSG in page
+    assert "id='taskBtn'" in page and "id='resetBtn'" in page
+    # UI disables (not errors on) the motion-permitting controls when degraded.
+    assert "document.getElementById('taskBtn').disabled=degraded" in page
+    assert "document.getElementById('resetBtn').disabled=degraded" in page
+    assert "secure_core_available===false" in page
+
+@pytest.mark.skipif(shutil.which("make") is None, reason="make not available in this environment (e.g. python:3.11-slim CI container); verified where make exists")
+def test_b5_make_demo_prints_exact_degraded_message():
+    # Regression: subprocess.run(timeout=...) kills only `make`, orphaning
+    # the uvicorn child on port 8000 (state leakage: the next run then
+    # passes in <1s via bind failure instead of serving). Start `make`
+    # in its own process group and kill the whole group after probing.
+    import signal, subprocess
+    repo = os.path.join(os.path.dirname(__file__), "..")
+    proc = subprocess.Popen(
+        ["make", "demo", "CORE_CLI=", f"VENV_PY={sys.executable}"],
+        cwd=repo, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True, start_new_session=True,
+    )
+    try:
+        try:
+            text, _ = proc.communicate(timeout=3)
+        except subprocess.TimeoutExpired:
+            # Server is blocking as documented; message was printed first.
+            os.killpg(proc.pid, signal.SIGTERM)
+            text, _ = proc.communicate(timeout=5)
+    finally:
+        if proc.poll() is None:
+            os.killpg(proc.pid, signal.SIGKILL)
+            proc.wait(timeout=5)
+    assert DEGRADED_MSG in text.splitlines(), text[-2000:]

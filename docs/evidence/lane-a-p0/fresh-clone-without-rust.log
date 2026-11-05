@@ -1,0 +1,35 @@
+LANE A FRESH CLONE WITHOUT RUST
+UTC: 2026-11-05T09:01:01Z
+Host: Mac Darwin 24.3.0
+Tip tested: ca8cd4db1623b1c525e7aed46a70b631f0bf3abb
+Clone: fresh, no .venv, no target at clone time
+python3.11: /Users/quberon1/.local/bin/python3.11 Python 3.11.15
+cargo: NO CARGO
+rustc: NO RUSTC
+ls: target/debug/quberon-secure-core-cli: No such file or directory
+ls: target/release/quberon-secure-core-cli: No such file or directory
+=== make setup ===
+[notice] A new release of pip is available: 24.0 -> 26.3
+[notice] To update, run: /private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/lane-a-fresh-1793869162/without-rust/.venv/bin/python -m pip install --upgrade pip
+secure core not built - STOP will run with unsigned attestation; see docs/SECURE-CORE.md
+=== make test ===
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+37 passed, 11 skipped, 1 warning in 6.11s
+=== named Lane A + B5 tests ===
+
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/lane-a-fresh-1793869162/without-rust/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================= 4 passed, 1 warning in 3.52s =========================
+=== make demo probe ===
+demo HTTP 200
+secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them.
+.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+INFO:     Started server process [84784]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53244 - "GET /robots/quberon-demo-001 HTTP/1.1" 200 OK

@@ -1,0 +1,17 @@
+HOST=quberon-pi
+UTC=2026-11-05T08:00:56Z
+---PROCESS---
+quberon1     797  0.2  5.1 135216 48052 ?        Ssl  Nov04   3:32 /home/quberon1/quberon-robot-interface/.venv/bin/python3 /home/quberon1/quberon-robot-interface/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-certfile /home/quberon1/.config/quberon-robot-interface/server.crt --ssl-keyfile /home/quberon1/.config/quberon-robot-interface/server.key
+DEPLOY_DIR=/home/quberon1/quberon-robot-interface
+---APP_MAIN_GREP---
+NO_MATCH_app/main.py
+---INTEGRATIONS_LS---
+total 12
+-rw-r--r-- 1 quberon1 quberon1    0 Nov  2 02:38 __init__.py
+drwxr-xr-x 2 quberon1 quberon1 4096 Nov  2 02:47 __pycache__
+-rw-r--r-- 1 quberon1 quberon1 4300 Nov  2 02:38 meta.py
+---INTEGRATIONS_GREP---
+NO_MATCH_integrations
+---SECURE_CORE_CLI---
+ls: cannot access 'target/debug/quberon-secure-core-cli': No such file or directory
+ls: cannot access 'target/release/quberon-secure-core-cli': No such file or directory

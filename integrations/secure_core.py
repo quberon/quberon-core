@@ -3,23 +3,29 @@
 SIMULATION ONLY, STOP AUTHORIZATION ONLY. NO PHYSICAL CONTROL.
 NOT A SAFETY-RATED E-STOP.
 
-Every STOP request in the app must obtain an ACCEPTED decision from the
+Every STOP request in the app should obtain an ACCEPTED decision from the
 Rust core (via the ``quberon-secure-core-cli`` subprocess) before
-``SimulatedRobotAdapter.stop`` may be invoked. Any client, subprocess,
-or core error raises :class:`SecureCoreError`; callers must fail closed
-(latch retained, observed state UNKNOWN, no adapter invocation).
+``SimulatedRobotAdapter.stop`` may be invoked as a *signed* stop. If the
+core is simply unavailable (no binary / cannot run), the app may still
+execute an authenticated simulation STOP but must mark it UNSIGNED /
+core_unavailable (see docs/SECURE-CORE.md, "Which direction does this
+fail?"). If a reachable core *rejects* the request, or returns malformed
+output, callers must fail closed (latch retained, observed state UNKNOWN,
+no adapter invocation). Motion-permitting operations (reset / task)
+always fail closed when the core is unavailable.
 
 Key custody (Increment 2):
-- Production mode (``QUBERON_SECURE_CORE_MODE=production``) FAILS CLOSED
-  unless an external signing key is supplied via
+- Production mode (``QUBERON_SECURE_CORE_MODE=production``) provisions
+  no client unless an external signing key is supplied via
   ``QUBERON_SECURE_CORE_SIGNING_KEY_FILE`` (a file with strict 0600
   permissions, never committed) or ``QUBERON_SECURE_CORE_SIGNING_KEY_HEX``
   (injected by an external secrets manager), plus a verifying key and an
   explicit core DB path. An audit anchor path should also be configured.
 - Ephemeral keys exist ONLY in explicit development mode
   (``QUBERON_SECURE_CORE_MODE=development``). There is no permissive
-  default: with no mode set, no client is provisioned and STOP fails
-  closed.
+  default: with no mode set, no client is provisioned; the app treats
+  that as core *unavailable* (authenticated STOP may proceed UNSIGNED;
+  motion-permitting operations remain blocked).
 Signing is performed by the Rust CLI, not by Python.
 """
 from __future__ import annotations
@@ -38,7 +44,26 @@ MAX_SUBJECT_CHARS = 128
 
 
 class SecureCoreError(Exception):
-    """Any failure of the Rust secure-core boundary. Always fail closed."""
+    """Any failure of the Rust secure-core boundary."""
+
+
+class SecureCoreUnavailable(SecureCoreError):
+    """No core decision was obtained: binary missing or cannot run.
+
+    Optional attestation is unavailable. An authenticated simulation
+    STOP may proceed UNSIGNED; motion-permitting operations must not.
+    """
+
+
+class SecureCoreRejected(SecureCoreError):
+    """A reachable core (or its structured reply) did not accept.
+
+    Fail closed: no adapter invocation for STOP, reset, or task.
+    """
+
+    def __init__(self, message, decision=None):
+        super().__init__(message)
+        self.decision = decision if isinstance(decision, dict) else {}
 
 
 def _default_binary() -> Path:
@@ -153,7 +178,7 @@ class SecureCoreClient:
     # -- subprocess plumbing -------------------------------------------------
     def _run_cli(self, args, payload: dict) -> dict:
         if not self.binary.is_file():
-            raise SecureCoreError(f"secure core binary not found: {self.binary}")
+            raise SecureCoreUnavailable(f"secure core binary not found: {self.binary}")
         try:
             proc = subprocess.run(
                 [str(self.binary), *args],
@@ -162,15 +187,15 @@ class SecureCoreClient:
                 timeout=self.timeout_s, check=False,
             )
         except Exception as exc:  # timeout, spawn failure, ...
-            raise SecureCoreError(f"secure core subprocess failed: {type(exc).__name__}") from exc
+            raise SecureCoreUnavailable(f"secure core subprocess failed: {type(exc).__name__}") from exc
         if len(proc.stdout) > MAX_CORE_OUTPUT_BYTES:
-            raise SecureCoreError("secure core output too large")
+            raise SecureCoreRejected("secure core output too large")
         try:
             data = json.loads(proc.stdout.decode())
         except Exception as exc:
-            raise SecureCoreError("secure core returned malformed output") from exc
+            raise SecureCoreRejected("secure core returned malformed output") from exc
         if not isinstance(data, dict):
-            raise SecureCoreError("secure core returned non-object output")
+            raise SecureCoreRejected("secure core returned non-object output")
         return data
 
     def _next_sequence(self) -> int:
@@ -178,7 +203,7 @@ class SecureCoreClient:
         try:
             _atomic_write_int(self._seq_path, self._sequence)
         except Exception as exc:
-            raise SecureCoreError("sequence persistence failed") from exc
+            raise SecureCoreUnavailable("sequence persistence failed") from exc
         return self._sequence
 
     # -- public API -----------------------------------------------------------
@@ -203,7 +228,7 @@ class SecureCoreClient:
                 "expires_at_unix": now + 120,
             })
             if "signature" not in envelope:
-                raise SecureCoreError(f"signing failed: {envelope.get('code', 'UNKNOWN')}")
+                raise SecureCoreRejected(f"signing failed: {envelope.get('code', 'UNKNOWN')}", decision=envelope)
             authorize_req = {
                 "db_path": self.db_path, "trusted": self.trusted,
                 "envelope": envelope, "now_unix": now, "boot_epoch": self.epoch,
@@ -214,10 +239,10 @@ class SecureCoreClient:
             decision = self._run_cli(["authorize"], authorize_req)
         if decision.get("outcome") != "ACCEPTED" or \
                 decision.get("code") != "ACCEPTED_SIMULATION_STOP_AUTHORIZATION":
-            raise SecureCoreError(f"secure core rejected STOP: {decision.get('code', 'UNKNOWN')}")
+            raise SecureCoreRejected(f"secure core rejected STOP: {decision.get('code', 'UNKNOWN')}", decision=decision)
         if decision.get("robot_id") != self.robot_id or \
                 decision.get("simulation_id") != self.simulation_id:
-            raise SecureCoreError("secure core decision scope mismatch")
+            raise SecureCoreRejected("secure core decision scope mismatch", decision=decision)
         return decision
 
 
@@ -253,10 +278,16 @@ def client_from_env(robot_id, app_db_path=None):
     """Build a client from QUBERON_SECURE_CORE_* env.
 
     - production: external key (file 0600 or secrets-manager hex) + verifying
-      key + DB path required; anything missing -> None (fail closed).
+      key + DB path required; anything missing -> None.
     - development: explicit opt-in; ephemeral keys allowed, or an env key
       if one is supplied.
-    - unset/unknown mode: None (fail closed). No permissive default.
+    - unset/unknown mode: None. No permissive default.
+    - binary missing: None.
+
+    Returning None means the core is *unavailable* at the app boundary:
+    an authenticated simulation STOP may then proceed UNSIGNED, while
+    reset/task (motion-permitting) must fail closed. It does not mean a
+    reachable core rejected anything.
     """
     binary = _default_binary()
     if not binary.is_file():

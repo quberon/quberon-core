@@ -1,6 +1,5 @@
 # Quberon Robot Interface (quberon-core)
 
-![Tests](https://img.shields.io/badge/tests-44%20python%20%2B%2017%20rust%20passed-16a34a)
 ![Python](https://img.shields.io/badge/python-3.11-3776ab)
 ![Rust](https://img.shields.io/badge/rust-secure%20core%20(increment%202)-dea584)
 ![Mode](https://img.shields.io/badge/robot-SIMULATION-b91c1c)
@@ -29,7 +28,7 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 | Voice / gesture interventions | 🧪 Deterministic recognizers implemented for final transcript observations and normalized 21-point open-palm frames; authenticated STOP-only API, **no microphone/camera capture or physical control** (`docs/INTERVENTION-INPUTS.md`) |
 | Isaac Sim | 🧪 Versioned bridge contract + deterministic local transport + fail-closed adapter implemented; Isaac Sim itself not installed/run and adapter not runtime-enabled (`docs/ISAAC-SIM-INTEGRATION.md`) |
 | Frontier Phase 1 research | 🧪 Provenance-first humanoid registry scaffold: 6 schemas, 25 unverified seed candidates, stdlib validator, legal + voice/gesture-STOP roadmaps (`research/humanoids/`, `docs/frontier-phase1/`) — no verified companies, no universe-size claim, no physical control |
-| Rust secure core (Increment 2) | 🧪 Implemented + tested on this branch: Ed25519-signed, scope-pinned, STOP-only envelope (Increment 1) plus epoch binding, key validity/revocation scaffolding, external audit anchor with rollback detection, fault-injection + SQLite write-failure tests, audit-capacity fail-closed, production/development key-custody modes, STOP-isolated rate limiting; every `execute_stop` STOP requires a Rust ACCEPTED decision before `SimulatedRobotAdapter.stop()` — any core error = latch retained, UNKNOWN, no adapter call (`docs/SECURE-CORE.md`). Local 2026-11-05: cargo audit + cargo deny ok, CycloneDX SBOM (98 components) verified, fuzz targets written but **not run** (cargo-fuzz unavailable, exit 77). **SIMULATION ONLY, STOP AUTHORIZATION ONLY, NO PHYSICAL CONTROL, NOT A SAFETY-RATED E-STOP.** Not externally reviewed, audited, or certified; no HSM, secure OTA, or SLSA provenance claim |
+| Rust secure core (Increment 2) | 🧪 Implemented + tested: Ed25519-signed, scope-pinned, STOP-only envelope (Increment 1) plus epoch binding, key validity/revocation scaffolding, external audit anchor with rollback detection, fault-injection + SQLite write-failure tests, audit-capacity fail-closed, production/development key-custody modes, STOP-isolated rate limiting; `execute_stop` requests a Rust ACCEPTED decision — if the core is unavailable an authenticated simulation STOP still executes UNSIGNED (audit `UNSIGNED/core_unavailable`), a reachable core rejection fails closed (no adapter call, latch retained, UNKNOWN, HTTP 503), and reset/task remain blocked without signed core availability (`docs/SECURE-CORE.md`). **SIMULATION ONLY, STOP AUTHORIZATION ONLY, NO PHYSICAL CONTROL, NOT A SAFETY-RATED E-STOP.** Not externally reviewed, audited, or certified; no HSM, secure OTA, or SLSA provenance claim |
 
 ## 🌌 Pushing the Frontier — Building for Superintelligence
 
@@ -37,15 +36,75 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 
 ## Run locally
 
+Quickstart (exact commands, from a clean clone). The same commands work
+with and without Rust; the difference is only whether `make setup`
+builds the secure-core CLI:
+
+With Rust (cargo on PATH — signed secure-core attestation available):
+
 ```sh
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python -m pytest -q
+make setup
+make test
+make core
+cargo test --workspace
+make demo
 ```
 
-Latest verified run (2026-11-05, local Mac): **44 passed** Python (3.11, project `.venv`), **17 passed** Rust (14 core unit/property + 3 CLI integration, `cargo test --workspace --all-features`), `cargo fmt --check` and `cargo clippy --workspace --all-targets --all-features -- -D warnings` clean, `cargo audit` and `cargo deny check` ok, SBOM verified (98 components). Fuzz smoke: **not run** (cargo-fuzz unavailable, exit 77). A Mac test pass is not a Pi or Isaac-host test pass.
+Without Rust (no cargo — STOP runs with unsigned attestation; reset and
+simulated tasks remain blocked; see `docs/SECURE-CORE.md`,
+"Which direction does this fail?"):
 
-Rust secure core: `cargo build --workspace && cargo test --workspace` (the Python STOP gate needs the built CLI at `target/debug/quberon-secure-core-cli` or `$QUBERON_SECURE_CORE_BIN`). See `docs/SECURE-CORE.md`.
+```sh
+make setup
+make test
+make demo
+```
+
+`make setup` creates `.venv` (preferring `python3.11` when available,
+falling back to `python3`; Python 3.11 is the documented version),
+installs `requirements.txt`, and builds
+the Rust CLI when cargo is present. Without cargo it prints exactly:
+
+```text
+secure core not built - STOP will run with unsigned attestation; see docs/SECURE-CORE.md
+```
+
+`make test` runs the Python suite (`.venv/bin/python -m pytest -q`).
+The suite is green in both modes: Rust-dependent reset/task tests are
+skipped when the CLI is not built, and the degraded unsigned-STOP path
+is exercised in both modes. Verified counts and raw output for both
+modes are recorded in `docs/evidence/lane-a-p0/` (see `SUMMARY.md`).
+A Mac test pass is
+not a Pi or Isaac-host test pass. Read-only Pi inspection on
+2026-11-05 found the Pi-deployed `app/main.py`/`integrations/` contain
+no secure-core gate and no secure-core CLI, so the gate is not
+deployed on the Pi.
+
+### Degraded-mode capability matrix (secure core not built)
+
+When the secure-core CLI is not built, `make demo` prints exactly:
+
+```text
+secure core not built: STOP available with unsigned attestation; simulated task and latch reset are disabled. Run make core to enable them.
+```
+
+The operator UI displays the same message and disables the
+simulated-task and simulation-reset controls instead of erroring on
+click. STOP itself stays available in every row below; what changes is
+attestation and motion-permitting operations.
+
+| Capability | Core built, ACCEPTED | Core unavailable (not built / no client) | Core reachable, REJECTED |
+|---|---|---|---|
+| Authenticated STOP | Adapter invoked, HTTP 200, `secure_core.status="accepted"` with decision/sequence/audit_record, audit `allowed` | Adapter invoked, HTTP 200, `secure_core.status="unavailable"`, decision/sequence/audit_record null, audit `UNSIGNED/core_unavailable`, latch retained | Adapter **not** invoked, HTTP 503, `secure_core.status="rejected"`, latch retained, observed state `UNKNOWN` |
+| Simulated task | Allowed when not latched (existing rules) | Blocked: HTTP 503; UI control disabled | Blocked while latch retained (STOP rejection retains the latch) |
+| Simulation reset / latch clear | Allowed for admin (existing rules) | Blocked: HTTP 503, latch retained; UI control disabled | Latch retained; no unsigned reset |
+| Signed attestation | Yes (Rust ACCEPTED decision) | No — unsigned by design, never report as signed | No |
+
+Latest verified run (2026-11-05, local Mac, Increment 2 on main): **44 passed** Python (3.11, project `.venv`), **17 passed** Rust (14 core unit/property + 3 CLI integration, `cargo test --workspace --all-features`), `cargo fmt --check` and `cargo clippy --workspace --all-targets --all-features -- -D warnings` clean, `cargo audit` and `cargo deny check` ok, SBOM verified (98 components). Fuzz smoke: **not run** (cargo-fuzz unavailable, exit 77). Lane A re-verification after the rebase is recorded in `docs/evidence/lane-a-p0/SUMMARY.md`. A Mac test pass is not a Pi or Isaac-host test pass.
+
+Rust secure core details: the Python client uses the built CLI at
+`target/debug/quberon-secure-core-cli` (or `target/release/...`, or
+`$QUBERON_SECURE_CORE_BIN`). See `docs/SECURE-CORE.md`.
 
 ## Deploy (from Mac, preserves Ethernet SSH at 10.77.0.2)
 
