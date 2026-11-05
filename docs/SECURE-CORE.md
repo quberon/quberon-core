@@ -109,6 +109,14 @@ This is a simulation-only, STOP-authorization-only component. It is
 not a safety-rated e-stop, and the unsigned degraded STOP above is a
 deliberate simulation availability choice, not a physical-safety claim.
 
+### Ruling 1 — control is independent of settlement infrastructure
+
+Nothing in control, intervention, or motion authorization depends on a
+blockchain. Control is local, deterministic, and capable of operating
+offline. Settlement, custody, and billing are separate concerns that may
+complete asynchronously or fail without changing control decisions or
+creating a safety impact.
+
 ## Key custody
 
 No secret is stored in Git. Increment 2 removes the permissive default:
