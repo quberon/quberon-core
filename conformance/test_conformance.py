@@ -11,7 +11,7 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-STATE-01..03     command vs observed state      (R6)
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
   QIP-PROP-01..03      proposal (planner) boundary    (frontier rule)
-  QIP-DEG-01..03       degraded / fail-direction      (R7; DEG-03 is a gap)
+  QIP-DEG-01..03       degraded / fail-direction      (R7)
 
 A skipped test is NOT TESTED, not a pass. See README.md NOT TESTED section.
 """
@@ -191,8 +191,41 @@ def test_QIP_DEG_02_failing_adapter_latches_and_reports_unknown(adapter_failing)
     assert r.command_state == "UNKNOWN" and r.stop_latched is True
 
 
-@pytest.mark.skip(reason="NOT TESTED: no implementation-neutral way to inject "
-                         "persistence failure or secure-core reachable-refusal "
-                         "through AdapterUnderTest yet; gap, not a pass")
-def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(adapter):
-    raise NotImplementedError
+def _needs_injection(adapter, capability):
+    if not adapter.capabilities().get(capability):
+        pytest.skip(f"NOT TESTED in this run: {capability} is False, so this "
+                    "degraded state cannot be injected through this adapter")
+
+
+def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
+        adapter_persistence_degraded, adapter_refusing_core):
+    # --- persistence-degraded: durability not claimed, latch retained ---
+    degraded = adapter_persistence_degraded
+    _needs_injection(degraded, "persistence_failure_injectable")
+    s = degraded.status("operator")
+    assert s.status_code == 200 and s.body["persistence_ok"] is False
+    assert s.stop_latched is True and s.observed_state == "UNKNOWN"
+    # STOP, task and reset all refuse non-2xx in this state; none may
+    # claim success/durability, and the latch must survive all three.
+    assert degraded.stop("operator", "qip-deg-03-persist").status_code == 503
+    assert degraded.submit_task("operator", "SIMULATE_INSPECTION").status_code == 503
+    assert degraded.reset_latch("admin").status_code == 503
+    assert degraded.status("operator").stop_latched is True
+
+    # --- secure-core reachable refusal: distinct from unavailability ---
+    # DEG-01 (unavailable) = STOP proceeds unsigned, 200/ACKNOWLEDGED.
+    # Here (R-IMM-2/QIP-R7.4): refusal = no invocation, latch retained,
+    # UNKNOWN, secure_core_status "rejected" -- never "unavailable".
+    refusing = adapter_refusing_core
+    _needs_injection(refusing, "secure_core_refusal_injectable")
+    r = refusing.stop("operator", "qip-deg-03-refusal")
+    assert r.status_code == 503
+    assert r.secure_core_status == "rejected"
+    assert r.command_state == "UNKNOWN" and r.observed_state == "UNKNOWN"
+    assert r.stop_latched is True
+    after = refusing.status("operator")
+    assert after.stop_latched is True and after.observed_state == "UNKNOWN"
+    # The refusal is recorded as a distinct audit outcome, not unsigned.
+    events = refusing.events("operator").body["events"]
+    match = [e for e in events if e["id"] == r.command_id]
+    assert len(match) == 1 and match[0]["auth_result"] == "secure_core_rejected"

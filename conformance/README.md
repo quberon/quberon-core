@@ -14,7 +14,26 @@ NOT certification, and NOT evidence about any physical robot (R11 caveat).
   (app.main simulator over HTTP/TestClient). Another system writes its own
   module like this and runs test_conformance.py unchanged.
 - conftest.py — fixtures binding the suite to quberon-core, plus
-  no-core (DEGRADED) and failing-adapter (STATE/DEGRADED) variants.
+  no-core (DEGRADED), failing-adapter (STATE/DEGRADED), persistence-
+  degraded and refusing-core (QIP-DEG-03) variants.
+
+## QIP-DEG-03 injection (Wave 5 F1)
+
+AdapterUnderTest now declares two implementation-neutral injection
+points, inject_persistence_failure() and inject_secure_core_refusal(),
+plus matching capabilities (False by default: an adapter that cannot
+inject reports the state NOT TESTED, never a pass). The interface names
+states, not mechanisms. quberon_adapter implements them conformance-side
+only: persistence injection sets the same persistence_ok=False degraded
+flag the app's SQLite-error/init-failure paths set, and refusal
+injection installs a reachable stub authority raising the app's existing
+SecureCoreRejected (decision code REFUSED_CONFORMANCE_INJECTION). No
+app/control-path code was changed. QIP-DEG-03 then observes, neutrally:
+persistence-degraded -> status reports persistence_ok False, latch
+retained, observed UNKNOWN, stop/task/reset all 503; reachable refusal
+-> stop 503, secure_core_status "rejected" (distinct from DEG-01
+"unavailable"), command/observed UNKNOWN, latch retained, audit
+auth_result "secure_core_rejected".
 - test_conformance.py — the suite. Stable test IDs QIP-<CLASS>-<nn> are in
   every test function name; N5 and later nodes reference them verbatim.
   Do not renumber; append new IDs only.
@@ -38,8 +57,12 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
 ## NOT TESTED (explicit gaps — remain gaps)
 
-- QIP-DEG-03: persistence failure and secure-core reachable-refusal via a
-  neutral injection point (test exists, deliberately skipped).
+- QIP-DEG-03 injection limits: a REAL disk/SQLite persistence failure
+  (injection flips the app's degraded flag, it does not corrupt storage),
+  and a REAL Rust secure-core rejection of a signed envelope (injection
+  uses a stub authority; no signing/verification is exercised). Restart
+  recovery from either degraded state. Adapter non-invocation is observed
+  via UNKNOWN/latch/audit outcomes, not via an invocation counter.
 - Any real manufacturer interface, vendor stop/status/reset mapping,
   capability negotiation (R10: registry api-surfaces.jsonl was empty at
   gate zero) — no adapter for any real robot exists here.
