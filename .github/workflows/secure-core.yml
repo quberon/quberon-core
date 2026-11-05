@@ -1,7 +1,10 @@
 name: secure-core
 on:
   push:
+    branches: [main, "lane-*", "meta/*"]
   pull_request:
+    branches: [main]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -70,3 +73,22 @@ jobs:
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure
+  python-without-rust:
+    # Degraded path: no Rust toolchain and no built CLI in this container.
+    # Proves authenticated STOP executes UNSIGNED and the Python suite is
+    # green without the secure core (reset/task tests skip, by design).
+    runs-on: ubuntu-latest
+    container: python:3.11-slim
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Prove no Rust toolchain or CLI is present
+        run: |
+          if command -v cargo >/dev/null 2>&1; then echo "cargo unexpectedly present"; exit 1; fi
+          if command -v rustc >/dev/null 2>&1; then echo "rustc unexpectedly present"; exit 1; fi
+          test ! -e target/debug/quberon-secure-core-cli
+          test ! -e target/release/quberon-secure-core-cli
+          echo "no cargo, no rustc, no secure-core CLI: degraded mode"
+      - name: Python tests without Rust (degraded unsigned STOP path)
+        run: |
+          pip install -r requirements.txt
+          python -m pytest -q

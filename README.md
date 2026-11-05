@@ -36,15 +36,49 @@ Authenticated mobile web prototype for a **simulated** robot STOP-request workfl
 
 ## Run locally
 
+Quickstart (exact commands, from a clean clone). The same commands work
+with and without Rust; the difference is only whether `make setup`
+builds the secure-core CLI:
+
+With Rust (cargo on PATH — signed secure-core attestation available):
+
 ```sh
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python -m pytest -q
+make setup
+make test
+make core
+cargo test --workspace
+make demo
 ```
 
-Latest verified run (2026-11-05, local Mac): **44 passed** Python (3.11, project `.venv`), **17 passed** Rust (14 core unit/property + 3 CLI integration, `cargo test --workspace --all-features`), `cargo fmt --check` and `cargo clippy --workspace --all-targets --all-features -- -D warnings` clean, `cargo audit` and `cargo deny check` ok, SBOM verified (98 components). Fuzz smoke: **not run** (cargo-fuzz unavailable, exit 77). A Mac test pass is not a Pi or Isaac-host test pass.
+Without Rust (no cargo — STOP runs with unsigned attestation; reset and
+simulated tasks remain blocked; see `docs/SECURE-CORE.md`,
+"Which direction does this fail?"):
 
-Rust secure core: `cargo build --workspace && cargo test --workspace` (the Python STOP gate needs the built CLI at `target/debug/quberon-secure-core-cli` or `$QUBERON_SECURE_CORE_BIN`). See `docs/SECURE-CORE.md`.
+```sh
+make setup
+make test
+make demo
+```
+
+`make setup` creates `.venv`, installs `requirements.txt`, and builds
+the Rust CLI when cargo is present. Without cargo it prints exactly:
+
+```text
+secure core not built - STOP will run with unsigned attestation; see docs/SECURE-CORE.md
+```
+
+`make test` runs the Python suite (`.venv/bin/python -m pytest -q`).
+The suite is green in both modes: Rust-dependent reset/task tests are
+skipped when the CLI is not built, and the degraded unsigned-STOP path
+is exercised in both modes. Verified counts and raw output for both
+modes are recorded in `docs/evidence/lane-a-p0/`. A Mac test pass is
+not a Pi or Isaac-host test pass.
+
+Latest verified run (2026-11-05, local Mac, Increment 2 on main): **44 passed** Python (3.11, project `.venv`), **17 passed** Rust (14 core unit/property + 3 CLI integration, `cargo test --workspace --all-features`), `cargo fmt --check` and `cargo clippy --workspace --all-targets --all-features -- -D warnings` clean, `cargo audit` and `cargo deny check` ok, SBOM verified (98 components). Fuzz smoke: **not run** (cargo-fuzz unavailable, exit 77). Lane A re-verification after the rebase is recorded in `docs/evidence/lane-a-p0/SUMMARY.md`. A Mac test pass is not a Pi or Isaac-host test pass.
+
+Rust secure core details: the Python client uses the built CLI at
+`target/debug/quberon-secure-core-cli` (or `target/release/...`, or
+`$QUBERON_SECURE_CORE_BIN`). See `docs/SECURE-CORE.md`.
 
 ## Deploy (from Mac, preserves Ethernet SSH at 10.77.0.2)
 
