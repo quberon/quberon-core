@@ -1,0 +1,142 @@
+Lane A post-merge main verification — WITH RUST, supported Python
+UTC_START=2026-11-05T09:57:07Z
+HOST=Mac
+Darwin Mac 24.3.0 Darwin Kernel Version 24.3.0: Thu Jan  2 20:22:58 PST 2025; root:xnu-11215.81.4~3/RELEASE_ARM64_T8132 arm64
+COMMIT=0d0a366a1116e071caf94cfdce3ad12e3f9b26f8
+Python 3.11.15
+cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)
+rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)
+$ python3.11 -m venv .venv311
+$ .venv311/bin/pip install -r requirements.txt
+Collecting fastapi==0.115.6 (from -r requirements.txt (line 1))
+  Using cached fastapi-0.115.6-py3-none-any.whl.metadata (27 kB)
+Collecting python-multipart==0.0.20 (from -r requirements.txt (line 2))
+  Using cached python_multipart-0.0.20-py3-none-any.whl.metadata (1.8 kB)
+Collecting uvicorn==0.34.0 (from -r requirements.txt (line 3))
+  Using cached uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting httpx==0.28.1 (from -r requirements.txt (line 4))
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting qrcode==8.0 (from -r requirements.txt (line 5))
+  Using cached qrcode-8.0-py3-none-any.whl.metadata (17 kB)
+Collecting Pillow==11.0.0 (from -r requirements.txt (line 6))
+  Using cached pillow-11.0.0-cp311-cp311-macosx_11_0_arm64.whl.metadata (9.1 kB)
+Collecting pytest==8.3.4 (from -r requirements.txt (line 7))
+  Using cached pytest-8.3.4-py3-none-any.whl.metadata (7.5 kB)
+Collecting starlette<0.42.0,>=0.40.0 (from fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached starlette-0.41.3-py3-none-any.whl.metadata (6.0 kB)
+Collecting pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4 (from fastapi==0.115.6->-r requirements.txt (line 1))
+  Downloading pydantic-2.14.3-py3-none-any.whl.metadata (141 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 141.5/141.5 kB 1.5 MB/s eta 0:00:00
+Collecting typing-extensions>=4.8.0 (from fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting click>=7.0 (from uvicorn==0.34.0->-r requirements.txt (line 3))
+  Using cached click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting h11>=0.8 (from uvicorn==0.34.0->-r requirements.txt (line 3))
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting anyio (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached anyio-4.16.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached certifi-2026.10.23-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpcore==1.* (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting idna (from httpx==0.28.1->-r requirements.txt (line 4))
+  Using cached idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting iniconfig (from pytest==8.3.4->-r requirements.txt (line 7))
+  Using cached iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+Collecting packaging (from pytest==8.3.4->-r requirements.txt (line 7))
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pluggy<2,>=1.5 (from pytest==8.3.4->-r requirements.txt (line 7))
+  Using cached pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting annotated-types>=0.6.0 (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.50.4 (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.115.6->-r requirements.txt (line 1))
+  Downloading pydantic_core-2.50.4-cp311-cp311-macosx_11_0_arm64.whl.metadata (6.6 kB)
+Collecting typing-inspection>=0.4.4 (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.115.6->-r requirements.txt (line 1))
+  Using cached typing_inspection-0.4.5-py3-none-any.whl.metadata (2.6 kB)
+Using cached fastapi-0.115.6-py3-none-any.whl (94 kB)
+Using cached python_multipart-0.0.20-py3-none-any.whl (24 kB)
+Using cached uvicorn-0.34.0-py3-none-any.whl (62 kB)
+Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Using cached qrcode-8.0-py3-none-any.whl (45 kB)
+Using cached pillow-11.0.0-cp311-cp311-macosx_11_0_arm64.whl (3.0 MB)
+Using cached pytest-8.3.4-py3-none-any.whl (343 kB)
+Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Using cached click-8.5.0-py3-none-any.whl (125 kB)
+Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Using cached pluggy-1.7.0-py3-none-any.whl (27 kB)
+Downloading pydantic-2.14.3-py3-none-any.whl (494 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 494.1/494.1 kB 2.9 MB/s eta 0:00:00
+Downloading pydantic_core-2.50.4-cp311-cp311-macosx_11_0_arm64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 2.0 MB/s eta 0:00:00
+Using cached starlette-0.41.3-py3-none-any.whl (73 kB)
+Using cached anyio-4.16.0-py3-none-any.whl (134 kB)
+Using cached idna-3.20-py3-none-any.whl (69 kB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached certifi-2026.10.23-py3-none-any.whl (135 kB)
+Using cached iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Using cached annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Using cached typing_inspection-0.4.5-py3-none-any.whl (14 kB)
+Installing collected packages: typing-extensions, qrcode, python-multipart, pluggy, Pillow, packaging, iniconfig, idna, h11, click, certifi, annotated-types, uvicorn, typing-inspection, pytest, pydantic-core, httpcore, anyio, starlette, pydantic, httpx, fastapi
+Successfully installed Pillow-11.0.0 annotated-types-0.8.0 anyio-4.16.0 certifi-2026.10.23 click-8.5.0 fastapi-0.115.6 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pydantic-2.14.3 pydantic-core-2.50.4 pytest-8.3.4 python-multipart-0.0.20 qrcode-8.0 starlette-0.41.3 typing-extensions-4.16.0 typing-inspection-0.4.5 uvicorn-0.34.0
+
+[notice] A new release of pip is available: 24.0 -> 26.3
+[notice] To update, run: python3.11 -m pip install --upgrade pip
+$ cargo build --workspace --locked
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.02s
+$ cargo fmt --all --check
+$ cargo clippy --workspace --all-targets --all-features -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.06s
+$ cargo test --workspace --all-features --locked
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src/lib.rs (target/debug/deps/quberon_secure_core-84c212d92b2da0fe)
+
+running 14 tests
+test tests::audit_hash_is_deterministic_and_sensitive ... ok
+test tests::read_only_and_missing_db_paths_never_accept ... ok
+test tests::accepts_valid_then_replay_rejected ... ok
+test tests::audit_capacity_fails_closed_without_growth ... ok
+test tests::audit_tamper_rejects_next_authorization ... ok
+test tests::anchor_fault_and_missing_anchor_never_accept ... ok
+test tests::epoch_binding_rejects_old_epoch_and_preserves_sequence ... ok
+test tests::revoked_and_out_of_window_keys_rejected_rotation_accepted ... ok
+test tests::rejects_expired_future_long_validity_and_tamper ... ok
+test tests::real_sqlite_write_failure_via_trigger_never_accepts ... ok
+test tests::anchor_detects_rollback_to_older_valid_db ... ok
+test tests::fault_injection_never_accepts ... ok
+test tests::mutated_valid_envelope_never_accepts_without_resigning ... ok
+test tests::arbitrary_bytes_never_panic_and_never_accept ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+
+     Running unittests src/main.rs (target/debug/deps/quberon_secure_core_cli-0f9c968a71aa07d4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli.rs (target/debug/deps/cli-1ff589f3f089f4ed)
+
+running 3 tests
+test malformed_and_oversized_input_rejected_without_crash ... ok
+test subprocess_sign_authorize_replay_and_tamper ... ok
+test epoch_mismatch_and_anchor_rollback_via_cli ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+   Doc-tests quberon_secure_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+$ .venv311/bin/python -m pytest -q
+................................................                         [100%]
+=============================== warnings summary ===============================
+.venv311/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/.venv311/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+48 passed, 1 warning in 7.21s
+UTC_END=2026-11-05T09:57:22Z

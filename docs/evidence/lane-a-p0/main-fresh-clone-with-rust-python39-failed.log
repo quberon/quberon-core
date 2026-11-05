@@ -1,0 +1,277 @@
+Lane A post-merge main verification — WITH RUST
+UTC_START=2026-11-05T09:56:18Z
+HOST=Mac
+Darwin Mac 24.3.0 Darwin Kernel Version 24.3.0: Thu Jan  2 20:22:58 PST 2025; root:xnu-11215.81.4~3/RELEASE_ARM64_T8132 arm64
+COMMIT=0d0a366a1116e071caf94cfdce3ad12e3f9b26f8
+Python 3.9.6
+cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)
+rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)
+$ python3 -m venv .venv
+$ .venv/bin/pip install -r requirements.txt
+Collecting fastapi==0.115.6
+  Using cached fastapi-0.115.6-py3-none-any.whl (94 kB)
+Collecting python-multipart==0.0.20
+  Using cached python_multipart-0.0.20-py3-none-any.whl (24 kB)
+Collecting uvicorn==0.34.0
+  Using cached uvicorn-0.34.0-py3-none-any.whl (62 kB)
+Collecting httpx==0.28.1
+  Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Collecting qrcode==8.0
+  Using cached qrcode-8.0-py3-none-any.whl (45 kB)
+Collecting Pillow==11.0.0
+  Using cached pillow-11.0.0-cp39-cp39-macosx_11_0_arm64.whl (3.0 MB)
+Collecting pytest==8.3.4
+  Using cached pytest-8.3.4-py3-none-any.whl (343 kB)
+Collecting starlette<0.42.0,>=0.40.0
+  Using cached starlette-0.41.3-py3-none-any.whl (73 kB)
+Collecting pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4
+  Using cached pydantic-2.13.5-py3-none-any.whl (472 kB)
+Collecting typing-extensions>=4.8.0
+  Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Collecting click>=7.0
+  Using cached click-8.1.8-py3-none-any.whl (98 kB)
+Collecting h11>=0.8
+  Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Collecting anyio
+  Using cached anyio-4.12.1-py3-none-any.whl (113 kB)
+Collecting httpcore==1.*
+  Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Collecting certifi
+  Using cached certifi-2026.10.23-py3-none-any.whl (135 kB)
+Collecting idna
+  Using cached idna-3.20-py3-none-any.whl (69 kB)
+Collecting packaging
+  Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Collecting tomli>=1
+  Using cached tomli-2.5.0-py3-none-any.whl (14 kB)
+Collecting pluggy<2,>=1.5
+  Using cached pluggy-1.6.0-py3-none-any.whl (20 kB)
+Collecting iniconfig
+  Using cached iniconfig-2.1.0-py3-none-any.whl (6.0 kB)
+Collecting exceptiongroup>=1.0.0rc8
+  Using cached exceptiongroup-1.3.1-py3-none-any.whl (16 kB)
+Collecting pydantic-core==2.46.5
+  Using cached pydantic_core-2.46.5-cp39-cp39-macosx_11_0_arm64.whl (1.9 MB)
+Collecting typing-inspection>=0.4.2
+  Using cached typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+Collecting annotated-types>=0.6.0
+  Using cached annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Installing collected packages: typing-extensions, idna, exceptiongroup, typing-inspection, pydantic-core, h11, certifi, anyio, annotated-types, tomli, starlette, pydantic, pluggy, packaging, iniconfig, httpcore, click, uvicorn, qrcode, python-multipart, pytest, Pillow, httpx, fastapi
+Successfully installed Pillow-11.0.0 annotated-types-0.7.0 anyio-4.12.1 certifi-2026.10.23 click-8.1.8 exceptiongroup-1.3.1 fastapi-0.115.6 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.1.0 packaging-26.3 pluggy-1.6.0 pydantic-2.13.5 pydantic-core-2.46.5 pytest-8.3.4 python-multipart-0.0.20 qrcode-8.0 starlette-0.41.3 tomli-2.5.0 typing-extensions-4.16.0 typing-inspection-0.4.2 uvicorn-0.34.0
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/.venv/bin/python3 -m pip install --upgrade pip' command.
+$ cargo build --workspace --locked
+   Compiling version_check v0.9.5
+   Compiling cfg-if v1.0.5
+   Compiling libc v0.2.191
+   Compiling typenum v1.20.1
+   Compiling zerocopy v0.8.63
+   Compiling proc-macro2 v1.0.107
+   Compiling semver v1.0.28
+   Compiling shlex v2.0.1
+   Compiling unicode-ident v1.0.27
+   Compiling find-msvc-tools v0.1.15
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling cc v1.11.0
+   Compiling once_cell v1.21.4
+   Compiling generic-array v0.14.7
+   Compiling ahash v0.8.12
+   Compiling rustc_version v0.4.1
+   Compiling vcpkg v0.2.15
+   Compiling pkg-config v0.3.34
+   Compiling curve25519-dalek v4.1.3
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling syn v3.0.9
+   Compiling zeroize v1.9.1
+   Compiling signature v2.2.0
+   Compiling subtle v2.6.1
+   Compiling ed25519 v2.2.3
+   Compiling libsqlite3-sys v0.30.1
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling getrandom v0.2.17
+   Compiling digest v0.10.7
+   Compiling cpufeatures v0.2.17
+   Compiling rand_core v0.6.4
+   Compiling sha2 v0.10.9
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling smallvec v1.16.4
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling fallible-iterator v0.3.0
+   Compiling bitflags v2.13.2
+   Compiling hex v0.4.3
+   Compiling ed25519-dalek v2.2.0
+   Compiling serde_derive v1.0.229
+   Compiling hashbrown v0.14.5
+   Compiling hashlink v0.9.1
+   Compiling rusqlite v0.32.1
+   Compiling quberon-secure-core v0.1.0 (/Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/crates/quberon-secure-core)
+   Compiling quberon-secure-core-cli v0.1.0 (/Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/apps/quberon-secure-core-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.79s
+$ cargo fmt --all --check
+$ cargo clippy --workspace --all-targets --all-features -- -D warnings
+    Checking cfg-if v1.0.5
+   Compiling libc v0.2.191
+    Checking typenum v1.20.1
+    Checking once_cell v1.21.4
+    Checking bitflags v2.13.2
+    Checking rand_core v0.10.1
+    Checking zerocopy v0.8.63
+   Compiling getrandom v0.4.3
+   Compiling rustix v1.1.6
+    Checking serde_core v1.0.229
+    Checking zeroize v1.9.1
+    Checking subtle v2.6.1
+    Checking signature v2.2.0
+    Checking libsqlite3-sys v0.30.1
+    Checking zmij v1.0.23
+    Checking ed25519 v2.2.3
+    Checking fallible-streaming-iterator v0.1.9
+    Checking fallible-iterator v0.3.0
+    Checking memchr v2.8.3
+    Checking itoa v1.0.18
+    Checking fastrand v2.5.0
+    Checking smallvec v1.16.4
+    Checking hex v0.4.3
+   Compiling autocfg v1.5.1
+    Checking bit-vec v0.10.1
+    Checking quick-error v1.2.3
+    Checking fnv v1.0.7
+    Checking chacha20 v0.10.2
+    Checking generic-array v0.14.7
+    Checking rand_xorshift v0.5.0
+    Checking unarray v0.1.4
+    Checking core_detect v1.0.0
+    Checking bit-set v0.11.1
+    Checking regex-syntax v0.8.11
+   Compiling num-traits v0.2.19
+    Checking crypto-common v0.1.7
+    Checking block-buffer v0.10.4
+    Checking digest v0.10.7
+    Checking curve25519-dalek v4.1.3
+    Checking serde_json v1.0.154
+    Checking serde v1.0.229
+    Checking cpufeatures v0.2.17
+    Checking getrandom v0.2.17
+    Checking errno v0.3.14
+    Checking sha2 v0.10.9
+    Checking rand_core v0.6.4
+    Checking wait-timeout v0.2.1
+    Checking rand v0.10.3
+    Checking ed25519-dalek v2.2.0
+    Checking tempfile v3.27.0
+    Checking rusty-fork v0.3.1
+    Checking proptest v1.12.0
+    Checking ahash v0.8.12
+    Checking hashbrown v0.14.5
+    Checking hashlink v0.9.1
+    Checking rusqlite v0.32.1
+    Checking quberon-secure-core v0.1.0 (/Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/crates/quberon-secure-core)
+    Checking quberon-secure-core-cli v0.1.0 (/Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/apps/quberon-secure-core-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.24s
+$ cargo test --workspace --all-features --locked
+   Compiling once_cell v1.21.4
+   Compiling bitflags v2.13.2
+   Compiling libc v0.2.191
+   Compiling rand_core v0.10.1
+   Compiling fastrand v2.5.0
+   Compiling quick-error v1.2.3
+   Compiling fnv v1.0.7
+   Compiling bit-vec v0.10.1
+   Compiling regex-syntax v0.8.11
+   Compiling num-traits v0.2.19
+   Compiling unarray v0.1.4
+   Compiling core_detect v1.0.0
+   Compiling ahash v0.8.12
+   Compiling rand_xorshift v0.5.0
+   Compiling chacha20 v0.10.2
+   Compiling bit-set v0.11.1
+   Compiling hashbrown v0.14.5
+   Compiling hashlink v0.9.1
+   Compiling getrandom v0.4.3
+   Compiling getrandom v0.2.17
+   Compiling errno v0.3.14
+   Compiling cpufeatures v0.2.17
+   Compiling wait-timeout v0.2.1
+   Compiling sha2 v0.10.9
+   Compiling rustix v1.1.6
+   Compiling rand_core v0.6.4
+   Compiling rand v0.10.3
+   Compiling ed25519-dalek v2.2.0
+   Compiling rusqlite v0.32.1
+   Compiling tempfile v3.27.0
+   Compiling quberon-secure-core v0.1.0 (/Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/crates/quberon-secure-core)
+   Compiling rusty-fork v0.3.1
+   Compiling proptest v1.12.0
+   Compiling quberon-secure-core-cli v0.1.0 (/Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/lane-a-main-verify/repo/apps/quberon-secure-core-cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.62s
+     Running unittests src/lib.rs (target/debug/deps/quberon_secure_core-84c212d92b2da0fe)
+
+running 14 tests
+test tests::audit_hash_is_deterministic_and_sensitive ... ok
+test tests::read_only_and_missing_db_paths_never_accept ... ok
+test tests::audit_capacity_fails_closed_without_growth ... ok
+test tests::accepts_valid_then_replay_rejected ... ok
+test tests::audit_tamper_rejects_next_authorization ... ok
+test tests::anchor_fault_and_missing_anchor_never_accept ... ok
+test tests::epoch_binding_rejects_old_epoch_and_preserves_sequence ... ok
+test tests::rejects_expired_future_long_validity_and_tamper ... ok
+test tests::real_sqlite_write_failure_via_trigger_never_accepts ... ok
+test tests::revoked_and_out_of_window_keys_rejected_rotation_accepted ... ok
+test tests::anchor_detects_rollback_to_older_valid_db ... ok
+test tests::fault_injection_never_accepts ... ok
+test tests::mutated_valid_envelope_never_accepts_without_resigning ... ok
+test tests::arbitrary_bytes_never_panic_and_never_accept ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+     Running unittests src/main.rs (target/debug/deps/quberon_secure_core_cli-0f9c968a71aa07d4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli.rs (target/debug/deps/cli-1ff589f3f089f4ed)
+
+running 3 tests
+test malformed_and_oversized_input_rejected_without_crash ... ok
+test subprocess_sign_authorize_replay_and_tamper ... ok
+test epoch_mismatch_and_anchor_rollback_via_cli ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+   Doc-tests quberon_secure_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+$ .venv/bin/python -m pytest -q
+..........F.....................................                         [100%]
+=================================== FAILURES ===================================
+_______________ test_gnss_parser_no_fix_and_fix_and_bad_checksum _______________
+
+    def test_gnss_parser_no_fix_and_fix_and_bad_checksum():
+>       from adapters.gnss import GnssStatus, parse_sentence
+
+tests/test_app.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+adapters/gnss.py:11: in <module>
+    class GnssStatus:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @dataclass
+    class GnssStatus:
+        state: str  # NO_DEVICE | NO_DATA | NO_FIX | FIX_NO_RTK | RTK_FLOAT | RTK_FIXED | STALE
+        fix_type: str = "none"
+>       satellites: int | None = None
+E       TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
+
+adapters/gnss.py:14: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_app.py::test_gnss_parser_no_fix_and_fix_and_bad_checksum - ...
+1 failed, 47 passed in 12.40s
