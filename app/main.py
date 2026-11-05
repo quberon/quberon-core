@@ -16,7 +16,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from adapters.robot_sim import SimulatedRobotAdapter
-from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan
+from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan, sanitize_proposal
 from integrations.interventions import InterventionEvent, InterventionKind, SourceStatus, STOP_KINDS
 from integrations.secure_core import SecureCoreError, SecureCoreRejected, SecureCoreUnavailable, client_from_env
 from integrations.recognizers import (
@@ -600,7 +600,22 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                 validation = validate_plan(proposal, robot_id, store.stop_latched)
             except Exception as exc:  # provider output must never escape as a 500 (fix C)
                 validation = {"allowed_as_proposal": False, "errors": [f"invalid proposal: {type(exc).__name__}"], "latch_blocks_task": bool(store.stop_latched)}
-            return {"provider": getattr(meta, "name", "unknown"), "proposal": proposal, "validation": validation}
+            # Wave4 N1 (N5 escapes A/B + provenance finding): downstream
+            # only ever sees the bounded sanitized copy -- never the raw
+            # untrusted proposal (no NaN render 500, no 100KB reflection,
+            # no forged secure_core/stop_latched fields).
+            visible = sanitize_proposal(proposal)
+            if validation.get("provenance_forgery_attempt"):
+                # Audit the forgery attempt (plan-related event type only,
+                # I6): field paths, never attacker values or large content.
+                paths = [str(p)[:64] for p in validation.get("trusted_fields_rejected", [])[:5]]
+                try:
+                    event(row["username"], robot_id, "PLAN_PROPOSAL", "provenance_forgery_rejected", None,
+                          hashlib.sha256(",".join(paths).encode()).hexdigest(), None,
+                          detail="provenance-forgery attempt in planner proposal: trusted-looking fields stripped from downstream-visible data: " + ",".join(paths))
+                except Exception:
+                    validation = {**validation, "audit_failed": True}
+            return {"provider": getattr(meta, "name", "unknown"), "proposal": visible, "validation": validation}
         finally:
             app.state.plan_semaphore.release()
 
