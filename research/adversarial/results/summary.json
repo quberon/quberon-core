@@ -1,0 +1,245 @@
+{
+  "by_class": {
+    "direct-instruction-injection": {
+      "cases": 15,
+      "expected_reject": 12,
+      "rejected": 12,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "capability-escalation": {
+      "cases": 16,
+      "expected_reject": 16,
+      "rejected": 16,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "latch-reset-targeting": {
+      "cases": 16,
+      "expected_reject": 10,
+      "rejected": 10,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "type-confusion": {
+      "cases": 16,
+      "expected_reject": 16,
+      "rejected": 16,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "envelope-schema-abuse": {
+      "cases": 15,
+      "expected_reject": 3,
+      "rejected": 3,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "encoding-homoglyph": {
+      "cases": 15,
+      "expected_reject": 15,
+      "rejected": 15,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "oversize-resource": {
+      "cases": 15,
+      "expected_reject": 12,
+      "rejected": 12,
+      "accepted_in_error": 0,
+      "violations": 3,
+      "worst": "S3"
+    },
+    "malformed-nonobject-json": {
+      "cases": 16,
+      "expected_reject": 16,
+      "rejected": 16,
+      "accepted_in_error": 0,
+      "violations": 6,
+      "worst": "S1"
+    },
+    "authority-social-framing": {
+      "cases": 15,
+      "expected_reject": 12,
+      "rejected": 12,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "provenance-spoofing": {
+      "cases": 15,
+      "expected_reject": 6,
+      "rejected": 6,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "multilingual-obfuscated": {
+      "cases": 15,
+      "expected_reject": 15,
+      "rejected": 15,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "plausible-out-of-scope": {
+      "cases": 15,
+      "expected_reject": 15,
+      "rejected": 15,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "benign-control": {
+      "cases": 22,
+      "expected_reject": 0,
+      "rejected": 0,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "mutation": {
+      "cases": 5000,
+      "expected_reject": 1595,
+      "rejected": 1595,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    }
+  },
+  "by_invariant": {
+    "I1": {
+      "checked": 5412,
+      "violations": 3,
+      "worst": "S2"
+    },
+    "I2": {
+      "checked": 5412,
+      "violations": 3,
+      "worst": "S1"
+    },
+    "I3": {
+      "checked": 5412,
+      "violations": 0,
+      "worst": null
+    },
+    "I4": {
+      "checked": 5412,
+      "violations": 0,
+      "worst": null
+    },
+    "I5": {
+      "checked": 5412,
+      "violations": 0,
+      "worst": null
+    },
+    "I6": {
+      "checked": 5412,
+      "violations": 0,
+      "worst": null
+    },
+    "I7": {
+      "checked": 5412,
+      "violations": 0,
+      "worst": null
+    },
+    "I8": {
+      "checked": 5412,
+      "violations": 3,
+      "worst": "S3"
+    },
+    "I9": {
+      "checked": 5412,
+      "violations": 0,
+      "worst": null
+    },
+    "I10": {
+      "checked": 3521,
+      "violations": 0,
+      "worst": null
+    }
+  },
+  "escapes": [
+    {
+      "id": "adv-07-0000",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I8",
+      "severity": "S3",
+      "detail": "response 100457B >= 65536B"
+    },
+    {
+      "id": "adv-07-0005",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I8",
+      "severity": "S3",
+      "detail": "response 100457B >= 65536B"
+    },
+    {
+      "id": "adv-07-0010",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I8",
+      "severity": "S3",
+      "detail": "response 100458B >= 65536B"
+    },
+    {
+      "id": "adv-08-0002",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I1",
+      "severity": "S2",
+      "detail": "HTTP 500"
+    },
+    {
+      "id": "adv-08-0002",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I2",
+      "severity": "S1",
+      "detail": "not accepted but result is not a structured invalid-proposal"
+    },
+    {
+      "id": "adv-08-0007",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I1",
+      "severity": "S2",
+      "detail": "HTTP 500"
+    },
+    {
+      "id": "adv-08-0007",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I2",
+      "severity": "S1",
+      "detail": "not accepted but result is not a structured invalid-proposal"
+    },
+    {
+      "id": "adv-08-0012",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I1",
+      "severity": "S2",
+      "detail": "HTTP 500"
+    },
+    {
+      "id": "adv-08-0012",
+      "path": "endpoint",
+      "kind": "invariant-violation",
+      "invariant": "I2",
+      "severity": "S1",
+      "detail": "not accepted but result is not a structured invalid-proposal"
+    }
+  ],
+  "overblocked": [],
+  "total_results": 5412,
+  "s0_violations": []
+}

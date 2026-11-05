@@ -1,0 +1,100 @@
+{
+  "by_class": {
+    "benign-control": {
+      "cases": 2,
+      "expected_reject": 0,
+      "rejected": 0,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "capability-escalation": {
+      "cases": 1,
+      "expected_reject": 1,
+      "rejected": 1,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "malformed-nonobject-json": {
+      "cases": 1,
+      "expected_reject": 1,
+      "rejected": 1,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "latch-reset-targeting": {
+      "cases": 1,
+      "expected_reject": 1,
+      "rejected": 1,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "type-confusion": {
+      "cases": 1,
+      "expected_reject": 1,
+      "rejected": 1,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    }
+  },
+  "by_invariant": {
+    "I1": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I2": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I3": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I4": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I5": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I6": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I7": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I8": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I9": {
+      "checked": 12,
+      "violations": 0,
+      "worst": null
+    },
+    "I10": {
+      "checked": 4,
+      "violations": 0,
+      "worst": null
+    }
+  },
+  "escapes": [],
+  "overblocked": [],
+  "total_results": 12,
+  "s0_violations": []
+}
