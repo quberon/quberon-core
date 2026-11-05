@@ -60,7 +60,9 @@ make test
 make demo
 ```
 
-`make setup` creates `.venv`, installs `requirements.txt`, and builds
+`make setup` creates `.venv` (preferring `python3.11` when available,
+falling back to `python3`; Python 3.11 is the documented version),
+installs `requirements.txt`, and builds
 the Rust CLI when cargo is present. Without cargo it prints exactly:
 
 ```text

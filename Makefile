@@ -1,6 +1,6 @@
 .PHONY: setup test demo core
 
-PYTHON ?= python3
+PYTHON ?= $(shell command -v python3.11 || command -v python3)
 VENV := .venv
 VENV_PY := $(VENV)/bin/python
 
