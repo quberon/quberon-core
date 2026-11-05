@@ -7,6 +7,7 @@ Credentials are read from environment variables on the server only.
 import json
 import os
 from typing import Any, Dict
+from urllib.parse import urlparse
 
 ALLOWED_ACTIONS = {"SIMULATE_INSPECTION", "SIMULATE_STATUS_CHECK"}
 ALLOWED_CAPABILITIES = {"inspect", "status"}
@@ -36,6 +37,19 @@ class MockMetaProvider:
         }
 
 
+def _redact_secret(value: Any, secret: str) -> Any:
+    """Recursively remove the credential from untrusted provider output."""
+    if not secret:
+        return value
+    if isinstance(value, str):
+        return value.replace(secret, "[REDACTED]")
+    if isinstance(value, list):
+        return [_redact_secret(v, secret) for v in value]
+    if isinstance(value, dict):
+        return {k: _redact_secret(v, secret) for k, v in value.items()}
+    return value
+
+
 class LiveMetaProvider:
     """OpenAI-compatible chat endpoint adapter, configured only by env.
 
@@ -47,11 +61,18 @@ class LiveMetaProvider:
     name = "live"
 
     def __init__(self):
-        self.url = os.environ.get("META_API_URL", "")
+        self.url = os.environ.get("META_API_URL", "").strip()
         self.key = os.environ.get("META_API_KEY", "")
-        self.model = os.environ.get("META_MODEL", "")
+        self.model = os.environ.get("META_MODEL", "").strip()
         if not (self.url and self.key and self.model):
             raise MetaProviderError("Meta live mode is not fully configured")
+        parsed = urlparse(self.url)
+        local_http = parsed.scheme == "http" and parsed.hostname in {"localhost", "127.0.0.1", "::1"}
+        if parsed.scheme != "https" and not local_http:
+            raise MetaProviderError("Meta live endpoint must use HTTPS (HTTP only for localhost)")
+        if parsed.username or parsed.password or parsed.fragment:
+            raise MetaProviderError("Meta live endpoint must not contain credentials or a fragment")
+        self.endpoint_host = parsed.hostname or ""
 
     def propose(self, robot_id: str, text: str) -> Dict[str, Any]:
         import httpx
@@ -76,9 +97,19 @@ class LiveMetaProvider:
                 )
                 r.raise_for_status()
                 content = r.json()["choices"][0]["message"]["content"]
-                data = json.loads(content)
+                if not isinstance(content, str) or len(content) > 20000:
+                    raise ValueError("provider response content is not bounded text")
+                stripped = content.strip()
+                if stripped.startswith("```"):
+                    stripped = stripped.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+                data = json.loads(stripped)
+                if not isinstance(data, dict):
+                    raise ValueError("provider response is not a JSON object")
         except Exception as exc:  # provider failure must never affect STOP
-            raise MetaProviderError(f"Meta provider failed: {type(exc).__name__}") from exc
+            # Only the exception type is exposed: messages from HTTP stacks
+            # may embed the request (and its Authorization header/key).
+            raise MetaProviderError(f"Meta provider failed: {type(exc).__name__}") from None
+        data = _redact_secret(data, self.key)
         data["provider"] = "live"
         return data
 
@@ -139,5 +170,10 @@ class UnavailableMetaProvider:
 
 def get_provider():
     if os.environ.get("META_MODE", "mock").lower() == "live":
-        return LiveMetaProvider()
+        try:
+            return LiveMetaProvider()
+        except MetaProviderError:
+            # Never silently fall back to mock in live mode: report
+            # unavailable so callers cannot mistake mock for live.
+            return UnavailableMetaProvider()
     return MockMetaProvider()
