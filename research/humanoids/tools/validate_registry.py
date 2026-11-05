@@ -150,6 +150,7 @@ def validate(root: Path = ROOT) -> dict:
         for rec in load_jsonl(root / "registry" / "provenance-claims.jsonl")[0]
     }
     company_records = load_jsonl(root / "registry" / "candidates.jsonl")[0]
+    company_ids = {rec.get("record_id") for rec in company_records}
     for rec in company_records:
         label = f"candidates.jsonl:{rec.get('record_id')}"
         missing_sources = set(rec.get("sources") or []) - source_ids
@@ -158,6 +159,71 @@ def validate(root: Path = ROOT) -> dict:
             errors.append(f"{label}: unknown source references: {sorted(missing_sources)}")
         if missing_claims:
             errors.append(f"{label}: unknown claim references: {sorted(missing_claims)}")
+
+    source_records = load_jsonl(root / "registry" / "sources.jsonl")[0]
+    source_urls = [rec.get("url") for rec in source_records]
+    if len(source_urls) != len(set(source_urls)):
+        errors.append("duplicate official source URLs in sources.jsonl")
+
+    claim_records = load_jsonl(root / "registry" / "provenance-claims.jsonl")[0]
+    sources_by_id = {rec.get("source_id"): rec for rec in source_records}
+    for rec in claim_records:
+        label = f"provenance-claims.jsonl:{rec.get('claim_id')}"
+        if not rec.get("source_ids"):
+            errors.append(f"{label}: claim must reference at least one official source URL")
+        missing_sources = set(rec.get("source_ids") or []) - source_ids
+        if missing_sources:
+            errors.append(f"{label}: unknown source references: {sorted(missing_sources)}")
+        for sid in rec.get("source_ids") or []:
+            src = sources_by_id.get(sid)
+            if src is None:
+                continue
+            if src.get("source_type") not in {"official_site", "official_docs"}:
+                errors.append(f"{label}: source {sid} is not an official source")
+            if not str(src.get("url") or "").startswith("https://"):
+                errors.append(f"{label}: source {sid} has no official https URL")
+            if rec.get("status") == "supported_by_primary_source":
+                if (src.get("provenance") or {}).get("evidence_strength") != "primary_official":
+                    errors.append(f"{label}: supported claim source {sid} is not primary_official")
+                if (src.get("access") or {}).get("method") in {None, "not_accessed"}:
+                    errors.append(f"{label}: supported claim source {sid} was not accessed")
+        subject = rec.get("subject_record_id")
+        if subject != "registry:candidates" and subject not in company_ids:
+            errors.append(f"{label}: unknown candidate subject: {subject!r}")
+    for rec in source_records:
+        label = f"sources.jsonl:{rec.get('source_id')}"
+        missing_claims = set((rec.get("provenance") or {}).get("supports_claim_ids") or []) - claim_ids
+        if missing_claims:
+            errors.append(f"{label}: unknown supported claim references: {sorted(missing_claims)}")
+    # Deterministic dedup/scope integrity: every candidate is classified by
+    # at least one claim and one source; no two candidates share a normalized
+    # seed name or an official source URL (proposals only, never promotion).
+    for rec in company_records:
+        label = f"candidates.jsonl:{rec.get('record_id')}"
+        if not rec.get("provenance_claim_ids"):
+            errors.append(f"{label}: candidate has no dedup/scope provenance claim")
+        if not rec.get("sources"):
+            errors.append(f"{label}: candidate has no official source")
+    norm_names = [str((rec.get("candidate_names") or [""])[0]).strip().lower() for rec in company_records]
+    if len(norm_names) != len(set(norm_names)):
+        errors.append("duplicate normalized candidate names in candidates.jsonl")
+    cand_urls = []
+    for rec in company_records:
+        for sid in rec.get("sources") or []:
+            if sid in sources_by_id:
+                cand_urls.append((sources_by_id[sid].get("url"), rec.get("record_id")))
+    seen_url: dict = {}
+    for url, cid in cand_urls:
+        if url in seen_url and seen_url[url] != cid:
+            errors.append(f"official source URL {url} shared by candidates {seen_url[url]} and {cid}")
+        seen_url[url] = cid
+    progress = index.get("discovery_progress") or {}
+    if progress.get("official_source_records") != counts.get("source"):
+        errors.append("index.json discovery_progress.official_source_records does not match sources.jsonl")
+    if progress.get("provenance_claim_records") != counts.get("provenance_claim"):
+        errors.append("index.json discovery_progress.provenance_claim_records does not match provenance-claims.jsonl")
+    if progress.get("candidates_classified_for_human_review") != counts.get("company"):
+        errors.append("index.json discovery_progress.candidates_classified_for_human_review does not match candidates.jsonl")
 
     return {"ok": not errors, "errors": errors, "counts": counts,
             "verified_companies": 0 if index.get("verified_count") == 0 else index.get("verified_count")}

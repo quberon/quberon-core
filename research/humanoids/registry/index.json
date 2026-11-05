@@ -45,9 +45,11 @@
     ]
   },
   "discovery_progress": {
-    "official_source_records": 6,
-    "provenance_claim_records": 12,
-    "lane_d_candidates_reviewed": 5,
-    "note": "Discovery evidence only. Candidate verification statuses and verified_count remain unchanged pending human review."
+    "official_source_records": 26,
+    "provenance_claim_records": 38,
+    "candidates_classified_for_human_review": 25,
+    "duplicate_candidate_pairs_proposed": 0,
+    "out_of_scope_candidates_proposed": 2,
+    "note": "N4 proposals only. All 25 candidates remain candidate_unverified; no canonical name or scope/status promotion occurred because checks.md has no human decision row."
   }
 }
