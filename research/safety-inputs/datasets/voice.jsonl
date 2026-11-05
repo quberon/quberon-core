@@ -1,0 +1,45 @@
+{"category": "canonical_positive", "confidence": 0.99, "final": true, "id": "V-POS-00", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "canonical_positive", "confidence": 0.99, "final": true, "id": "V-POS-01", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "stop"}
+{"category": "canonical_positive", "confidence": 0.99, "final": true, "id": "V-POS-02", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "Stopp"}
+{"category": "canonical_positive", "confidence": 0.99, "final": true, "id": "V-POS-03", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP!"}
+{"category": "canonical_positive", "confidence": 0.99, "final": true, "id": "V-POS-04", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "stopp."}
+{"category": "canonical_positive", "confidence": 0.99, "final": true, "id": "V-POS-05", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "please stop"}
+{"category": "degraded_confidence", "confidence": 0.0, "final": true, "id": "V-CONF-00", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 0.5, "final": true, "id": "V-CONF-01", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 0.8, "final": true, "id": "V-CONF-02", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 0.84, "final": true, "id": "V-CONF-03", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 0.849, "final": true, "id": "V-CONF-04", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 0.85, "final": true, "id": "V-CONF-05", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 0.851, "final": true, "id": "V-CONF-06", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 0.9, "final": true, "id": "V-CONF-07", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 1.0, "final": true, "id": "V-CONF-08", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": -0.1, "final": true, "id": "V-INVALIDCONF-00", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 1.01, "final": true, "id": "V-INVALIDCONF-01", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "degraded_confidence", "confidence": 1.5, "final": true, "id": "V-INVALIDCONF-02", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "missed_trigger_boundary", "confidence": 0.99, "final": false, "id": "V-INTERIM-00", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "missed_trigger_boundary", "confidence": 0.99, "final": false, "id": "V-INTERIM-01", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "missed_trigger_boundary", "confidence": 0.99, "final": false, "id": "V-INTERIM-02", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-00", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "do not stop"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-01", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "don't stop"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-02", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "never stop"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-03", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "inte stopp"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-04", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "ej stopp"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-05", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "no stop"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-06", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "nonstop"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-07", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "stopwatch"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-08", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "the bus stop is near"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-09", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "stopping by"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-10", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "continue"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-11", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "resume"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-12", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "go ahead"}
+{"category": "false_trigger", "confidence": 0.99, "final": true, "id": "V-NEG-13", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": ""}
+{"category": "false_trigger", "confidence": 0.99, "final": false, "id": "V-NEGCONF-00", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "do not stop"}
+{"category": "false_trigger", "confidence": 0.99, "final": false, "id": "V-NEGCONF-01", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "nonstop"}
+{"category": "false_trigger", "confidence": 0.99, "final": false, "id": "V-NEGCONF-02", "intent_stop": false, "modality": "voice", "synthetic": true, "transcript": "continue"}
+{"age_seconds": 301, "category": "stale_replay", "confidence": 0.99, "final": true, "id": "V-STALE-00", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"age_seconds": 3600, "category": "stale_replay", "confidence": 0.99, "final": true, "id": "V-STALE-01", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"age_seconds": -31, "category": "stale_replay", "confidence": 0.99, "final": true, "id": "V-STALE-02", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"age_seconds": 299, "category": "stale_replay", "confidence": 0.99, "final": true, "id": "V-FRESH-00", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"age_seconds": 0, "category": "stale_replay", "confidence": 0.99, "final": true, "id": "V-REPLAY-00", "intent_stop": true, "modality": "voice", "synthetic": true, "transcript": "STOP"}
+{"age_seconds": 0, "category": "stale_replay", "confidence": 0.99, "final": true, "id": "V-REPLAY-01", "intent_stop": true, "modality": "voice", "replay_of": "V-REPLAY-00", "synthetic": true, "transcript": "STOP"}
+{"age_seconds": 0, "category": "stale_replay", "confidence": 0.99, "final": true, "id": "V-REPLAY-02", "intent_stop": true, "modality": "voice", "replay_of": "V-REPLAY-00", "synthetic": true, "transcript": "STOP"}
