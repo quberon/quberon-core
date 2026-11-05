@@ -1,62 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="560" viewBox="0 0 1180 560" font-family="Segoe UI, Helvetica, Arial, sans-serif">
-  <rect width="1180" height="560" fill="#ffffff"/>
-  <text x="40" y="48" font-size="26" font-weight="700" fill="#0f172a">Quberon Core — System Architecture</text>
-  <text x="40" y="76" font-size="14" fill="#64748b">Authenticated STOP-request workflow for a <tspan font-weight="700" fill="#b91c1c">SIMULATED</tspan> robot · Raspberry Pi + e-ink · Not an emergency stop · No physical robot connected</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="580" viewBox="0 0 1180 580" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="1180" height="580" fill="#ffffff"/>
+  <text x="40" y="44" font-size="26" font-weight="700" fill="#0f172a">Quberon Core — System Architecture</text>
+  <text x="40" y="70" font-size="14" font-weight="700" fill="#b91c1c">SIMULATION ONLY · STOP AUTHORIZATION ONLY · NO PHYSICAL CONTROL · NOT A SAFETY-RATED E-STOP</text>
+  <text x="40" y="92" font-size="12.5" fill="#64748b">Authenticated STOP-request workflow for a SIMULATED robot · Raspberry Pi + e-ink · No physical robot connected</text>
 
   <defs>
     <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#475569"/></marker>
   </defs>
 
   <!-- Phone -->
-  <rect x="40" y="150" width="190" height="110" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-  <text x="135" y="190" font-size="17" font-weight="700" fill="#1e3a8a" text-anchor="middle">📱 Phone UI</text>
-  <text x="135" y="216" font-size="12.5" fill="#334155" text-anchor="middle">Login · Roles</text>
-  <text x="135" y="236" font-size="12.5" fill="#334155" text-anchor="middle">CSRF · Idempotency-Key</text>
+  <rect x="30" y="150" width="170" height="120" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="115" y="188" font-size="16" font-weight="700" fill="#1e3a8a" text-anchor="middle">📱 Phone UI</text>
+  <text x="115" y="214" font-size="12" fill="#334155" text-anchor="middle">Login · Roles</text>
+  <text x="115" y="234" font-size="12" fill="#334155" text-anchor="middle">CSRF · Idempotency-Key</text>
+  <text x="115" y="254" font-size="12" fill="#334155" text-anchor="middle">Button · Voice · Gesture</text>
 
   <!-- Pi API -->
-  <rect x="310" y="130" width="250" height="150" rx="14" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text x="435" y="168" font-size="17" font-weight="700" fill="#14532d" text-anchor="middle">🥧 Raspberry Pi — FastAPI</text>
-  <text x="435" y="194" font-size="12.5" fill="#334155" text-anchor="middle">viewer / operator / admin</text>
-  <text x="435" y="214" font-size="12.5" fill="#334155" text-anchor="middle">Persistent STOP latch (SQLite)</text>
-  <text x="435" y="234" font-size="12.5" fill="#334155" text-anchor="middle">Audit event log · Fail-closed on DB error</text>
-  <text x="435" y="254" font-size="12.5" fill="#334155" text-anchor="middle">STOP unaffected by planner failures</text>
+  <rect x="270" y="130" width="235" height="160" rx="14" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="387" y="163" font-size="16" font-weight="700" fill="#14532d" text-anchor="middle">🥧 Raspberry Pi — FastAPI</text>
+  <text x="387" y="188" font-size="12" fill="#334155" text-anchor="middle">viewer / operator / admin</text>
+  <text x="387" y="208" font-size="12" fill="#334155" text-anchor="middle">ONE execute_stop convergence path</text>
+  <text x="387" y="228" font-size="12" fill="#334155" text-anchor="middle">Persistent STOP latch (SQLite)</text>
+  <text x="387" y="248" font-size="12" fill="#334155" text-anchor="middle">Audit event log · Fail-closed on DB error</text>
+  <text x="387" y="268" font-size="12" fill="#334155" text-anchor="middle">Core error ⇒ latch held, UNKNOWN,</text>
+  <text x="387" y="284" font-size="12" fill="#334155" text-anchor="middle">adapter never invoked</text>
+
+  <!-- Rust secure core -->
+  <rect x="575" y="130" width="255" height="160" rx="14" fill="#fff1f2" stroke="#be123c" stroke-width="2.5"/>
+  <text x="702" y="163" font-size="16" font-weight="700" fill="#881337" text-anchor="middle">🦀 Rust Secure Core (Incr. 1) ✓ tested</text>
+  <text x="702" y="188" font-size="12" fill="#334155" text-anchor="middle">Ed25519 signed envelope · domain-separated</text>
+  <text x="702" y="208" font-size="12" fill="#334155" text-anchor="middle">STOP-only closed enum · exact scope</text>
+  <text x="702" y="228" font-size="12" fill="#334155" text-anchor="middle">Expiry / skew / payload-hash checks</text>
+  <text x="702" y="248" font-size="12" fill="#334155" text-anchor="middle">SQLite replay seq. + hash-chained audit</text>
+  <text x="702" y="268" font-size="12" fill="#334155" text-anchor="middle">Accept only after commit · subprocess CLI</text>
+  <text x="702" y="284" font-size="12" font-weight="700" fill="#b91c1c" text-anchor="middle">Decisions never claim physical state</text>
 
   <!-- Simulated adapter -->
-  <rect x="640" y="130" width="230" height="150" rx="14" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/>
-  <text x="755" y="168" font-size="17" font-weight="700" fill="#713f12" text-anchor="middle">🤖 SimulatedRobotAdapter</text>
-  <text x="755" y="194" font-size="12.5" fill="#334155" text-anchor="middle">ACKNOWLEDGED / UNKNOWN</text>
-  <text x="755" y="214" font-size="12.5" fill="#334155" text-anchor="middle">Non-ACK ⇒ UNKNOWN,</text>
-  <text x="755" y="234" font-size="12.5" fill="#334155" text-anchor="middle">never “stopped”</text>
-  <text x="755" y="254" font-size="12.5" fill="#b91c1c" text-anchor="middle" font-weight="700">Only adapter enabled</text>
-
-  <!-- E-ink -->
-  <rect x="950" y="130" width="190" height="150" rx="14" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
-  <text x="1045" y="168" font-size="17" font-weight="700" fill="#581c87" text-anchor="middle">🖥️ E-ink 7.5″ V2</text>
-  <text x="1045" y="194" font-size="12.5" fill="#334155" text-anchor="middle">Control QR code</text>
-  <text x="1045" y="214" font-size="12.5" fill="#334155" text-anchor="middle">1 Hz LIVE badge</text>
-  <text x="1045" y="234" font-size="12.5" fill="#334155" text-anchor="middle">GPS status line</text>
+  <rect x="900" y="150" width="250" height="120" rx="14" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/>
+  <text x="1025" y="188" font-size="16" font-weight="700" fill="#713f12" text-anchor="middle">🤖 SimulatedRobotAdapter</text>
+  <text x="1025" y="214" font-size="12" fill="#334155" text-anchor="middle">Invoked ONLY after Rust ACCEPTED</text>
+  <text x="1025" y="234" font-size="12" fill="#334155" text-anchor="middle">ACKNOWLEDGED / UNKNOWN</text>
+  <text x="1025" y="254" font-size="12" font-weight="700" fill="#b91c1c" text-anchor="middle">Only adapter enabled</text>
 
   <!-- Planner -->
-  <rect x="310" y="350" width="250" height="120" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="435" y="386" font-size="17" font-weight="700" fill="#7c2d12" text-anchor="middle">🧠 Meta Planner (advisory)</text>
-  <text x="435" y="412" font-size="12.5" fill="#334155" text-anchor="middle">Default: MOCK · Live: unverified</text>
-  <text x="435" y="432" font-size="12.5" fill="#334155" text-anchor="middle">Deterministic validator · allow-list</text>
-  <text x="435" y="452" font-size="12.5" fill="#334155" text-anchor="middle">Can never reset latch or move robot</text>
+  <rect x="270" y="350" width="235" height="120" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="387" y="386" font-size="16" font-weight="700" fill="#7c2d12" text-anchor="middle">🧠 Meta Planner (advisory)</text>
+  <text x="387" y="412" font-size="12" fill="#334155" text-anchor="middle">Default: MOCK · Live: unverified</text>
+  <text x="387" y="432" font-size="12" fill="#334155" text-anchor="middle">Deterministic validator · allow-list</text>
+  <text x="387" y="452" font-size="12" fill="#334155" text-anchor="middle">Can never reset latch or move robot</text>
 
-  <!-- Roadmap -->
-  <rect x="640" y="350" width="500" height="120" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="7 5"/>
-  <text x="890" y="386" font-size="17" font-weight="700" fill="#334155" text-anchor="middle">🗺️ Roadmap — NOT implemented</text>
-  <text x="890" y="414" font-size="13" fill="#475569" text-anchor="middle">Voice/gesture intervention events → ONE STOP path (implemented, experimental)</text>
-  <text x="890" y="436" font-size="13" fill="#475569" text-anchor="middle">Recognizers + Isaac Sim bridge (GPU host) → supervised integration (planned)</text>
+  <!-- E-ink + roadmap -->
+  <rect x="575" y="350" width="255" height="120" rx="14" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
+  <text x="702" y="386" font-size="16" font-weight="700" fill="#581c87" text-anchor="middle">🖥️ E-ink 7.5″ V2</text>
+  <text x="702" y="412" font-size="12" fill="#334155" text-anchor="middle">Control QR code · 1 Hz LIVE badge</text>
+  <text x="702" y="432" font-size="12" fill="#334155" text-anchor="middle">GPS status line</text>
+
+  <rect x="900" y="350" width="250" height="120" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="1025" y="386" font-size="16" font-weight="700" fill="#334155" text-anchor="middle">🗺️ Planned — NOT implemented</text>
+  <text x="1025" y="412" font-size="12" fill="#475569" text-anchor="middle">External review · HSM key custody</text>
+  <text x="1025" y="432" font-size="12" fill="#475569" text-anchor="middle">SLSA provenance · Isaac Sim bridge</text>
+  <text x="1025" y="452" font-size="12" fill="#475569" text-anchor="middle">Recognizers → supervised integration</text>
 
   <!-- Arrows -->
-  <line x1="230" y1="205" x2="302" y2="205" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
-  <line x1="560" y1="205" x2="632" y2="205" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
-  <line x1="870" y1="205" x2="942" y2="205" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
-  <line x1="435" y1="342" x2="435" y2="288" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
-  <text x="448" y="322" font-size="12" fill="#64748b">proposals only</text>
-  <line x1="890" y1="342" x2="890" y2="288" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <line x1="200" y1="210" x2="262" y2="210" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
+  <line x1="505" y1="210" x2="567" y2="210" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="536" y="198" font-size="11" fill="#64748b" text-anchor="middle">signed STOP req.</text>
+  <line x1="830" y1="210" x2="892" y2="210" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="861" y="198" font-size="11" fill="#64748b" text-anchor="middle">if ACCEPTED</text>
+  <line x1="387" y1="342" x2="387" y2="298" stroke="#475569" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="400" y="322" font-size="12" fill="#64748b">proposals only</text>
+  <line x1="1025" y1="342" x2="1025" y2="278" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"/>
 
-  <rect x="40" y="500" width="1100" height="36" rx="10" fill="#fef2f2" stroke="#fca5a5"/>
-  <text x="590" y="524" font-size="13.5" font-weight="700" fill="#991b1b" text-anchor="middle">⚠ SIMULATED ROBOT — NOT AN EMERGENCY STOP · Developed with Meta AI assistance (Hermes) · Runtime planner is mock unless stated otherwise</text>
+  <rect x="30" y="512" width="1120" height="40" rx="10" fill="#fef2f2" stroke="#fca5a5"/>
+  <text x="590" y="537" font-size="13.5" font-weight="700" fill="#991b1b" text-anchor="middle">⚠ SIMULATION ONLY · STOP AUTHORIZATION ONLY · NO PHYSICAL CONTROL · NOT A SAFETY-RATED E-STOP · Not externally reviewed / audited / certified</text>
 </svg>

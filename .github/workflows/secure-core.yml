@@ -1,0 +1,39 @@
+name: secure-core
+on:
+  push:
+    branches: [meta/secure-core-rust-20261105-073231]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  rust-and-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - name: Format and lint
+        run: |
+          cargo fmt --all --check
+          cargo clippy --workspace --all-targets -- -D warnings
+      - name: Rust tests
+        run: cargo test --workspace --locked
+      - name: cargo audit (installs the tool; failure is visible, not hidden)
+        run: |
+          cargo install cargo-audit --locked || echo "cargo-audit install unavailable"
+          if command -v cargo-audit >/dev/null; then cargo audit; else echo "cargo audit NOT RUN: tool unavailable"; fi
+      - name: cargo deny (installs the tool; failure is visible, not hidden)
+        run: |
+          cargo install cargo-deny --locked || echo "cargo-deny install unavailable"
+          if command -v cargo-deny >/dev/null; then cargo deny check; else echo "cargo deny NOT RUN: tool unavailable"; fi
+      - name: SBOM
+        run: |
+          sh scripts/sbom.sh sbom.cdx.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Python tests (Rust CLI built above is exercised by the app gate)
+        run: |
+          pip install -r requirements.txt
+          python -m pytest -q

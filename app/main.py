@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 from adapters.robot_sim import SimulatedRobotAdapter
 from integrations.meta import MockMetaProvider, UnavailableMetaProvider, get_provider, validate_plan
 from integrations.interventions import InterventionEvent, InterventionKind, SourceStatus, STOP_KINDS
+from integrations.secure_core import SecureCoreError, client_from_env
 from integrations.recognizers import (
     GestureFrame,
     HandLandmark,
@@ -220,7 +221,7 @@ async function post(path,body,key){let r=await fetch(path,{method:'POST',headers
 function stopRobot(){post('/api/robots/__ROBOT__/stop',{note:'phone UI STOP request'})}async function interv(kind){let r=await fetch('/api/robots/__ROBOT__/interventions',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({kind:kind,source_status:'SYNTHETIC',event_id:crypto.randomUUID(),evidence_text:document.getElementById('intervText').value})});let j=await r.json();document.getElementById('out').textContent=JSON.stringify(j,null,2);load()}function task(){post('/api/robots/__ROBOT__/simulated-task',{action:'SIMULATE_INSPECTION'})}function resetSim(){if(confirm('Reset simulated latch? This does not start a task.'))post('/api/robots/__ROBOT__/simulation-reset',{confirm:'RESET_SIMULATION'})}async function plan(e){e.preventDefault();post('/api/robots/__ROBOT__/plan',{text:document.getElementById('planText').value})}async function logout(){await fetch('/auth/logout',{method:'POST',headers:{'X-CSRF-Token':csrf}});location.reload()}load();setInterval(load,2000)</script></body></html>"""
 
 
-def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provider=None) -> FastAPI:
+def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provider=None, secure_core="auto") -> FastAPI:
     db_path = db_path or os.environ.get("QUBERON_DB_PATH", "/var/lib/quberon-robot-interface/quberon.db")
     store = Store(db_path)
     adapter = SimulatedRobotAdapter(fail=adapter_fail or os.environ.get("SIM_ADAPTER_FAIL", "false").lower() == "true")
@@ -238,6 +239,15 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
     app.state.plan_semaphore = threading.BoundedSemaphore(2)
     app.state.voice_recognizer = VoiceStopRecognizer()
     app.state.gesture_recognizer = OpenPalmStopRecognizer()
+    # Rust secure core: every STOP (button/voice/gesture/intervention) must be
+    # authorized here before SimulatedRobotAdapter.stop is invoked. "auto"
+    # provisions an ephemeral simulation client; None/unavailable = fail closed.
+    if secure_core == "auto":
+        try:
+            secure_core = client_from_env(ROBOT_ID, app_db_path=db_path)
+        except Exception:
+            secure_core = None
+    app.state.secure_core = secure_core
 
     @app.exception_handler(sqlite3.Error)
     async def sqlite_degraded(request: Request, exc: sqlite3.Error):
@@ -354,6 +364,20 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                     # Historical duplicate: report the recorded result as history,
                     # never as a claim about the simulator's CURRENT state (fix A).
                     return {"command_id": existing["id"], "command_state": existing["command_state"], "observed_state": existing["observed_state"], "historical_duplicate": True, "current_stop_latched": bool(store.stop_latched), "current_observed_state": store.observed_state, "stop_latched": bool(store.stop_latched), "duplicate": True}
+                # Rust secure-core gate (Increment 1): no Rust ACCEPTED
+                # decision => no adapter invocation, latch retained, UNKNOWN.
+                core_client = app.state.secure_core
+                try:
+                    if core_client is None:
+                        raise SecureCoreError("secure core unavailable")
+                    core_decision = core_client.authorize_stop(subject=actor_username)
+                except Exception as exc:
+                    code = str(exc) if isinstance(exc, SecureCoreError) else type(exc).__name__
+                    eid = secrets.token_urlsafe(16)
+                    db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, "secure_core_rejected", idempotency_key, payload_hash, "UNKNOWN", "UNKNOWN", f"secure core did not authorize STOP; adapter not invoked; {code}"))
+                    store.set_state(db, True, "UNKNOWN")
+                    db.execute("COMMIT")
+                    raise HTTPException(503, "secure core did not authorize STOP; latch retained, state UNKNOWN, adapter not invoked")
                 result = adapter.stop()
                 eid = secrets.token_urlsafe(16)
                 db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", (eid, iso(), actor_username, robot_id, action_label, "allowed", idempotency_key, payload_hash, result.command_state, result.observed_state, result.detail))
@@ -362,7 +386,7 @@ def create_app(db_path: Optional[str] = None, adapter_fail: bool = False, provid
                 else:
                     store.set_state(db, True, "UNKNOWN")
                 db.execute("COMMIT")
-                return {"command_id": eid, "command_state": result.command_state, "observed_state": store.observed_state, "stop_latched": True, "detail": result.detail}
+                return {"command_id": eid, "command_state": result.command_state, "observed_state": store.observed_state, "stop_latched": True, "detail": result.detail, "secure_core": {"decision": core_decision.get("code"), "audit_record": core_decision.get("audit_record"), "sequence": core_decision.get("sequence"), "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION"}}
 
     @app.post("/api/robots/{robot_id}/stop")
     def stop(robot_id: str, body: StopBody, request: Request, idempotency_key: str = Header(..., alias="Idempotency-Key")):

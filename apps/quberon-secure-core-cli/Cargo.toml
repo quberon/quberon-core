@@ -1,0 +1,13 @@
+[package]
+name = "quberon-secure-core-cli"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+quberon-secure-core = { path = "../../crates/quberon-secure-core", version = "0.1.0" }
+serde_json = "1"
+
+[dev-dependencies]
+tempfile = "3"

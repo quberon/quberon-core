@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quberon.example.invalid/schemas/humanoids/1.0.0/source.schema.json",
+  "title": "Provenance-bearing source record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source_id",
+    "record_kind",
+    "source_type",
+    "url",
+    "title",
+    "publisher_claim",
+    "access",
+    "provenance",
+    "verification"
+  ],
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "pattern": "^src-[a-z0-9-]+$"
+    },
+    "record_kind": {
+      "const": "source"
+    },
+    "source_type": {
+      "enum": [
+        "official_site",
+        "official_docs",
+        "official_api_reference",
+        "official_sdk",
+        "github_official",
+        "github_community",
+        "paper",
+        "preprint",
+        "forum",
+        "youtube_official",
+        "youtube_third_party",
+        "dataset_repository",
+        "license_text",
+        "safety_document",
+        "standard_reference",
+        "regulator_primary",
+        "news",
+        "other"
+      ]
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 500
+    },
+    "publisher_claim": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 500
+    },
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "robots_txt_status",
+        "terms_status",
+        "accessed_at",
+        "download_permitted"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "manual_browser_review",
+            "official_api",
+            "permitted_fetch",
+            "metadata_only",
+            "not_accessed"
+          ]
+        },
+        "robots_txt_status": {
+          "enum": [
+            "not_checked",
+            "respected_allowed",
+            "respected_disallowed",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "terms_status": {
+          "enum": [
+            "not_checked",
+            "permitted",
+            "restricted",
+            "prohibited",
+            "unknown"
+          ]
+        },
+        "accessed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "download_permitted": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "content_hash_sha256",
+        "language",
+        "evidence_strength",
+        "supports_claim_ids"
+      ],
+      "properties": {
+        "content_hash_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([a-f0-9]{64})?$"
+        },
+        "language": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 35
+        },
+        "evidence_strength": {
+          "enum": [
+            "unassessed",
+            "primary_official",
+            "primary_regulator",
+            "peer_reviewed",
+            "secondary",
+            "community_unverified"
+          ]
+        },
+        "supports_claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^claim-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        },
+        "retrieval_note": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000
+    },
+    "url_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "iso_date_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    }
+  }
+}

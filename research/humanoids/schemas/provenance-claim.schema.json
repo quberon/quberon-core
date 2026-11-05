@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quberon.example.invalid/schemas/humanoids/1.0.0/provenance-claim.schema.json",
+  "title": "Atomic provenance claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim_id",
+    "record_kind",
+    "subject_record_id",
+    "predicate",
+    "object_value",
+    "status",
+    "source_ids",
+    "assessed"
+  ],
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "pattern": "^claim-[a-z0-9-]+$"
+    },
+    "record_kind": {
+      "const": "provenance_claim"
+    },
+    "subject_record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "predicate": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$",
+      "maxLength": 200
+    },
+    "object_value": {
+      "type": [
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "candidate_unverified",
+        "supported_by_primary_source",
+        "supported_by_secondary_source",
+        "contested",
+        "retracted",
+        "rejected"
+      ]
+    },
+    "source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^src-[a-z0-9-]+$"
+      },
+      "uniqueItems": true
+    },
+    "assessed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "by",
+        "at",
+        "confidence",
+        "note"
+      ],
+      "properties": {
+        "by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "confidence": {
+          "enum": [
+            "unknown",
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "evidence_source_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate_unverified",
+            "partially_verified",
+            "verified",
+            "rejected",
+            "duplicate",
+            "out_of_scope"
+          ]
+        },
+        "basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src-[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000
+    },
+    "url_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "iso_date_or_null": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    }
+  }
+}

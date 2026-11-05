@@ -8,3 +8,5 @@ artifacts/wifi-qr.png
 artifacts/display-mock.png
 *.db
 .DS_Store
+target/
+sbom.cdx.json

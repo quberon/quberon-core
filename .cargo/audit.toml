@@ -1,0 +1,5 @@
+[advisories]
+# cargo-audit config. Yanked crates are reported; no vulnerability is
+# silently ignored in this repository. Add an ignore here only with a
+# written justification and an expiry issue reference.
+ignore = []

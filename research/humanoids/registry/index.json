@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "generated_for": "frontier-phase1",
+  "candidate_count": 25,
+  "verified_count": 0,
+  "universe_size_claim": null,
+  "universe_size_note": "No claim is made about the total number of humanoid companies worldwide. In particular, no 'exactly 200 companies' claim is supported by this registry.",
+  "verification_status_counts": {
+    "candidate_unverified": 25
+  },
+  "seed_names_preserved_exactly": [
+    "Leju Robot",
+    "Kepler",
+    "Tesla Optimus",
+    "Sanctuary AI",
+    "Fourier",
+    "Boston Dynamics",
+    "X-humanoid",
+    "Unitree",
+    "Engineai",
+    "Robot Era",
+    "Pndbotics",
+    "Xpeng",
+    "UBTech",
+    "DEEP Robotics",
+    "Physicalintelligence",
+    "Limx Dynamics",
+    "Tencent",
+    "Pudu Robotics",
+    "Booster Robotics",
+    "RoMeLa",
+    "JAKA Robotics",
+    "AgiBot",
+    "MagicLab",
+    "Apptronik",
+    "Agility"
+  ],
+  "files": {
+    "candidates": "registry/candidates.jsonl",
+    "schemas": "schemas/",
+    "empty_registries": [
+      "registry/sources.jsonl",
+      "registry/datasets.jsonl",
+      "registry/api-surfaces.jsonl",
+      "registry/compliance.jsonl",
+      "registry/provenance-claims.jsonl"
+    ]
+  }
+}
