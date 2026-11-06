@@ -1,8 +1,8 @@
 NODE: reg-decision-packet-refresh
 TIER: 1
 BRANCH: node/reg-decision-packet-refresh
-COMMITS: see final message / git log on this branch (report updated in a follow-up commit after clean-clone tests)
-STATUS: pending final clean-clone verification (updated below)
+COMMITS: f99dd6a (packet refresh) + this report-update commit; final head listed in the final message
+STATUS: done — exit gate and both-mode clean-clone tests pass (below); packet unsigned, no decision applied
 
 CHANGED:
 - research/humanoids/DECISION-PACKET.md (refresh only: refreshed-by header, new section 3A capability-tuple context table for all 25 candidates, section 6 verbatim current validator output + current test counts + refresh cross-check, section 7 no-QIP-claim bullet)
@@ -66,10 +66,23 @@ TESTS (both modes):
 - with Rust (this worktree, after make setup): make test = 211 passed.
   Humanoid subset: .venv/bin/python -m pytest
   tests/test_humanoid_registry.py research/humanoids/tests/test_capability_tuples.py -q = 12 passed.
-- without Rust: PENDING clean-clone run, updated in follow-up commit.
+- Clean clone of f99dd6a, with Rust (cargo/rustc 1.99.1, /opt/homebrew/bin):
+  python3 research/humanoids/tools/validate_registry.py exit 0 (JSON above);
+  make setup exit 0; make test = 211 passed, exit 0.
+- Clean clone of f99dd6a, Rust removed from PATH
+  (PATH=/Users/quberon1/.local/bin:/usr/bin:/bin, command -v cargo fails,
+  no target/ at clone): validate_registry.py exit 0;
+  make setup exit 0 ("secure core not built" degraded note);
+  make test = 199 passed, 12 skipped, exit 0.
+- import check (no-Rust clean clone): .venv/bin/python -c "import app.main"
+  printed "import ok"; git status --short empty afterwards
+  (zero files created, ignoring pre-existing __pycache__ from the test run).
 - fail-direction: full suite includes
   tests/test_humanoid_registry.py::test_verified_without_evidence_is_rejected
-  (validator rejects verified-without-evidence); result covered by make test above.
+  (validator rejects verified-without-evidence); result covered by both
+  make test runs above (passed in with-Rust mode; in the suite either
+  way). Universal gate ops/gate.sh additionally runs both
+  fail-direction tests externally.
 
 STILL NOT TRUE:
 - No candidate is verified or partially_verified; all 25 remain
