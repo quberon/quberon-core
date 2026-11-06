@@ -97,6 +97,17 @@ class AdapterUnderTest:
     def events(self, role: str) -> NeutralResult:
         raise NotImplementedError
 
+    def stop_invocation_count(self) -> Optional[int]:
+        """Direct count of target-adapter STOP invocations, if observable.
+
+        Returns None when this adapter cannot directly observe invocation.
+        Tests that require non-invocation (QIP-R7.4) must treat None as
+        NOT TESTED, never infer a pass from outcome fields alone. A
+        returned count is a process-local observation for this adapter's
+        system under test, not evidence about any other adapter.
+        """
+        return None
+
     # --- Implementation-neutral fault injection (QIP-DEG-03) -------------
     # These are the injection points the original interface lacked. They
     # name STATES, not mechanisms: how an adapter puts its system into the

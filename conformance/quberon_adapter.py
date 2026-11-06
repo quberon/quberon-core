@@ -12,8 +12,26 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from fastapi.testclient import TestClient
 
 from app.main import ROBOT_ID, Store, create_app
+from adapters.robot_sim import SimulatedRobotAdapter
 from conformance.adapter_interface import AdapterUnderTest, NeutralResult
 from integrations.secure_core import SecureCoreRejected
+
+
+# Direct STOP-invocation observation for QIP-R7.4 (conformance process only).
+# create_app() keeps its SimulatedRobotAdapter in a closure, so this
+# reference adapter counts invocations by wrapping that simulator class's
+# stop method in-process. This changes no app/control-path code and makes
+# no claim about any real adapter: it only counts calls that would have
+# reached SimulatedRobotAdapter.stop in this test process.
+_ADAPTER_STOP_INVOCATIONS = {"count": 0}
+_original_simulated_stop = SimulatedRobotAdapter.stop
+if not getattr(_original_simulated_stop, "_conformance_counted", False):
+    def _counted_simulated_stop(self):
+        _ADAPTER_STOP_INVOCATIONS["count"] += 1
+        return _original_simulated_stop(self)
+
+    setattr(_counted_simulated_stop, "_conformance_counted", True)
+    SimulatedRobotAdapter.stop = _counted_simulated_stop
 
 
 class _RefusingSecureCore:
@@ -94,6 +112,9 @@ class QuberonCoreAdapter(AdapterUnderTest):
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
         }
+
+    def stop_invocation_count(self):
+        return _ADAPTER_STOP_INVOCATIONS["count"]
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
     def inject_persistence_failure(self) -> None:

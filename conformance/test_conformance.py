@@ -198,7 +198,7 @@ def _needs_injection(adapter, capability):
 
 
 def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
-        adapter_persistence_degraded, adapter_refusing_core):
+        adapter, adapter_persistence_degraded, adapter_refusing_core):
     # --- persistence-degraded: durability not claimed, latch retained ---
     degraded = adapter_persistence_degraded
     _needs_injection(degraded, "persistence_failure_injectable")
@@ -218,7 +218,25 @@ def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
     # UNKNOWN, secure_core_status "rejected" -- never "unavailable".
     refusing = adapter_refusing_core
     _needs_injection(refusing, "secure_core_refusal_injectable")
+    # QIP-R7.4 requires direct non-invocation, not inference from UNKNOWN:
+    # an adapter that cannot report its STOP invocation count is
+    # NOT TESTED for that clause, never a pass.
+    invocations_before = refusing.stop_invocation_count()
+    if invocations_before is None:
+        pytest.skip("NOT TESTED in this run: stop_invocation_count() is "
+                    "None, so adapter non-invocation cannot be observed")
+    # Positive control: the counter must prove it can observe an
+    # invocation (a normal STOP on a separate adapter increments it),
+    # so the unchanged count after refusal is not a stuck-at-zero pass.
+    control = adapter.stop("operator", "qip-deg-03-control")
+    assert control.status_code == 200 and control.command_state == "ACKNOWLEDGED"
+    assert refusing.stop_invocation_count() == invocations_before + 1
+    invocations_before += 1
+    # Precondition: latch engaged before the refused request, so
+    # "latch retained" below is retention, not initial-state accident.
+    assert refusing.status("operator").stop_latched is True
     r = refusing.stop("operator", "qip-deg-03-refusal")
+    assert refusing.stop_invocation_count() == invocations_before
     assert r.status_code == 503
     assert r.secure_core_status == "rejected"
     assert r.command_state == "UNKNOWN" and r.observed_state == "UNKNOWN"

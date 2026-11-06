@@ -34,6 +34,21 @@ retained, observed UNKNOWN, stop/task/reset all 503; reachable refusal
 -> stop 503, secure_core_status "rejected" (distinct from DEG-01
 "unavailable"), command/observed UNKNOWN, latch retained, audit
 auth_result "secure_core_rejected".
+
+QIP-R7.4 direct non-invocation (this node): the neutral interface adds
+stop_invocation_count() (None = cannot observe = NOT TESTED for the
+non-invocation clause, never inferred from UNKNOWN). The quberon
+reference adapter counts SimulatedRobotAdapter.stop calls in-process
+(conformance-side class wrapping only; no app/control-path change).
+QIP-DEG-03 asserts, for reachable refusal: a positive control STOP on a
+separate adapter increments the count by exactly 1, the refused STOP
+increments it by 0, the latch was engaged before and is retained
+after, and command/observed are UNKNOWN. This traces the simulator
+scope of QIP-R7.4 only; it does not amend QIP-v0.1 Section 11 (that
+amendment belongs to the profile owner) and does not cover a real
+adapter, a real Rust-core rejection, or the "unless independently
+observed" branch (no independent observation source exists in this
+adapter, so that branch is explicitly NOT TESTED, not passed).
 - test_conformance.py — the suite. Stable test IDs QIP-<CLASS>-<nn> are in
   every test function name; N5 and later nodes reference them verbatim.
   Do not renumber; append new IDs only.
@@ -61,8 +76,12 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
   (injection flips the app's degraded flag, it does not corrupt storage),
   and a REAL Rust secure-core rejection of a signed envelope (injection
   uses a stub authority; no signing/verification is exercised). Restart
-  recovery from either degraded state. Adapter non-invocation is observed
-  via UNKNOWN/latch/audit outcomes, not via an invocation counter.
+  recovery from either degraded state. Adapter non-invocation under
+  refusal IS now directly counted, but only for the in-process
+  SimulatedRobotAdapter in this reference adapter; non-invocation of
+  any real/manufacturer adapter, and QIP-R7.4's "unless independently
+  observed" branch (no independent observation source in this adapter),
+  remain NOT TESTED.
 - Any real manufacturer interface, vendor stop/status/reset mapping,
   capability negotiation (R10: registry api-surfaces.jsonl was empty at
   gate zero) — no adapter for any real robot exists here.
