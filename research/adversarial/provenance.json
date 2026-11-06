@@ -1,0 +1,179 @@
+{
+  "schema": "quberon-adversarial-provenance/1",
+  "independent_generator": {
+    "module": "adversary.py",
+    "generator": {
+      "model": "none-programmatic-templates",
+      "provider": "none-offline-templates",
+      "sees_implementation": false,
+      "lineage": "ind-1-adversary-split/programmatic-templates/public-interface+QIP-only"
+    },
+    "allowed_inputs": [
+      {
+        "role": "public-interface",
+        "name": "public_interface.json",
+        "sha256": "76620a0b1c1f638b12dcecca7a5add84f3f0189f334b4b716f607ffd59853fc1"
+      },
+      {
+        "role": "qip",
+        "name": "QIP-v0.1.md",
+        "sha256": "0be1a945ff90f82bba28075e1ff4e96864d20880b0396d890843f2dedd2d5520"
+      }
+    ],
+    "artefact_file": "corpus/independent.jsonl",
+    "note": "Every artefact in corpus/independent.jsonl carries this generator record inline, including per-input sha256. No real independent model is provisioned; the honest model label remains none-programmatic-templates."
+  },
+  "legacy_prior_corpora": [
+    {
+      "file": "corpus/class-01-direct-instruction-injection.jsonl",
+      "cases": 500,
+      "sha256": "d78288b1fbc3801fb5dfa5b20e49b7fd964920a7d8c41749207d14d220873429",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-02-capability-escalation.jsonl",
+      "cases": 500,
+      "sha256": "a3c5d77ee1eeecff501fde68549c7809940d46fa4f6714bd6c896a7a735c31fb",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-03-latch-reset-targeting.jsonl",
+      "cases": 500,
+      "sha256": "e1767559b2df3df509cbc6d407130f55bec1a6d5a2ced9dba847ac34a573864d",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-04-type-confusion.jsonl",
+      "cases": 500,
+      "sha256": "39d7737473fba8823a9c5217f2df1842a397e74e81de222726e0b7c9b82f47b7",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-05-envelope-schema-abuse.jsonl",
+      "cases": 500,
+      "sha256": "aa8cab30b2a466b83e13ad2ff885120c86e2e08a41e5e4665afda104ef6265ce",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-06-encoding-homoglyph.jsonl",
+      "cases": 500,
+      "sha256": "770387486bbe4913f5448dcf33a05dc05c10fc35bc7454f4a9eca8553c836d01",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-07-oversize-resource.jsonl",
+      "cases": 500,
+      "sha256": "4aa6a4e5cf712143afa3b951e1f8bd03e148e150bd412fdc4878632eccc6e35b",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-08-malformed-nonobject-json.jsonl",
+      "cases": 500,
+      "sha256": "69286a21fd3cf33305025eb370a686241a1dd021253817e46cfd1ed17e7dd45c",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-09-authority-social-framing.jsonl",
+      "cases": 500,
+      "sha256": "b5a43dcd77744aa60a3e124ef06cb3c9fe0919be262257005fc39fb2d19b48fa",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-10-provenance-spoofing.jsonl",
+      "cases": 500,
+      "sha256": "72ce69952141c318508af6bec35a26d59e0beb665f08f4bacdbfc06574d7e697",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-11-multilingual-obfuscated.jsonl",
+      "cases": 500,
+      "sha256": "e4a43e23edd6982c5cb6cb3f950c3b236da827bf6c9bc5f8fe9d8b8c32729e1d",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-12-plausible-out-of-scope.jsonl",
+      "cases": 500,
+      "sha256": "37cbfff554b30cc4ce1d5855a69ff785c1c1d40b9bd6dcd34dfe21f5af26dcc1",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/class-13-benign-control.jsonl",
+      "cases": 500,
+      "sha256": "2e7fa00fd1f7bc6a66e7871493afe08039dac86db21ed0dc12caac97411be63f",
+      "generator_models_observed": {
+        "BLOCKED-no-real-model-template-corpus": 500
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/hand-written.jsonl",
+      "cases": 6,
+      "sha256": "f6ff12b218f74fc69cf22d54888b3d3e97691621c48a2f1a331083240804d27e",
+      "generator_models_observed": {
+        "hand-written": 6
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    },
+    {
+      "file": "corpus/mutations.jsonl",
+      "cases": 50000,
+      "sha256": "d55e47ebdba702134ef48d6e928b6f1ac19b505c4ac0a07de691370921e217e1",
+      "generator_models_observed": {
+        "none-deterministic-mutation": 50000
+      },
+      "classification": "legacy-prior-corpus",
+      "sees_implementation_claim": "NOT CLAIMED - prior corpora keep their existing honest generator.model label as recorded in the file; they were authored in the same lineage as the validator and are not independent-adversary evidence. adversary.py is the split generator for new artefacts."
+    }
+  ],
+  "rule": "New adversarial artefacts must come from adversary.py and must validate with adversary.validate_artefact. Legacy files must not be relabelled as independent; their existing generator.model values above are preserved verbatim."
+}
