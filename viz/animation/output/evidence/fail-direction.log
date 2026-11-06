@@ -1,0 +1,20 @@
+fail-direction tests
+============================= test session starts ==============================
+platform darwin -- Python 3.11.15, pytest-8.3.4, pluggy-1.7.0 -- /Users/quberon1/Library/Application Support/Quberon/worktrees/viz-3-stop-path-animation/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/quberon1/Library/Application Support/Quberon/worktrees/viz-3-stop-path-animation
+plugins: anyio-4.16.0
+collecting ... collected 3 items
+
+tests/test_secure_core.py::test_stop_executes_without_secure_core_but_reset_does_not PASSED [ 33%]
+tests/test_secure_core.py::test_stop_rejected_by_secure_core_does_not_invoke_adapter PASSED [ 66%]
+viz/animation/tests/test_animation.py::test_fail_direction_asymmetry PASSED [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/Library/Application Support/Quberon/worktrees/viz-3-stop-path-animation/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================= 3 passed, 1 warning in 0.36s =========================
+EXIT:0

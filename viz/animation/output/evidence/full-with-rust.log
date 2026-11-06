@@ -1,0 +1,21 @@
+UTC 2026-11-06T11:32:59Z host Darwin Quberon1.local 24.3.0 Darwin Kernel Version 24.3.0: Thu Jan  2 20:22:58 PST 2025; root:xnu-11215.81.4~3/RELEASE_ARM64_T8132 arm64
+Python 3.11.15
+cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)
+rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)
+ffmpeg version 9.0.1-https://www.martin-riedl.de Copyright (c) 2000-2026 the FFmpeg developers
+CMD .venv/bin/python -m pytest -q (with Rust)
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 97%]
+.....                                                                    [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/Library/Application Support/Quberon/worktrees/viz-3-stop-path-animation/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+<frozen importlib._bootstrap>:283
+  <frozen importlib._bootstrap>:283: DeprecationWarning: the load_module() method is deprecated and slated for removal in Python 3.12; use exec_module() instead
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+221 passed, 2 warnings in 40.37s
+EXIT:0
