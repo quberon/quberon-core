@@ -303,4 +303,13 @@ if __name__ == "__main__":
         for i, c in lr.items(cases):
             time.sleep(0.01)
             lr.record({"case": c, "ok": True}, escaped=(c % 97 == 0))
-    print(json.dumps(json.loads((out / "summary.json").read_text()), indent=2))
+    summary = out / "summary.json"
+    if summary.exists():
+        print(json.dumps(json.loads(summary.read_text()), indent=2))
+    else:
+        # A signal stopped the run: the partial summary is the diagnostic,
+        # not a crash in the harness. Exit as a terminated run would.
+        partial = out / "summary-partial.json"
+        if partial.exists():
+            print(json.dumps(json.loads(partial.read_text()), indent=2))
+        sys.exit(143)
