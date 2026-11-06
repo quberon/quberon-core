@@ -1,0 +1,24 @@
+# Quberon Tier 2 paths require code-owner review.
+# Coverage mirrors the tier2_paths list in ops/ownership.json.
+
+app/main.py @quberon
+app/__init__.py @quberon
+integrations/secure_core.py @quberon
+integrations/meta.py @quberon
+integrations/interventions.py @quberon
+integrations/recognizers.py @quberon
+crates/** @quberon
+apps/** @quberon
+tools/quberon-verify/** @quberon
+.github/** @quberon
+ops/** @quberon
+Cargo.toml @quberon
+Cargo.lock @quberon
+Makefile @quberon
+requirements.txt @quberon
+deny.toml @quberon
+scripts/deploy_pi.sh @quberon
+scripts/deploy_user_pi.sh @quberon
+scripts/setup_ap.sh @quberon
+scripts/setup_cellular.sh @quberon
+scripts/ap_rollback.sh @quberon
