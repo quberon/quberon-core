@@ -93,6 +93,7 @@ class QuberonCoreAdapter(AdapterUnderTest):
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
+            "non_intervention_saturation_injectable": True,
         }
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
@@ -105,6 +106,15 @@ class QuberonCoreAdapter(AdapterUnderTest):
         store.persistence_ok = False
         store.stop_latched = True
         store.observed_state = "UNKNOWN"
+
+    def saturate_non_intervention_traffic(self) -> None:
+        # Hold every slot of the app's existing planner semaphore
+        # (app.main plan_semaphore, capacity 2) for this adapter's life.
+        # This is the same state planner saturation produces; it is not
+        # real load and exercises no other traffic class. Conformance only.
+        sem = self._app.state.plan_semaphore
+        while sem.acquire(blocking=False):
+            pass
 
     def inject_secure_core_refusal(self) -> None:
         self._app.state.secure_core = _RefusingSecureCore()

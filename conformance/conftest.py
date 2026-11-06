@@ -40,6 +40,14 @@ def adapter_persistence_degraded(tmp_path):
 
 
 @pytest.fixture()
+def adapter_planner_saturated(tmp_path):
+    """Adapter after neutral non-intervention saturation (QIP-INT-06)."""
+    a = make_quberon_adapter(tmp_path / "plannersat")
+    a.saturate_non_intervention_traffic()
+    return a
+
+
+@pytest.fixture()
 def adapter_refusing_core(tmp_path):
     """Adapter after neutral reachable-refusal injection (QIP-DEG-03)."""
     a = make_quberon_adapter(tmp_path / "refusing", secure_core=None)

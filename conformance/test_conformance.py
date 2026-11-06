@@ -6,7 +6,7 @@ swapping the fixtures in conftest.py. This run binds quberon-core.
 Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-ID-01..04        identity & target scope        (outline R1)
   QIP-AUTH-01..04      authentication/authorization   (R2)
-  QIP-INT-01..05       intervention & idempotency     (R3/R4/R9, partial)
+  QIP-INT-01..06       intervention & idempotency     (R3/R4/R9, partial)
   QIP-LATCH-01..03     latching & reset separation    (R5)
   QIP-STATE-01..03     command vs observed state      (R6)
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
@@ -93,6 +93,38 @@ def test_QIP_INT_05_audit_only_kind_never_triggers_stop(adapter):
     r = adapter.intervene("operator", "PANIC_CANDIDATE", "qip-int-05")
     assert r.status_code == 200 and r.body["stop_triggered"] is False
     assert adapter.status("operator").stop_latched == before
+
+
+def _needs_saturation(adapter):
+    if not adapter.capabilities().get("non_intervention_saturation_injectable"):
+        pytest.skip("NOT TESTED in this run: non_intervention_saturation_injectable "
+                    "is False, so saturated non-intervention traffic cannot be "
+                    "injected through this adapter")
+
+
+def test_QIP_INT_06_saturated_planner_busy_refusal_and_stop_not_delayed(
+        adapter_planner_saturated):
+    # QIP-R3.2 planner branch only (partial; R3.2 stays UNIMPLEMENTED --
+    # see README NOT TESTED). Deterministic, no timing assertion: the
+    # saturation is HELD for the whole test, so a STOP that returned at
+    # all was not queued behind the held planner capacity, and a planner
+    # reply received while capacity is still held is a bounded refusal,
+    # not a silently queued/delayed one.
+    a = adapter_planner_saturated
+    _needs_saturation(a)
+    # Saturated non-intervention traffic -> bounded "busy" refusal.
+    r = a.submit_proposal("operator", "check status while saturated")
+    assert r.status_code == 200 and r.body["provider_status"] == "busy"
+    assert r.body["stop_unaffected"] is True
+    # STOP is serviced while saturation is still held.
+    s = a.stop("operator", "qip-int-06")
+    assert s.status_code == 200 and s.command_state == "ACKNOWLEDGED"
+    assert s.stop_latched is True
+    # STOP neither consumed nor released planner capacity: the next
+    # proposal is still refused "busy", and status still reports latched.
+    r2 = a.submit_proposal("operator", "still saturated after stop")
+    assert r2.status_code == 200 and r2.body["provider_status"] == "busy"
+    assert a.status("operator").stop_latched is True
 
 
 # ------------------------------------------------------------- LATCH (R5)
