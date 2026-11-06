@@ -56,6 +56,7 @@ TESTS (both modes):
   with Rust: 29 passed, 1 skipped (skip = QIP-R11.3 explicit UNTESTABLE record only; QIP-LATCH-03 passed with target/debug core built)
   without Rust core: 28 passed, 2 skipped (skips = QIP-LATCH-03 NOT TESTED no-core + QIP-R11.3 explicit UNTESTABLE)
   Full suite, both fail-direction tests, and import-app.main-zero-files were NOT run by this node; they are the universal gate run by ops/gate.sh. No claim is made about them here.
+  Clean-clone verification (observed after commit 074c884): git clone --branch node/qip-qip-r11-3 to /tmp/qip-r11-3-clone, python3.11 venv + pip install -r requirements.txt, then in that clone: .venv/bin/python -m pytest conformance/ -q = 28 passed, 2 skipped (no Rust core in clean clone: QIP-LATCH-03 NOT TESTED + QIP-R11.3 UNTESTABLE), exit 0.
 
 DISPOSITION DETAIL:
   QIP-R11.3 text (QIP-v0.1.md R11): "Changes to normative text, class assignment, or traceability status MUST be versioned with the profile; an implementation MUST state the profile version it claims against, and a claim against a superseded version MUST be labelled as such."
