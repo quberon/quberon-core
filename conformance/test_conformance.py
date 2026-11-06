@@ -12,6 +12,9 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
   QIP-PROP-01..03      proposal (planner) boundary    (frontier rule)
   QIP-DEG-01..03       degraded / fail-direction      (R7)
+  QIP-CAP-01..06       capability declaration         (R10.1, OBSERVE;
+                         simulator declaration only -- no manufacturer
+                         mapping is declared, probed, or implied)
 
 A skipped test is NOT TESTED, not a pass. See README.md NOT TESTED section.
 """
@@ -229,3 +232,105 @@ def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
     events = refusing.events("operator").body["events"]
     match = [e for e in events if e["id"] == r.command_id]
     assert len(match) == 1 and match[0]["auth_result"] == "secure_core_rejected"
+
+
+# --------------------------------- CAP: capability declaration (R10.1)
+# QIP-R10.1 (OBSERVE): declare intervention kinds, target scope, status
+# values and reset semantics; declare unsupported kinds as unsupported
+# rather than approximating them. These tests probe the declaration
+# against observed behaviour of the SAME adapter. They declare/probe no
+# manufacturer mapping (QIP-R10.2 remains a gap): a declaration naming a
+# manufacturer mapping or source would fail QIP-CAP-01 for this adapter,
+# whose manufacturer_mapping must stay explicitly None.
+
+def _declaration(adapter):
+    if not adapter.capabilities().get("capability_declaration_available"):
+        pytest.skip("NOT TESTED in this run: capability_declaration_available "
+                    "is False, so no QIP-R10.1 declaration can be probed "
+                    "through this adapter")
+    return adapter.capability_declaration()
+
+
+def test_QIP_CAP_01_declaration_complete_and_no_manufacturer_mapping(adapter):
+    d = _declaration(adapter)
+    scope = d["target_scope"]
+    assert scope["robot_id"] == adapter.robot_id
+    status = adapter.status("operator")
+    assert scope["robot_id"] == status.body["robot_id"]
+    assert scope["adapter_mode"] == status.body["adapter_mode"]
+    kinds = d["intervention_kinds"]
+    assert kinds["stop"] and kinds["audit_only"]
+    assert not (set(kinds["stop"]) & set(kinds["audit_only"]))
+    assert d["undeclared_kinds"] == "unsupported"
+    for group in ("command_state", "observed_state", "secure_core_status"):
+        assert d["status_values"][group], group
+    reset = d["reset_semantics"]
+    assert reset["distinct_from_stop"] is True and reset["starts_task"] is False
+    assert reset["action"] and reset["requires_role"] and reset["confirmation"]
+    # Explicit non-claim, not an omitted field: no observed manufacturer
+    # material exists for this adapter (see README NOT TESTED / R10.2).
+    assert d["manufacturer_mapping"] is None
+    assert d["manufacturer_mapping_source"] is None
+
+
+def test_QIP_CAP_02_declared_stop_kinds_stop_and_audit_only_kinds_do_not(adapter):
+    d = _declaration(adapter)
+    for i, kind in enumerate(d["intervention_kinds"]["stop"]):
+        r = adapter.intervene("operator", kind, f"qip-cap-02-stop-{i}",
+                              evidence_text="stop")
+        assert r.status_code == 200 and r.body["stop_triggered"] is True, kind
+        assert r.stop_latched is True, kind
+    for i, kind in enumerate(d["intervention_kinds"]["audit_only"]):
+        r = adapter.intervene("operator", kind, f"qip-cap-02-audit-{i}",
+                              evidence_text="stop")
+        assert r.status_code == 200 and r.body["stop_triggered"] is False, kind
+
+
+def test_QIP_CAP_03_undeclared_kind_is_unsupported_not_approximated(adapter):
+    d = _declaration(adapter)
+    declared = (set(d["intervention_kinds"]["stop"])
+                | set(d["intervention_kinds"]["audit_only"]))
+    probe = "QIP_UNSUPPORTED_KIND"
+    assert probe not in declared and d["undeclared_kinds"] == "unsupported"
+    before_events = adapter.events("operator").body["events"]
+    before_latched = adapter.status("operator").stop_latched
+    r = adapter.intervene("operator", probe, "qip-cap-03")
+    assert r.status_code == 400 and r.body.get("stop_triggered") is not True
+    assert adapter.status("operator").stop_latched == before_latched
+    assert len(adapter.events("operator").body["events"]) == len(before_events)
+
+
+def test_QIP_CAP_04_declared_status_values_match_observed_stop(adapter):
+    d = _declaration(adapter)
+    values = d["status_values"]
+    r = adapter.stop("operator", "qip-cap-04")
+    assert r.status_code == 200
+    assert r.command_state in values["command_state"]
+    assert r.observed_state in values["observed_state"]
+    if r.secure_core_status is not None:
+        assert r.secure_core_status in values["secure_core_status"]
+    s = adapter.status("operator")
+    assert s.observed_state in values["observed_state"]
+
+
+def test_QIP_CAP_05_declared_reset_is_distinct_and_role_gated(adapter):
+    d = _declaration(adapter)
+    reset = d["reset_semantics"]
+    assert reset["distinct_from_stop"] is True and reset["starts_task"] is False
+    # The declared gate is probed from a non-privileged role: reset is a
+    # separate action from STOP, refused for operator, latch retained.
+    assert reset["requires_role"] == "admin"
+    assert adapter.reset_latch("operator").status_code == 403
+    assert adapter.status("operator").stop_latched is True
+
+
+def test_QIP_CAP_06_declared_admin_reset_clears_latch_without_task(adapter):
+    d = _declaration(adapter)
+    _needs_core(adapter)
+    reset = d["reset_semantics"]
+    assert reset["requires_role"] == "admin" and reset["clears_latch"] is True
+    r = adapter.reset_latch("admin", confirm=reset["confirmation"])
+    assert r.status_code == 200 and r.body.get("task_started") is False
+    assert r.command_state in d["status_values"]["command_state"]
+    assert r.observed_state in d["status_values"]["observed_state"]
+    assert adapter.status("admin").stop_latched is False

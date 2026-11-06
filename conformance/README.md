@@ -43,7 +43,14 @@ auth_result "secure_core_rejected".
 ID (R1) · AUTH (R2) · INT intervention/idempotency/inputs (R3/R4/R9 partial)
 · LATCH (R5) · STATE (R6) · AUDIT (R8 partial) · PROPOSAL planner boundary
 (frontier rule: model proposes, deterministic law disposes) ·
-DEGRADED fail-direction (R7, graph.md R-IMM-1/R-IMM-2).
+DEGRADED fail-direction (R7, graph.md R-IMM-1/R-IMM-2) ·
+CAP capability declaration (R10.1, OBSERVE: QIP-CAP-01..06 probe the
+adapter's own declared intervention kinds, target scope, status values
+and reset semantics against its observed behaviour, and probe an
+undeclared kind as unsupported/not approximated). The quberon-core
+declaration is for the SIMULATION adapter only and explicitly declares
+manufacturer_mapping: None — no manufacturer mapping is tested or implied.
+Adapters without a declaration report QIP-CAP NOT TESTED (skip), never a pass.
 
 ## Run
 
@@ -65,7 +72,14 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
   via UNKNOWN/latch/audit outcomes, not via an invocation counter.
 - Any real manufacturer interface, vendor stop/status/reset mapping,
   capability negotiation (R10: registry api-surfaces.jsonl was empty at
-  gate zero) — no adapter for any real robot exists here.
+  gate zero) — no adapter for any real robot exists here. QIP-CAP-01..06
+  cover only QIP-R10.1's declaration duty for the in-repo simulator;
+  QIP-R10.2 (manufacturer mapping) remains explicitly untested/UNIMPLEMENTED,
+  and the Section 11 traceability row for QIP-R10.1 in QIP-v0.1.md remains
+  UNIMPLEMENTED until the profile owner amends it by that section's
+  procedure — this suite alone does not amend it.
+- QIP-CAP-06's admin-reset branch without the Rust secure-core binary:
+  it skips (NOT TESTED) in that run, as does QIP-LATCH-03.
 - Physical stopping time, response-time/deadline/load/starvation, network
   partition, restart/reconnect against a real controller (R3/R4 limits).
 - Independent physical-state sensing, observation latency (R6 limits).

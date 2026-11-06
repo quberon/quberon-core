@@ -93,6 +93,43 @@ class QuberonCoreAdapter(AdapterUnderTest):
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
+            "capability_declaration_available": True,
+        }
+
+    def capability_declaration(self):
+        # Declaration for THIS simulator implementation only (derived
+        # from app.main / integrations.interventions behaviour probed by
+        # QIP-CAP-02..06). No manufacturer interface has been observed,
+        # so no manufacturer mapping is declared or implied (QIP-R10.2).
+        status = self.status("operator").body
+        return {
+            "target_scope": {
+                "robot_id": self.robot_id,
+                "adapter_mode": status.get("adapter_mode"),
+            },
+            "intervention_kinds": {
+                # STOP_KINDS in integrations/interventions.py, via the
+                # neutral intervene() surface; PANIC_CANDIDATE is the
+                # sole audit-only kind there.
+                "stop": ["BUTTON", "VOICE_STOP", "GESTURE_STOP"],
+                "audit_only": ["PANIC_CANDIDATE"],
+            },
+            "undeclared_kinds": "unsupported",
+            "status_values": {
+                "command_state": ["ACKNOWLEDGED", "UNKNOWN"],
+                "observed_state": ["SIMULATED_STOPPED", "SIMULATED_IDLE", "UNKNOWN"],
+                "secure_core_status": ["accepted", "unavailable", "rejected"],
+            },
+            "reset_semantics": {
+                "action": "SIMULATION_RESET",
+                "distinct_from_stop": True,
+                "requires_role": "admin",
+                "confirmation": "RESET_SIMULATION",
+                "clears_latch": True,
+                "starts_task": False,
+            },
+            "manufacturer_mapping": None,
+            "manufacturer_mapping_source": None,
         }
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------

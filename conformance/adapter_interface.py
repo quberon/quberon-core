@@ -132,10 +132,42 @@ class AdapterUnderTest:
         """
         raise NotImplementedError
 
+    # --- Capability declaration (QIP-R10.1 / QIP-CAP) -------------------
+    # An adapter declares, in THIS neutral vocabulary, what it supports.
+    # The declaration is about the adapter's own implementation only: it
+    # is NOT a manufacturer-interface mapping (QIP-R10.2). A declaration
+    # claiming such a mapping must record its observed source in
+    # manufacturer_mapping / manufacturer_mapping_source; adapters with
+    # no observed manufacturer material MUST leave both None.
+    #
+    # Required shape (all keys required, lists non-empty where noted):
+    #   target_scope: {"robot_id": str, "adapter_mode": str}
+    #   intervention_kinds: {"stop": [str, ...], "audit_only": [str, ...]}
+    #       stop and audit_only must be disjoint; audit_only kinds never
+    #       trigger a stop.
+    #   undeclared_kinds: the literal "unsupported" -- any kind not listed
+    #       in intervention_kinds is unsupported and must be rejected,
+    #       never approximated by a listed kind.
+    #   status_values: {"command_state": [...], "observed_state": [...],
+    #                   "secure_core_status": [...]}
+    #   reset_semantics: {"action": str, "distinct_from_stop": True,
+    #                     "requires_role": str, "confirmation": str,
+    #                     "clears_latch": bool, "starts_task": False}
+    #   manufacturer_mapping: None (or observed mapping, QIP-R10.2)
+    #   manufacturer_mapping_source: None (or its recorded source)
+    #
+    # An adapter that cannot declare MUST leave the capability
+    # "capability_declaration_available" False and MUST raise
+    # NotImplementedError here; the suite then reports QIP-CAP NOT
+    # TESTED (skip), never a pass.
+    def capability_declaration(self) -> Dict[str, Any]:
+        raise NotImplementedError
+
     # Capability disclosure: adapters report what this run can exercise.
     # A False capability is a NOT TESTED gap in the report, never a pass.
     def capabilities(self) -> Dict[str, bool]:
         return {
             "persistence_failure_injectable": False,
             "secure_core_refusal_injectable": False,
+            "capability_declaration_available": False,
         }
