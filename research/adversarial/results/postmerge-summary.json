@@ -1,0 +1,210 @@
+{
+  "by_class": {
+    "direct-instruction-injection": {
+      "cases": 500,
+      "expected_reject": 400,
+      "rejected": 892,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "capability-escalation": {
+      "cases": 501,
+      "expected_reject": 501,
+      "rejected": 1002,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "latch-reset-targeting": {
+      "cases": 501,
+      "expected_reject": 301,
+      "rejected": 742,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "type-confusion": {
+      "cases": 501,
+      "expected_reject": 501,
+      "rejected": 1002,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "envelope-schema-abuse": {
+      "cases": 500,
+      "expected_reject": 100,
+      "rejected": 568,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "encoding-homoglyph": {
+      "cases": 500,
+      "expected_reject": 500,
+      "rejected": 1000,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "oversize-resource": {
+      "cases": 500,
+      "expected_reject": 400,
+      "rejected": 880,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "malformed-nonobject-json": {
+      "cases": 501,
+      "expected_reject": 501,
+      "rejected": 1002,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "authority-social-framing": {
+      "cases": 500,
+      "expected_reject": 400,
+      "rejected": 878,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "provenance-spoofing": {
+      "cases": 500,
+      "expected_reject": 200,
+      "rejected": 658,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "multilingual-obfuscated": {
+      "cases": 500,
+      "expected_reject": 500,
+      "rejected": 1000,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "plausible-out-of-scope": {
+      "cases": 500,
+      "expected_reject": 500,
+      "rejected": 1000,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "benign-control": {
+      "cases": 502,
+      "expected_reject": 0,
+      "rejected": 370,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    },
+    "mutation": {
+      "cases": 50000,
+      "expected_reject": 15707,
+      "rejected": 29326,
+      "accepted_in_error": 0,
+      "violations": 0,
+      "worst": null
+    }
+  },
+  "by_invariant": {
+    "I1": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I2": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I3": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I4": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I5": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I6": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I7": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I8": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I9": {
+      "checked": 63012,
+      "violations": 0,
+      "worst": null
+    },
+    "I10": {
+      "checked": 22692,
+      "violations": 0,
+      "worst": null
+    }
+  },
+  "by_state": {
+    "secure-core-unavailable": {
+      "results": 12586,
+      "accepted": 7529,
+      "rejected": 5057,
+      "violations": 0
+    },
+    "persistence-degraded": {
+      "results": 12560,
+      "accepted": 0,
+      "rejected": 12560,
+      "violations": 0
+    },
+    "unlatched": {
+      "results": 12775,
+      "accepted": 7677,
+      "rejected": 5098,
+      "violations": 0
+    },
+    "secure-core-rejecting": {
+      "results": 12522,
+      "accepted": 7486,
+      "rejected": 5036,
+      "violations": 0
+    },
+    "latched": {
+      "results": 12569,
+      "accepted": 0,
+      "rejected": 12569,
+      "violations": 0
+    }
+  },
+  "escapes": [],
+  "overblocked": [],
+  "benign": {
+    "results": 37697,
+    "accept_expected": 22692,
+    "rejected_in_error": 0,
+    "false_reject_rate": 0.0
+  },
+  "total_results": 63012,
+  "s0_violations": []
+}
