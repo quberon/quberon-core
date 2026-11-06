@@ -55,7 +55,7 @@ if [ -n "$missing" ]; then
   bash "$OPS/incident.sh" environment "Supervisor cannot run; missing on PATH:$missing. Check EnvironmentVariables in the launchd plist." 2>/dev/null
   exit 1
 fi
-if [ ! -d "$REPO/.git" ]; then
+if ! git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1; then
   log "FATAL: $REPO is not a git repository"
   exit 1
 fi
