@@ -120,6 +120,20 @@ class AdapterUnderTest:
         """
         raise NotImplementedError
 
+    def saturate_non_intervention_traffic(self) -> None:
+        """Saturate the adapter's non-intervention (planner/proposal) capacity.
+
+        Names a STATE, not a mechanism, like the DEG-03 injections above.
+        Scope is explicitly the planner/proposal capacity only: status and
+        other traffic have no neutral saturation point in this interface.
+        After saturation, non-intervention traffic is expected to receive
+        the adapter's bounded refusal and STOP is expected to still be
+        serviced. An adapter that cannot saturate MUST leave the
+        capability False and raise NotImplementedError; the suite then
+        reports NOT TESTED (skip), never a pass.
+        """
+        raise NotImplementedError
+
     def inject_secure_core_refusal(self) -> None:
         """Make the authorising authority REACHABLE but REFUSING.
 
@@ -138,4 +152,5 @@ class AdapterUnderTest:
         return {
             "persistence_failure_injectable": False,
             "secure_core_refusal_injectable": False,
+            "non_intervention_saturation_injectable": False,
         }

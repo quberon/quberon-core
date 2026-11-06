@@ -55,6 +55,27 @@ Without the Rust secure-core binary, motion-permitting reset cannot be
 exercised: QIP-LATCH-03 skips, and the no-core DEGRADED tests still run.
 Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
+## QIP-INT-06 planner saturation (QIP-R3.2, partial only)
+
+AdapterUnderTest declares a neutral injection point
+saturate_non_intervention_traffic() plus capability
+non_intervention_saturation_injectable (False by default: an adapter
+that cannot inject reports NOT TESTED, never a pass). Scope is the
+planner/proposal capacity only. quberon_adapter implements it
+conformance-side only: it holds every slot of the app's existing
+planner semaphore for the adapter's life; no app/control-path code was
+changed. QIP-INT-06 then observes, deterministically and with no timing
+assertion: saturated proposal -> 200 with provider_status "busy" and
+stop_unaffected True (the app's bounded-refusal vocabulary, not an HTTP
+error code); STOP while saturation is still held -> 200/ACKNOWLEDGED/
+latched (a returned STOP was not queued behind held planner capacity);
+a further proposal after STOP is still "busy" (STOP neither consumed
+nor released planner capacity).
+
+This is partial coverage of QIP-R3.2 only. It does NOT trace QIP-R3.2,
+which stays UNIMPLEMENTED in QIP-v0.1.md Section 11 until the profile
+owner amends it under that section's procedure.
+
 ## NOT TESTED (explicit gaps — remain gaps)
 
 - QIP-DEG-03 injection limits: a REAL disk/SQLite persistence failure
@@ -68,6 +89,17 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
   gate zero) — no adapter for any real robot exists here.
 - Physical stopping time, response-time/deadline/load/starvation, network
   partition, restart/reconnect against a real controller (R3/R4 limits).
+- QIP-R3.2 remainder (explicitly untestable in this suite, not a trace):
+  saturation of status and other non-intervention traffic. Status has no
+  bounded capacity pool to saturate through the neutral adapter; the
+  capacity status/task/STOP share (Store.lock, ASGI threadpool) cannot
+  be saturated deterministically through the synchronous TestClient
+  adapter, and holding Store.lock would block STOP by construction
+  rather than measure independence. Threaded/network load, any delay
+  bound, and starvation behaviour have no conformance mechanism here;
+  loadtest/ (Wave 5 F3) is separate local simulated evidence with no
+  conformance test ID. QIP-INT-06 covers only the planner branch above,
+  via injected semaphore saturation, not real concurrent planner load.
 - Independent physical-state sensing, observation latency (R6 limits).
 - Audit retention, clock trust, external export, tamper-evidence recovery,
   custody chain (R8 limits); signed-attestation verification when a core
