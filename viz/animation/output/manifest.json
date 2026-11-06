@@ -1,0 +1,31 @@
+{
+  "animated_svg": "stop-path-animation.svg",
+  "copper_byte_identical": true,
+  "copper_task_outputs_sha256": "249509dc1dd8890886210406a1d5bee1787d6a896165acdcec7aac606506361d",
+  "fail_probes_status": "RUN",
+  "fleet_trace_digest": "bc00d02757b140236eff8687b4934a3cb373aee72759281b1f87087d13e79eb0",
+  "frames": [
+    "frames/frame-000.svg",
+    "frames/frame-001.svg",
+    "frames/frame-002.svg",
+    "frames/frame-003.svg",
+    "frames/frame-004.svg",
+    "frames/frame-005.svg",
+    "frames/frame-006.svg",
+    "frames/frame-007.svg",
+    "frames/frame-008.svg",
+    "frames/frame-009.svg",
+    "frames/frame-010.svg",
+    "frames/frame-011.svg"
+  ],
+  "kind": "quberon-viz-stop-path-animation/v1",
+  "physical_robot": false,
+  "simulated": true,
+  "source_trace_sha256": "fa5fc598748094b1c5d86cd7b11c336c18359487aceabe824ee858a48c0e44c3",
+  "video": {
+    "bytes": 75664,
+    "file": "stop-path-animation.mp4",
+    "status": "encoded",
+    "tool": "/Users/quberon1/.hermes/tools/ffmpeg-9.0.1-darwin-arm64/ffmpeg"
+  }
+}

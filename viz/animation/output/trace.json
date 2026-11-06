@@ -1,0 +1,149 @@
+{
+  "copper": {
+    "comparison": {
+      "authorized": "true",
+      "byte_identical": "true",
+      "command": "STOP",
+      "keyframe_byte_identical": "true",
+      "original_task_outputs_bytes": "39",
+      "replay_task_outputs_bytes": "39",
+      "sequence": "1"
+    },
+    "comparison_txt_sha256": "b8e41ee84db4ca436767673667dcb201ba0b8fccd42b090be319ede983480797",
+    "copper_logs_byte_identical": true,
+    "original_copper_log_sha256": "f5ac0065cf3b603cad9df9d8a0d396945912e2c3a18a2b328a9d9ce9752d1be5",
+    "original_task_outputs_sha256": "249509dc1dd8890886210406a1d5bee1787d6a896165acdcec7aac606506361d",
+    "replay_copper_log_sha256": "f5ac0065cf3b603cad9df9d8a0d396945912e2c3a18a2b328a9d9ce9752d1be5",
+    "replay_task_outputs_sha256": "249509dc1dd8890886210406a1d5bee1787d6a896165acdcec7aac606506361d",
+    "task_outputs_byte_identical": true
+  },
+  "events": [
+    {
+      "detail": "Copper InterventionSource: command=STOP sequence=1 (comparison.txt, sha256=b8e41ee84db4ca43\u2026)",
+      "scenario": "authorized_stop",
+      "stage": "sensor",
+      "title": "Sensor / intervention source emits STOP"
+    },
+    {
+      "detail": "Copper Authorization task: authorized iff command == \"STOP\"; recorded authorized=true",
+      "scenario": "authorized_stop",
+      "stage": "recognition",
+      "title": "Recognition: command recognised as STOP"
+    },
+    {
+      "detail": "task-outputs sha256=249509dc1dd8890886210406a1d5bee1787d6a896165acdcec7aac606506361d original==replay byte_identical=true keyframe_byte_identical=true",
+      "scenario": "authorized_stop",
+      "stage": "authorization",
+      "title": "Authorization: replay byte-identical"
+    },
+    {
+      "detail": "SimulatedRobotAdapter.stop -> ACKNOWLEDGED/SIMULATED_STOPPED; fleet single-node STOP -> LATCHED motion_permitted=False adapter_invocations=1",
+      "scenario": "authorized_stop",
+      "stage": "actuator",
+      "title": "Simulated actuator outcome (SIMULATED)"
+    },
+    {
+      "detail": "Authenticated simulation STOP request reaches execute_stop (real app probe, tmp DB)",
+      "scenario": "core_unavailable",
+      "stage": "sensor",
+      "title": "Sensor / operator STOP request"
+    },
+    {
+      "detail": "execute_stop convergence path entered; no secure-core client provisioned (core unavailable, not a rejection)",
+      "scenario": "core_unavailable",
+      "stage": "recognition",
+      "title": "Recognition: STOP request recognised"
+    },
+    {
+      "detail": "secure_core.status=unavailable decision=None sequence=None audit_record=None",
+      "scenario": "core_unavailable",
+      "stage": "authorization",
+      "title": "Authorization: UNAVAILABLE -> UNSIGNED"
+    },
+    {
+      "detail": "http=200 adapter_invocations=1 command_state=ACKNOWLEDGED stop_latched=True observed_state=SIMULATED_STOPPED",
+      "scenario": "core_unavailable",
+      "stage": "actuator",
+      "title": "STOP proceeds UNSIGNED, latch retained (SIMULATED)"
+    },
+    {
+      "detail": "Authenticated simulation STOP request reaches execute_stop (real app probe, tmp DB)",
+      "scenario": "core_rejecting",
+      "stage": "sensor",
+      "title": "Sensor / operator STOP request"
+    },
+    {
+      "detail": "execute_stop convergence path entered; reachable core returns a non-ACCEPTED decision",
+      "scenario": "core_rejecting",
+      "stage": "recognition",
+      "title": "Recognition: STOP request recognised"
+    },
+    {
+      "detail": "secure_core.status=rejected decision=REPLAY_REJECTED sequence=7",
+      "scenario": "core_rejecting",
+      "stage": "authorization",
+      "title": "Authorization: REJECTED -> fail closed"
+    },
+    {
+      "detail": "http=503 adapter_invocations=0 command_state=UNKNOWN stop_latched=True observed_state=UNKNOWN",
+      "scenario": "core_rejecting",
+      "stage": "actuator",
+      "title": "STOP blocked, state UNKNOWN, latch retained (SIMULATED)"
+    }
+  ],
+  "fail_probes": {
+    "core_rejecting": {
+      "adapter_invocations": 0,
+      "command_state": "UNKNOWN",
+      "http_status": 503,
+      "observed_state": "UNKNOWN",
+      "secure_core": {
+        "audit_record": "deadbeef",
+        "decision": "REPLAY_REJECTED",
+        "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION",
+        "sequence": 7,
+        "status": "rejected"
+      },
+      "stop_latched": true
+    },
+    "core_unavailable": {
+      "adapter_invocations": 1,
+      "command_state": "ACKNOWLEDGED",
+      "http_status": 200,
+      "observed_state": "SIMULATED_STOPPED",
+      "secure_core": {
+        "audit_record": null,
+        "decision": null,
+        "scope": "SIMULATION_ONLY_STOP_AUTHORIZATION",
+        "sequence": null,
+        "status": "unavailable"
+      },
+      "stop_latched": true
+    },
+    "status": "RUN"
+  },
+  "fleet": {
+    "replayed_twice_identical": true,
+    "single_node_adapter_invocations": 1,
+    "single_node_motion_permitted_after_stop": false,
+    "single_node_stop_outcome": "LATCHED",
+    "trace_lines": [
+      "PARTITION groups=[['n1', 'n2'], ['n3']]",
+      "STOP LATCHED node=n1 event=e1 epoch=1 net=0",
+      "STOP LATCHED node=n3 event=e2 epoch=1 net=0",
+      "STOP_DUPLICATE node=n1 event=e1 outcome=LATCHED",
+      "GOSSIP net_calls=1",
+      "HEAL",
+      "GOSSIP net_calls=4",
+      "RESET RESET_APPLIED node=n2 event=r1 clears=1",
+      "GOSSIP net_calls=7",
+      "OBSERVE node=n1 target=robot-a value=STOPPED src=sensor-1",
+      "OBSERVE node=n2 target=robot-a value=MOVING src=sensor-2"
+    ],
+    "trace_sha256_digest": "bc00d02757b140236eff8687b4934a3cb373aee72759281b1f87087d13e79eb0"
+  },
+  "kind": "quberon-viz-stop-path-trace/v1",
+  "physical_robot": false,
+  "simulated": true,
+  "source_trace_sha256": "fa5fc598748094b1c5d86cd7b11c336c18359487aceabe824ee858a48c0e44c3"
+}
