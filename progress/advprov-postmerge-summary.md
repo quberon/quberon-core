@@ -1,7 +1,7 @@
 NODE: advprov-postmerge-summary
 TIER: 1
 BRANCH: node/advprov-postmerge-summary
-COMMITS: see below (recorded after commit; code commit is the parent of the commit adding this file's final version)
+COMMITS: b57619bfb4ed50a134d8775b084cc1a2236fd1ca (code + initial report), plus the docs commit that records this hash (git log on this branch)
 STATUS: complete (pending scheduler merge; PR opened by this worker, not merged by this worker)
 
 CHANGED:
@@ -55,10 +55,11 @@ TESTS (both modes):
 - With Rust (cargo build --workspace, RC=0): full suite 216 passed; both
   fail-direction tests (test_stop_executes_without_secure_core_but_reset_does_not,
   test_stop_rejected_by_secure_core_does_not_invoke_adapter) 2 passed.
-- Rust removed from PATH (cargo on PATH: None): full suite 216 passed;
-  both fail-direction tests 2 passed. Note: this worktree still had a
-  target/ binary on disk, so this mode is a PATH-removal run, not a
-  no-binary run; see STILL NOT TRUE.
+- Rust removed from PATH (cargo on PATH: None): full suite 216 passed in
+  the worktree (target/ binary still on disk there); in a clean clone of
+  b57619b with no target/ built, the same mode gives 204 passed, 12 skipped
+  and the exit gate gives 17 passed (raw file, clean-clone section).
+  Both fail-direction tests 2 passed in the worktree without-Rust run.
 - import app.main creating zero files: files_created: [] (raw file).
 
 STILL NOT TRUE:
@@ -76,9 +77,10 @@ STILL NOT TRUE:
   and no partial-summary-on-SIGTERM for the adversarial loop in this node.
   A killed future run can still leave no summary; only the S0-stop path
   writes a non-citable summary. LongRun integration is future work.
-- The without-Rust run above removed cargo from PATH only; the previously
-  built target/ secure-core binary remained on disk, so Rust-dependent
-  tests were not in their no-binary state in that run.
+- The in-worktree without-Rust run removed cargo from PATH only, with a
+  target/ binary on disk; the clean-clone section of the raw evidence
+  (no target/ at clone time, 204 passed / 12 skipped) is the no-binary
+  evidence, and it verified commit b57619b, not any later docs commit.
 - The 63,012 count's underlying 26 MB results JSONL is not in this repo
   (per evidence/adversarial-postmerge.md it is reproducible from the
   recorded command); this node did not regenerate or re-verify it.

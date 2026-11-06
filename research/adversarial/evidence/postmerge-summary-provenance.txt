@@ -81,3 +81,28 @@ tmpdir: /var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/tmp.GHMn53tvdF
 files_created: []
 import app.main zero-files: OK
 RC=0
+=== CLEAN CLONE GATE (clone of b57619b, no .venv/target at clone time) ===
+CLEAN CLONE: /var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T//clean-advprov-postmerge commit b57619bfb4ed50a134d8775b084cc1a2236fd1ca
+UTC: 2026-11-06T14:23:46Z
+Darwin Quberon1.local 24.3.0 Darwin Kernel Version 24.3.0: Thu Jan  2 20:22:58 PST 2025; root:xnu-11215.81.4~3/RELEASE_ARM64_T8132 arm64
+Python 3.11.15
+cargo: /opt/homebrew/bin/cargo
+--- without Rust on PATH, no target/ built yet ---
+ls: target: No such file or directory
+.................                                                        [100%]
+17 passed in 0.10s
+RC=0
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+204 passed, 12 skipped, 2 warnings in 42.01s
+RC=0
+--- with Rust ---
+   Compiling quberon-secure-core-cli v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/clean-advprov-postmerge/apps/quberon-secure-core-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.52s
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+216 passed, 2 warnings in 42.33s
+RC=0
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 1 warning in 0.24s
+RC=0
