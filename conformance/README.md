@@ -38,6 +38,21 @@ auth_result "secure_core_rejected".
   every test function name; N5 and later nodes reference them verbatim.
   Do not renumber; append new IDs only.
 
+## QIP-INT-06 / QIP-R1.3 declaration surface (qip-qip-r1-3)
+
+AdapterUnderTest now also declares one implementation-neutral readout,
+declared_intervention_kinds(), plus the capability
+intervention_kinds_declared (False by default: an adapter whose system
+exposes no QIP-R10.1 declaration reports QIP-R1.3 NOT TESTED, never a
+pass). The readout names a readout, not a mechanism, exactly as for the
+QIP-DEG-03 injection points above, and it must be sourced from the
+system under test — an adapter-hardcoded kind list is fabrication, not
+a declaration. quberon_adapter leaves it False/None: quberon-core's
+status surface exposes no intervention-kind declaration (its
+"capabilities" field lists role permissions plan/read/stop/task, not
+intervention kinds). QIP-INT-06 therefore skips in every quberon-core
+run. See NOT TESTED below.
+
 ## Classes and outline mapping
 
 ID (R1) · AUTH (R2) · INT intervention/idempotency/inputs (R3/R4/R9 partial)
@@ -57,6 +72,22 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
 ## NOT TESTED (explicit gaps — remain gaps)
 
+- QIP-R1.3 (QIP-INT-06, added qip-qip-r1-3): rejection of an intervention
+  kind not declared under QIP-R10.1. Explicitly untestable against
+  quberon-core today, not merely untested: no QIP-R10.1 declaration
+  exists to reject relative to (QIP-R10.1 is itself UNIMPLEMENTED), and
+  the app exposes no kind declaration on any surface the neutral suite
+  can read. Observed partial behaviour, recorded here and in
+  progress/qip-qip-r1-3.md but NOT counted as coverage: POSTing a kind
+  string outside the app's internal enum (e.g. NOT_A_KIND) returns 400
+  "unknown intervention kind or source_status". That does not verify
+  R1.3 — it cannot distinguish undeclared from not-in-enum, cannot
+  exercise a kind declared as unsupported, and cannot exercise a
+  system declaring only a subset of kinds — so QIP-R1.3 stays
+  UNIMPLEMENTED and QIP-INT-06 skips (NOT TESTED) until a system-sourced
+  declaration exists. Any traceability amendment on the basis of a
+  future passing QIP-INT-06 belongs to the QIP profile owner under
+  QIP-v0.1 Section 11, not to this suite.
 - QIP-DEG-03 injection limits: a REAL disk/SQLite persistence failure
   (injection flips the app's degraded flag, it does not corrupt storage),
   and a REAL Rust secure-core rejection of a signed envelope (injection

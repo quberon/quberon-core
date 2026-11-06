@@ -91,9 +91,19 @@ class QuberonCoreAdapter(AdapterUnderTest):
         return {
             "secure_core_available": bool(status.get("secure_core_available")),
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
+            # QIP-R10.1/QIP-R1.3: app status exposes no intervention-kind
+            # declaration (its "capabilities" field lists role permissions
+            # such as plan/read/stop/task, not intervention kinds), so no
+            # declaration is claimed here. Inventing the app's enum in
+            # this adapter would be adapter-side fabrication, not an
+            # observed declaration. QIP-INT-06 therefore stays NOT TESTED.
+            "intervention_kinds_declared": False,
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
         }
+
+    def declared_intervention_kinds(self):
+        return None
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
     def inject_persistence_failure(self) -> None:

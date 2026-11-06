@@ -97,6 +97,21 @@ class AdapterUnderTest:
     def events(self, role: str) -> NeutralResult:
         raise NotImplementedError
 
+    def declared_intervention_kinds(self):
+        """Return the QIP-R10.1 declaration, sourced from the system itself.
+
+        Expected shape when declared: a mapping with at least
+        ``supported`` (kinds the receiver will accept for processing)
+        and ``unsupported`` (kinds explicitly declared unsupported).
+        The declaration MUST come from the system under test (for
+        example its own status/capability surface), not from a list
+        hardcoded in the adapter: an adapter-invented list proves
+        nothing about what the receiver has declared. Return None
+        when the system exposes no such declaration; the suite then
+        reports QIP-R1.3 NOT TESTED, never a pass.
+        """
+        return None
+
     # --- Implementation-neutral fault injection (QIP-DEG-03) -------------
     # These are the injection points the original interface lacked. They
     # name STATES, not mechanisms: how an adapter puts its system into the
@@ -136,6 +151,7 @@ class AdapterUnderTest:
     # A False capability is a NOT TESTED gap in the report, never a pass.
     def capabilities(self) -> Dict[str, bool]:
         return {
+            "intervention_kinds_declared": False,
             "persistence_failure_injectable": False,
             "secure_core_refusal_injectable": False,
         }
