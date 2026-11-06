@@ -62,6 +62,7 @@ TESTS (both modes):
 - With Rust: conformance 28 passed, 1 skipped (QIP-CLAIM-01 NOT TESTED). Full suite 211 passed, 1 skipped.
 - Without Rust: conformance 27 passed, 2 skipped (QIP-CLAIM-01 NOT TESTED; QIP-LATCH-03 NOT TESTED, pre-existing). Full suite 199 passed, 13 skipped.
 - Exit gate `python -m pytest conformance/ -q` exits 0 in both modes (run as .venv/bin/python -m pytest conformance/ -q / -q -rs; -rs only adds skip reasons).
+- Clean-clone check of pushed branch 1dda3a7 (fresh clone, fresh .venv, no Rust binary built): 27 passed, 2 skipped (QIP-LATCH-03 and QIP-CLAIM-01, both NOT TESTED), exit 0. PR: https://github.com/quberon/quberon-core/pull/69
 
 STILL NOT TRUE:
 - QIP-R11.1 is not verified by any passing test; QIP-CLAIM-01 skips in every quberon-core run and QIP-R11.1 must remain UNIMPLEMENTED in QIP-v0.1 Section 11.
