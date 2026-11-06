@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.quberon.supervisor</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/quberon1/quberon-core/ops/supervisor.sh</string>
+  </array>
+
+  <!-- launchd hands a job a minimal PATH. Without this block git, gh, cargo,
+       python3 and make all vanish and the tick fails in a way that looks like
+       a code bug. This is the single most common launchd mistake. -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/quberon1/.cargo/bin</string>
+    <key>HOME</key>
+    <string>/Users/quberon1</string>
+    <key>QUBERON_REPO</key>
+    <string>/Users/quberon1/quberon-core</string>
+    <key>QUBERON_STATE</key>
+    <string>/Users/quberon1/Library/Application Support/Quberon</string>
+    <key>QUBERON_LOGDIR</key>
+    <string>/Users/quberon1/Library/Logs/quberon</string>
+    <key>HERMES_HOME</key>
+    <string>/Users/quberon1/.hermes</string>
+    <key>LANG</key>
+    <string>en_US.UTF-8</string>
+  </dict>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/quberon1/quberon-core</string>
+
+  <key>StartInterval</key>
+  <integer>120</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <!-- launchd will not start a second instance of the same label, and
+       supervisor.sh takes its own lock as well. Both, deliberately. -->
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>LowPriorityIO</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/quberon1/Library/Logs/quberon/launchd.supervisor.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/quberon1/Library/Logs/quberon/launchd.supervisor.err.log</string>
+</dict>
+</plist>

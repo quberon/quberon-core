@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.quberon.watchdog</string>
+
+  <!-- Watches the watchers. A supervisor with no supervisor is how you find
+       out on Saturday that nothing has run since Thursday.
+
+       Every 15 minutes it checks that the supervisor label is loaded, that
+       state.json's last_tick_utc is recent, and that no running node has gone
+       silent. On failure it files an incident issue and tries exactly one
+       kickstart. It never tries twice: a restart loop that hides a real fault
+       is worse than a stopped system you can see. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/quberon1/quberon-core/ops/watchdog.sh</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/quberon1/.cargo/bin</string>
+    <key>HOME</key>
+    <string>/Users/quberon1</string>
+    <key>QUBERON_REPO</key>
+    <string>/Users/quberon1/quberon-core</string>
+    <key>QUBERON_STATE</key>
+    <string>/Users/quberon1/Library/Application Support/Quberon</string>
+    <key>QUBERON_LOGDIR</key>
+    <string>/Users/quberon1/Library/Logs/quberon</string>
+    <key>LANG</key>
+    <string>en_US.UTF-8</string>
+  </dict>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/quberon1/quberon-core</string>
+
+  <key>StartInterval</key>
+  <integer>900</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>ThrottleInterval</key>
+  <integer>60</integer>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>StandardOutPath</key>
+  <string>/Users/quberon1/Library/Logs/quberon/watchdog.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/quberon1/Library/Logs/quberon/watchdog.err.log</string>
+</dict>
+</plist>

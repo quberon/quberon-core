@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "max_slots": 6,
+  "node_budget_minutes": 90,
+  "node_max_attempts": 3,
+  "heartbeat_stale_minutes": 20,
+  "tick_stale_minutes": 10,
+  "min_free_gb": 10,
+  "refill_threshold_multiplier": 2,
+  "merge_method": "--merge",
+  "branch_prefix": "node/",
+  "default_base": "origin/main",
+
+  "budget": {
+    "daily_usd_ceiling": 40.0,
+    "daily_token_ceiling": 40000000,
+    "on_exhausted": "halt_dispatch"
+  },
+
+  "models": {
+    "mechanical": "meta-muse-wonder-fast",
+    "design": "meta-muse-wonder",
+    "_comment": "Replace with the exact model identifiers your Hermes install accepts. Record the verification in ops/RUNBOOK.md. Mechanical nodes are tests, scaffolding, docs assembly and dependency work; design nodes are adversarial, threat-model, profile and prose work."
+  },
+
+  "universal_gate": {
+    "_comment": "Run on a fresh clean clone by ops/gate.sh for every node, in addition to the node's own gate command. These are the invariants no node may break.",
+    "fail_direction_tests": [
+      "tests/test_secure_core.py::test_stop_executes_without_secure_core_but_reset_does_not",
+      "tests/test_secure_core.py::test_stop_rejected_by_secure_core_does_not_invoke_adapter"
+    ],
+    "import_side_effect_check": true,
+    "require_both_modes": true
+  },
+
+  "hermes": {
+    "_comment": "PLACEHOLDER. Determine the real non-interactive invocation, verify it detaches and returns a usable exit code, and record how you verified it in ops/RUNBOOK.md before trusting this file.",
+    "command": ["hermes", "run", "--non-interactive", "--prompt-file", "{prompt}"],
+    "verified": false
+  }
+}

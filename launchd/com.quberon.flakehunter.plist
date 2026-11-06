@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.quberon.flakehunter</string>
+
+  <!-- The standing daemon that finally chases the open P0: intermittent
+       STOP-path non-determinism, never root-caused with a captured traceback.
+       We fixed a plausible cause (orphaned uvicorn at tests/test_app.py:349)
+       without proving causation, and a control-path flake we cannot explain
+       is the most dangerous thing in the repository.
+
+       It runs the suite in randomised order under CPU contention, forever,
+       capturing full traceback, process list, port owner, database path,
+       environment and seed on every run. It stops only when it reproduces
+       with a captured traceback, or when 1000 consecutive clean runs let us
+       downgrade it. The script must say which of the two happened. -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-lc</string>
+    <string>exec caffeinate -is "$QUBERON_REPO/.venv/bin/python" "$QUBERON_REPO/ops/flakehunter.py" --forever</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/quberon1/.cargo/bin</string>
+    <key>HOME</key>
+    <string>/Users/quberon1</string>
+    <key>QUBERON_REPO</key>
+    <string>/Users/quberon1/quberon-core</string>
+    <key>QUBERON_STATE</key>
+    <string>/Users/quberon1/Library/Application Support/Quberon</string>
+    <key>QUBERON_LOGDIR</key>
+    <string>/Users/quberon1/Library/Logs/quberon</string>
+    <key>LANG</key>
+    <string>en_US.UTF-8</string>
+  </dict>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/quberon1/quberon-core</string>
+
+  <!-- No StartInterval: this is a daemon, not a tick. KeepAlive restarts it if
+       it dies, and ops/longrun.py resumes it from its checkpoint rather than
+       starting the count over. -->
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>ThrottleInterval</key>
+  <integer>60</integer>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>Nice</key>
+  <integer>5</integer>
+
+  <key>StandardOutPath</key>
+  <string>/Users/quberon1/Library/Logs/quberon/flakehunter.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/quberon1/Library/Logs/quberon/flakehunter.err.log</string>
+</dict>
+</plist>

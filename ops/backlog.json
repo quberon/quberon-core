@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "_comment": [
+    "Seed backlog. ops/refill.py appends to this; a human may add or re-prioritise.",
+    "priority: lower runs first. needs_scoping: true means a human or a scoping node",
+    "must give it owns and a gate before it can be dispatched.",
+    "tier>=2 requires approved_by_human: true before the scheduler will dispatch it."
+  ],
+  "nodes": [
+    {
+      "id": "ind-1-adversary-split",
+      "title": "Split adversary from defender: the corpus generator must not be the agent, model or prompt lineage that wrote the code under test. Give the adversary the public interface and QIP only. Record generator.model and generator.sees_implementation=false on every artefact, and keep the existing honest label model=none-programmatic-templates on prior corpora.",
+      "source": "seed:independence",
+      "tier": 1, "priority": 1, "model": "design",
+      "owns": ["research/adversarial/**", "progress/ind-1-adversary-split.md"],
+      "gate": "python -m pytest research/adversarial/tests -q",
+      "status": "ready", "needs_scoping": false
+    },
+    {
+      "id": "ind-3-cross-verifier",
+      "title": "Second, independent implementation of the evidence-bundle verifier, written from crates/quberon-evidence-bundle/SPEC.md without reading the Rust source, which must agree with tools/quberon-verify on every fixture. Disagreement is a spec defect, not a test failure. Follow the F2 pattern: test a Tier 2 component from outside it.",
+      "source": "seed:independence",
+      "tier": 1, "priority": 2, "model": "design",
+      "owns": ["evidence-bundle-conformance/**", "progress/ind-3-cross-verifier.md"],
+      "gate": "python -m pytest evidence-bundle-conformance -q",
+      "status": "ready", "needs_scoping": false
+    },
+    {
+      "id": "w5-n6-limitations",
+      "title": "Create docs/LIMITATIONS.md as the single canonical statement of what is not true, assembled from the STILL NOT TRUE sections already in progress/*.md and docs/DILIGENCE.md. Referenced from README and every evidence bundle. Append-only thereafter.",
+      "source": "seed:wave5",
+      "tier": 1, "priority": 4, "model": "design",
+      "owns": ["docs/LIMITATIONS.md", "progress/w5-n6-limitations.md"],
+      "gate": "test -s docs/LIMITATIONS.md",
+      "status": "ready", "needs_scoping": false,
+      "note": "This one unblocks generator 1 in ops/schedule.py, which currently produces nothing because the file does not exist. Doing it first makes the backlog self-feeding."
+    },
+    {
+      "id": "w5-n1-trusted-time",
+      "title": "RFC 3161 trusted timestamps on evidence bundles, so a reader no longer has to trust our clock.",
+      "source": "seed:wave5-custody",
+      "tier": 2, "priority": 6, "model": "design",
+      "owns": ["crates/quberon-evidence-bundle/**", "docs/specs/TRUSTED-TIME.md", "progress/w5-n1-trusted-time.md"],
+      "gate": "cargo test -p quberon-evidence-bundle --all-features",
+      "status": "ready", "needs_scoping": false,
+      "approved_by_human": false
+    },
+    {
+      "id": "w5-n4-verifier-hardening",
+      "title": "Harden tools/quberon-verify: cargo-fuzz target, one negative fixture per failure mode, and the invariant that the verifier never reports valid on partial verification.",
+      "source": "seed:wave5-custody",
+      "tier": 2, "priority": 7, "model": "design",
+      "owns": ["tools/quberon-verify/**", "fuzz/**", "progress/w5-n4-verifier-hardening.md"],
+      "gate": "cargo test -p quberon-verify --all-features",
+      "status": "ready", "needs_scoping": false,
+      "approved_by_human": false
+    },
+    {
+      "id": "qip-3-fail-direction-argument",
+      "title": "Write R4, the fail-direction asymmetry, as a standalone argued artefact with prior art: core unavailable means STOP executes unsigned with the latch retained; core rejects means STOP blocked, adapter not invoked, state UNKNOWN; reset and task always fail closed. This is the original normative contribution and currently exists only as two test names.",
+      "source": "seed:profile",
+      "tier": 1, "priority": 5, "model": "design",
+      "owns": ["docs/specs/intervention-profile/**", "progress/qip-3-fail-direction.md"],
+      "gate": "python -m pytest conformance/ -q",
+      "status": "ready", "needs_scoping": false
+    },
+    {
+      "id": "adv-summary-provenance",
+      "title": "Make every adversarial summary self-describing. research/adversarial/results/postmerge-summary.json currently holds total_results=63012 and escapes=[] with no commit, finished_utc, toolchain, generator or completeness marker inside the file; its provenance exists only in a sibling markdown. Move run.py onto ops/longrun.py so each summary carries complete, citable, commit, UTC, toolchain and generator fields, and so a killed run writes summary-partial.json instead of nothing. Backfill the existing summaries from their committed evidence logs without inventing values.",
+      "source": "seed:evidence-repair",
+      "tier": 1, "priority": 3, "model": "mechanical",
+      "owns": ["research/adversarial/**", "progress/adv-summary-provenance.md"],
+      "gate": "python -m pytest research/adversarial/tests -q",
+      "status": "ready", "needs_scoping": false,
+      "note": "The post-merge rerun did complete: postmerge-full-run.txt ends RC=0 at commit c19501c. The earlier RC=143 report was superseded. 56,506 is the case count, not a kill point. The real defect is that the machine-readable artefact cannot prove any of that about itself."
+    },
+    {
+      "id": "meta-live-prep",
+      "title": "Prepare, never execute, the live Meta call: .env.example placeholders, .env gitignored, redaction verified, one-shot evidence runner ready for the moment credentials reach the application runtime. Hermes credentials are not repository credentials.",
+      "source": "seed:blocked-on-human",
+      "tier": 3, "priority": 30, "model": "mechanical",
+      "owns": ["scripts/meta_live_evidence.py", "scripts/run_meta_live_evidence.sh", "tests/test_meta_live.py", "progress/meta-live-prep.md"],
+      "gate": "python -m pytest tests/test_meta_live.py -q",
+      "status": "ready", "needs_scoping": false,
+      "approved_by_human": false,
+      "note": "Rasmus owns the credentials. docs/evidence/meta-live.md is Tier 3 and only a real credential-backed run may change its verdict."
+    },
+    {
+      "id": "copper-1-replay",
+      "title": "Copper 1.3.0 spike: isolated workspace, root Rust MSRV untouched, source to authorization to simulated sink, deterministic canonical replay as the acceptance criterion. Performance is explicitly secondary.",
+      "source": "seed:blocked-on-ruling",
+      "tier": 1, "priority": 35, "model": "design",
+      "owns": ["spikes/copper-stop-path/**", "progress/copper-1-replay.md"],
+      "gate": "",
+      "status": "blocked", "needs_scoping": true,
+      "note": "Needs Rasmus's ruling on whether the Lane C gate is satisfied by the synthetic contract alone."
+    }
+  ]
+}
