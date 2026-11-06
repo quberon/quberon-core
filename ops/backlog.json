@@ -1,87 +1,133 @@
 {
   "version": 1,
-  "_comment": [
-    "Seed backlog. ops/refill.py appends to this; a human may add or re-prioritise.",
-    "priority: lower runs first. needs_scoping: true means a human or a scoping node",
-    "must give it owns and a gate before it can be dispatched.",
-    "tier>=2 requires approved_by_human: true before the scheduler will dispatch it."
-  ],
   "nodes": [
     {
       "id": "ind-1-adversary-split",
       "title": "Split adversary from defender: the corpus generator must not be the agent, model or prompt lineage that wrote the code under test. Give the adversary the public interface and QIP only. Record generator.model and generator.sees_implementation=false on every artefact, and keep the existing honest label model=none-programmatic-templates on prior corpora.",
       "source": "seed:independence",
-      "tier": 1, "priority": 1, "model": "design",
-      "owns": ["research/adversarial/**", "progress/ind-1-adversary-split.md"],
+      "tier": 1,
+      "priority": 1,
+      "model": "design",
+      "owns": [
+        "research/adversarial/**",
+        "progress/ind-1-adversary-split.md"
+      ],
       "gate": "python -m pytest research/adversarial/tests -q",
-      "status": "ready", "needs_scoping": false
+      "status": "dispatched",
+      "needs_scoping": false
     },
     {
       "id": "ind-3-cross-verifier",
       "title": "Second, independent implementation of the evidence-bundle verifier, written from crates/quberon-evidence-bundle/SPEC.md without reading the Rust source, which must agree with tools/quberon-verify on every fixture. Disagreement is a spec defect, not a test failure. Follow the F2 pattern: test a Tier 2 component from outside it.",
       "source": "seed:independence",
-      "tier": 1, "priority": 2, "model": "design",
-      "owns": ["evidence-bundle-conformance/**", "progress/ind-3-cross-verifier.md"],
+      "tier": 1,
+      "priority": 2,
+      "model": "design",
+      "owns": [
+        "evidence-bundle-conformance/**",
+        "progress/ind-3-cross-verifier.md"
+      ],
       "gate": "python -m pytest evidence-bundle-conformance -q",
-      "status": "ready", "needs_scoping": false
+      "status": "dispatched",
+      "needs_scoping": false
     },
     {
       "id": "w5-n6-limitations",
       "title": "Create docs/LIMITATIONS.md as the single canonical statement of what is not true, assembled from the STILL NOT TRUE sections already in progress/*.md and docs/DILIGENCE.md. Referenced from README and every evidence bundle. Append-only thereafter.",
       "source": "seed:wave5",
-      "tier": 1, "priority": 4, "model": "design",
-      "owns": ["docs/LIMITATIONS.md", "progress/w5-n6-limitations.md"],
+      "tier": 1,
+      "priority": 4,
+      "model": "design",
+      "owns": [
+        "docs/LIMITATIONS.md",
+        "progress/w5-n6-limitations.md"
+      ],
       "gate": "test -s docs/LIMITATIONS.md",
-      "status": "ready", "needs_scoping": false,
+      "status": "dispatched",
+      "needs_scoping": false,
       "note": "This one unblocks generator 1 in ops/schedule.py, which currently produces nothing because the file does not exist. Doing it first makes the backlog self-feeding."
     },
     {
       "id": "w5-n1-trusted-time",
       "title": "RFC 3161 trusted timestamps on evidence bundles, so a reader no longer has to trust our clock.",
       "source": "seed:wave5-custody",
-      "tier": 2, "priority": 6, "model": "design",
-      "owns": ["crates/quberon-evidence-bundle/**", "docs/specs/TRUSTED-TIME.md", "progress/w5-n1-trusted-time.md"],
+      "tier": 2,
+      "priority": 6,
+      "model": "design",
+      "owns": [
+        "crates/quberon-evidence-bundle/**",
+        "docs/specs/TRUSTED-TIME.md",
+        "progress/w5-n1-trusted-time.md"
+      ],
       "gate": "cargo test -p quberon-evidence-bundle --all-features",
-      "status": "ready", "needs_scoping": false,
+      "status": "ready",
+      "needs_scoping": false,
       "approved_by_human": false
     },
     {
       "id": "w5-n4-verifier-hardening",
       "title": "Harden tools/quberon-verify: cargo-fuzz target, one negative fixture per failure mode, and the invariant that the verifier never reports valid on partial verification.",
       "source": "seed:wave5-custody",
-      "tier": 2, "priority": 7, "model": "design",
-      "owns": ["tools/quberon-verify/**", "fuzz/**", "progress/w5-n4-verifier-hardening.md"],
+      "tier": 2,
+      "priority": 7,
+      "model": "design",
+      "owns": [
+        "tools/quberon-verify/**",
+        "fuzz/**",
+        "progress/w5-n4-verifier-hardening.md"
+      ],
       "gate": "cargo test -p quberon-verify --all-features",
-      "status": "ready", "needs_scoping": false,
+      "status": "ready",
+      "needs_scoping": false,
       "approved_by_human": false
     },
     {
       "id": "qip-3-fail-direction-argument",
       "title": "Write R4, the fail-direction asymmetry, as a standalone argued artefact with prior art: core unavailable means STOP executes unsigned with the latch retained; core rejects means STOP blocked, adapter not invoked, state UNKNOWN; reset and task always fail closed. This is the original normative contribution and currently exists only as two test names.",
       "source": "seed:profile",
-      "tier": 1, "priority": 5, "model": "design",
-      "owns": ["docs/specs/intervention-profile/**", "progress/qip-3-fail-direction.md"],
+      "tier": 1,
+      "priority": 5,
+      "model": "design",
+      "owns": [
+        "docs/specs/intervention-profile/**",
+        "progress/qip-3-fail-direction.md"
+      ],
       "gate": "python -m pytest conformance/ -q",
-      "status": "ready", "needs_scoping": false
+      "status": "dispatched",
+      "needs_scoping": false
     },
     {
       "id": "adv-summary-provenance",
       "title": "Make every adversarial summary self-describing. research/adversarial/results/postmerge-summary.json currently holds total_results=63012 and escapes=[] with no commit, finished_utc, toolchain, generator or completeness marker inside the file; its provenance exists only in a sibling markdown. Move run.py onto ops/longrun.py so each summary carries complete, citable, commit, UTC, toolchain and generator fields, and so a killed run writes summary-partial.json instead of nothing. Backfill the existing summaries from their committed evidence logs without inventing values.",
       "source": "seed:evidence-repair",
-      "tier": 1, "priority": 3, "model": "mechanical",
-      "owns": ["research/adversarial/**", "progress/adv-summary-provenance.md"],
+      "tier": 1,
+      "priority": 3,
+      "model": "mechanical",
+      "owns": [
+        "research/adversarial/**",
+        "progress/adv-summary-provenance.md"
+      ],
       "gate": "python -m pytest research/adversarial/tests -q",
-      "status": "ready", "needs_scoping": false,
+      "status": "ready",
+      "needs_scoping": false,
       "note": "The post-merge rerun did complete: postmerge-full-run.txt ends RC=0 at commit c19501c. The earlier RC=143 report was superseded. 56,506 is the case count, not a kill point. The real defect is that the machine-readable artefact cannot prove any of that about itself."
     },
     {
       "id": "meta-live-prep",
       "title": "Prepare, never execute, the live Meta call: .env.example placeholders, .env gitignored, redaction verified, one-shot evidence runner ready for the moment credentials reach the application runtime. Hermes credentials are not repository credentials.",
       "source": "seed:blocked-on-human",
-      "tier": 3, "priority": 30, "model": "mechanical",
-      "owns": ["scripts/meta_live_evidence.py", "scripts/run_meta_live_evidence.sh", "tests/test_meta_live.py", "progress/meta-live-prep.md"],
+      "tier": 3,
+      "priority": 30,
+      "model": "mechanical",
+      "owns": [
+        "scripts/meta_live_evidence.py",
+        "scripts/run_meta_live_evidence.sh",
+        "tests/test_meta_live.py",
+        "progress/meta-live-prep.md"
+      ],
       "gate": "python -m pytest tests/test_meta_live.py -q",
-      "status": "ready", "needs_scoping": false,
+      "status": "ready",
+      "needs_scoping": false,
       "approved_by_human": false,
       "note": "Rasmus owns the credentials. docs/evidence/meta-live.md is Tier 3 and only a real credential-backed run may change its verdict."
     },
@@ -89,11 +135,615 @@
       "id": "copper-1-replay",
       "title": "Copper 1.3.0 spike: isolated workspace, root Rust MSRV untouched, source to authorization to simulated sink, deterministic canonical replay as the acceptance criterion. Performance is explicitly secondary.",
       "source": "seed:blocked-on-ruling",
-      "tier": 1, "priority": 35, "model": "design",
-      "owns": ["spikes/copper-stop-path/**", "progress/copper-1-replay.md"],
+      "tier": 1,
+      "priority": 35,
+      "model": "design",
+      "owns": [
+        "spikes/copper-stop-path/**",
+        "progress/copper-1-replay.md"
+      ],
       "gate": "",
-      "status": "blocked", "needs_scoping": true,
+      "status": "blocked",
+      "needs_scoping": true,
       "note": "Needs Rasmus's ruling on whether the Lane C gate is satisfied by the synthetic contract alone."
+    },
+    {
+      "id": "qip-qip-r1-3",
+      "title": "QIP-R1.3 (INTERVENE) is UNIMPLEMENTED: QIP-INT-05 covers audit-only kinds only. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r1-3.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "dispatched",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r2-3",
+      "title": "QIP-R2.3 (AUTHORIZE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r2-3.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r3-1",
+      "title": "QIP-R3.1 (INTERVENE) is UNIMPLEMENTED: no load/priority test in N4. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r3-1.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r3-2",
+      "title": "QIP-R3.2 (INTERVENE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r3-2.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r3-3",
+      "title": "QIP-R3.3 (INTERVENE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r3-3.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r5-1",
+      "title": "QIP-R5.1 (INTERVENE) is UNIMPLEMENTED: restart persistence not in N4. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r5-1.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r7-1",
+      "title": "QIP-R7.1 (AUTHORIZE) is UNIMPLEMENTED: QIP-DEG-03 skipped: NOT TESTED, gap not pass. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r7-1.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r7-4",
+      "title": "QIP-R7.4 (AUTHORIZE) is UNIMPLEMENTED: QIP-DEG-03 skipped: NOT TESTED, gap not pass. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r7-4.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r8-1",
+      "title": "QIP-R8.1 (EVIDENCE) is UNIMPLEMENTED: QIP-AUDIT-01 covers event existence/id/ts only. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r8-1.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r8-3",
+      "title": "QIP-R8.3 (EVIDENCE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r8-3.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r8-4",
+      "title": "QIP-R8.4 (EVIDENCE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r8-4.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r9-1",
+      "title": "QIP-R9.1 (INTERVENE) is UNIMPLEMENTED: QIP-INT-04 covers stale voice input only. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r9-1.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r9-3",
+      "title": "QIP-R9.3 (INTERVENE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r9-3.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r10-1",
+      "title": "QIP-R10.1 (OBSERVE) is UNIMPLEMENTED: R10: N4 records no manufacturer/capability mapping. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r10-1.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r10-2",
+      "title": "QIP-R10.2 (OBSERVE) is UNIMPLEMENTED: R10 gap, explicit in N4 README. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r10-2.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r11-1",
+      "title": "QIP-R11.1 (OBSERVE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r11-1.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r11-2",
+      "title": "QIP-R11.2 (OBSERVE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r11-2.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "qip-qip-r11-3",
+      "title": "QIP-R11.3 (EVIDENCE) is UNIMPLEMENTED: no reason recorded. Trace it to a passing conformance test or record it as explicitly untestable. Partial coverage stays UNIMPLEMENTED; never round a gap up to a trace.",
+      "source": "generator:qip-section-11",
+      "tier": 1,
+      "priority": 10,
+      "model": "design",
+      "owns": [
+        "conformance/**",
+        "progress/qip-qip-r11-3.md"
+      ],
+      "gate": "python -m pytest conformance/ -q",
+      "needs_scoping": false,
+      "note": "A work node may not amend QIP traceability itself; section 11 defines the amendment procedure and it belongs to the profile owner.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "todo-ops-schedule-py-525",
+      "title": "Resolve or remove: ops/schedule.py:525 \"\"\"4. Untracked TODO/FIXME/XXX in tracked source: fix it or delete it.\"\"\"",
+      "source": "generator:todo",
+      "tier": 1,
+      "priority": 60,
+      "owns": [
+        "ops/schedule.py"
+      ],
+      "gate": "",
+      "needs_scoping": true,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "cov-app-main-py-utcnow",
+      "title": "No test names app/main.py:utcnow() - add coverage or justify the omission",
+      "source": "generator:control-coverage",
+      "tier": 1,
+      "priority": 25,
+      "owns": [
+        "tests/test_cov_utcnow.py",
+        "progress/cov-utcnow.md"
+      ],
+      "gate": "python -m pytest tests/test_cov_utcnow.py -q",
+      "needs_scoping": false,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "cov-app-main-py-hash-password",
+      "title": "No test names app/main.py:hash_password() - add coverage or justify the omission",
+      "source": "generator:control-coverage",
+      "tier": 1,
+      "priority": 25,
+      "owns": [
+        "tests/test_cov_hash-password.py",
+        "progress/cov-hash-password.md"
+      ],
+      "gate": "python -m pytest tests/test_cov_hash-password.py -q",
+      "needs_scoping": false,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "cov-app-main-py-verify-password",
+      "title": "No test names app/main.py:verify_password() - add coverage or justify the omission",
+      "source": "generator:control-coverage",
+      "tier": 1,
+      "priority": 25,
+      "owns": [
+        "tests/test_cov_verify-password.py",
+        "progress/cov-verify-password.md"
+      ],
+      "gate": "python -m pytest tests/test_cov_verify-password.py -q",
+      "needs_scoping": false,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "cov-app-main-py-token-hash",
+      "title": "No test names app/main.py:token_hash() - add coverage or justify the omission",
+      "source": "generator:control-coverage",
+      "tier": 1,
+      "priority": 25,
+      "owns": [
+        "tests/test_cov_token-hash.py",
+        "progress/cov-token-hash.md"
+      ],
+      "gate": "python -m pytest tests/test_cov_token-hash.py -q",
+      "needs_scoping": false,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "cov-app-main-py-asgi-app",
+      "title": "No test names app/main.py:asgi_app() - add coverage or justify the omission",
+      "source": "generator:control-coverage",
+      "tier": 1,
+      "priority": 25,
+      "owns": [
+        "tests/test_cov_asgi-app.py",
+        "progress/cov-asgi-app.md"
+      ],
+      "gate": "python -m pytest tests/test_cov_asgi-app.py -q",
+      "needs_scoping": false,
+      "status": "dispatched",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "reg-decision-packet-refresh",
+      "title": "Refresh the human decision packet for 25 candidate_unverified entities",
+      "source": "generator:registry",
+      "tier": 1,
+      "priority": 40,
+      "owns": [
+        "research/humanoids/**",
+        "progress/reg-decision-packet.md"
+      ],
+      "gate": "python research/humanoids/tools/validate_registry.py",
+      "needs_scoping": false,
+      "note": "Research only. No promotion, universe_size_claim stays null.",
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "advprov-hand-summary",
+      "title": "hand-summary.json reports total_results=12 but carries no complete, commit, finished_utc, toolchain, generator. Make the summary self-describing via ops/longrun.py so a count can never be quoted without the run that produced it.",
+      "source": "generator:adversarial-provenance:hand-summary.json",
+      "tier": 1,
+      "priority": 4,
+      "model": "mechanical",
+      "owns": [
+        "research/adversarial/**",
+        "progress/advprov-hand-summary.md"
+      ],
+      "gate": "python -m pytest research/adversarial/tests -q",
+      "needs_scoping": false,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "advprov-postmerge-summary",
+      "title": "postmerge-summary.json reports total_results=63012 but carries no complete, commit, finished_utc, toolchain, generator. Make the summary self-describing via ops/longrun.py so a count can never be quoted without the run that produced it.",
+      "source": "generator:adversarial-provenance:postmerge-summary.json",
+      "tier": 1,
+      "priority": 4,
+      "model": "mechanical",
+      "owns": [
+        "research/adversarial/**",
+        "progress/advprov-postmerge-summary.md"
+      ],
+      "gate": "python -m pytest research/adversarial/tests -q",
+      "needs_scoping": false,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "advprov-summary",
+      "title": "summary.json reports total_results=63012 but carries no complete, commit, finished_utc, toolchain, generator. Make the summary self-describing via ops/longrun.py so a count can never be quoted without the run that produced it.",
+      "source": "generator:adversarial-provenance:summary.json",
+      "tier": 1,
+      "priority": 4,
+      "model": "mechanical",
+      "owns": [
+        "research/adversarial/**",
+        "progress/advprov-summary.md"
+      ],
+      "gate": "python -m pytest research/adversarial/tests -q",
+      "needs_scoping": false,
+      "status": "ready",
+      "created_utc": "2026-11-06T10:51:00Z",
+      "attempts": 0
+    },
+    {
+      "id": "viz-1-evidence-renderers",
+      "title": "Build viz/ as a deterministic renderer that turns COMMITTED evidence files into SVG figures. No figure is hand-authored and none invents a number. Render at minimum: (a) the fleet-sim scenario trace as a timeline, from fleet-sim/run.py output including its trace_sha256; (b) loadtest percentiles per scenario from loadtest/results/attempt{1,2,3}.json, showing all three attempts so the spread is visible rather than a single flattering run; (c) the adversarial defect classes and escape counts from research/adversarial/results/*summary*.json; (d) the QIP section-11 traceability grid with all 18 UNIMPLEMENTED requirements clearly marked as gaps. Every SVG embeds source path, source sha256, git commit, UTC and an evidence band of MEASURED-ON-HOST, SIMULATED, SYNTHETIC or NOT TESTED. Running the renderer twice must produce byte-identical output; prove it with sha256sum as F4 and F6 did.",
+      "source": "manual:viz-camera",
+      "tier": 1,
+      "priority": 12,
+      "model": "design",
+      "owns": [
+        "viz/evidence/**",
+        "viz/README.md",
+        "viz/tests/**",
+        "progress/viz-1-evidence-renderers.md"
+      ],
+      "gate": "python -m pytest viz/tests -q",
+      "status": "ready",
+      "needs_scoping": false,
+      "note": "A figure that cannot name the file it came from is decoration. The point of this node is that the figures stay true automatically as the evidence changes, so nobody has to remember to redraw them before a demo.",
+      "created_utc": "2026-11-06T11:12:36Z",
+      "attempts": 0
+    },
+    {
+      "id": "viz-2-truth-map",
+      "title": "Produce the architecture diagram as a TRUTH MAP: every component coloured by its actual evidence status, derived from docs/specs/intervention-profile/QIP-v0.1.md section 11 and docs/assurance/CLAIM-TO-EVIDENCE.md, not from intent. Components with no passing test render as gaps, and the legend states plainly that a gap means not built or not tested. Supersede docs/assets/architecture.svg only if the generated map covers everything the hand-drawn one shows; otherwise keep both and say which is generated. The diagram must be regenerable from a single command recorded in viz/README.md.",
+      "source": "manual:viz-camera",
+      "tier": 1,
+      "priority": 14,
+      "model": "design",
+      "owns": [
+        "viz/truthmap/**",
+        "docs/assets/**",
+        "progress/viz-2-truth-map.md"
+      ],
+      "gate": "python -m pytest viz/truthmap/tests -q",
+      "status": "ready",
+      "needs_scoping": false,
+      "note": "A diagram that admits what is not built is more persuasive to a notified body or a diligent investor than one that does not, and it is the only kind we can defend.",
+      "created_utc": "2026-11-06T11:12:36Z",
+      "attempts": 0
+    },
+    {
+      "id": "viz-3-stop-path-animation",
+      "title": "Animate the intervention path sensor to recognition to authorization to actuator outcome, driven frame-by-frame by an ACTUAL replayed trace, not an artist's impression. Use the Copper deterministic replay and the fleet-sim trace that already produce byte-identical output. Emit an SVG or frame sequence plus, only if ffmpeg is present, an MP4; if ffmpeg is absent record that the video step was SKIPPED and never silently drop it. Every frame carries the SIMULATED band and the source trace sha256. Include the fail-direction behaviour explicitly: core unavailable means STOP proceeds unsigned with the latch retained, core rejecting means STOP is blocked with state UNKNOWN. That asymmetry is the thing worth showing.",
+      "source": "manual:viz-camera",
+      "tier": 1,
+      "priority": 16,
+      "model": "design",
+      "owns": [
+        "viz/animation/**",
+        "progress/viz-3-stop-path-animation.md"
+      ],
+      "gate": "python -m pytest viz/animation/tests -q",
+      "status": "ready",
+      "needs_scoping": false,
+      "note": "The animation IS the replayed evidence rendered, so it cannot drift from the system. Nothing in it may be presented as a physical robot.",
+      "created_utc": "2026-11-06T11:12:36Z",
+      "attempts": 0
+    },
+    {
+      "id": "cam-1-bringup-harness",
+      "title": "Write the camera bring-up harness as code only, in research/camera-bringup/. It enumerates video devices, probes resolution, frame rate, capture latency and dropped frames, and writes a capture manifest recording device, driver, settings, per-frame timestamps, sha256 of each frame and the UTC window. EXIF and location metadata are stripped on write. It must run on a host with no camera and report NO DEVICE rather than failing obscurely, and it must not import or modify anything in app/, integrations/ or adapters/. This node executes against no physical hardware.",
+      "source": "manual:viz-camera",
+      "tier": 1,
+      "priority": 18,
+      "model": "mechanical",
+      "owns": [
+        "research/camera-bringup/**",
+        "progress/cam-1-bringup-harness.md"
+      ],
+      "gate": "python -m pytest research/camera-bringup/tests -q",
+      "status": "ready",
+      "needs_scoping": false,
+      "created_utc": "2026-11-06T11:12:36Z",
+      "attempts": 0
+    },
+    {
+      "id": "cam-2-pi-capture-run",
+      "title": "Run the cam-1 harness against the physical Pi camera and commit the raw results to docs/evidence/camera-bringup/. Scene content must be the e-ink display and static objects only, with no person in frame, matching the existing artifacts/camera-eink-view.jpg precedent. Record device, driver, lighting, distance, exposure and every failure. This is hardware bring-up evidence, nothing more: it establishes that a camera captures frames, and says so in exactly those words.",
+      "source": "manual:viz-camera",
+      "tier": 3,
+      "priority": 20,
+      "model": "mechanical",
+      "owns": [
+        "docs/evidence/camera-bringup/**",
+        "progress/cam-2-pi-capture-run.md"
+      ],
+      "gate": "",
+      "status": "ready",
+      "needs_scoping": false,
+      "approved_by_human": false,
+      "note": "Tier 3: physical device. Needs Rasmus's per-session authorization naming the Pi and the session. Read-only inspection of the Pi is Tier 1 and may proceed without it; writing to or running capture on the Pi may not.",
+      "created_utc": "2026-11-06T11:12:36Z",
+      "attempts": 0
+    },
+    {
+      "id": "cam-3-gesture-shadow-eval",
+      "title": "Feed recorded camera frames through the existing OpenPalmStopRecognizer offline, in shadow mode, and evaluate against the acceptance gates G1 to G7 already defined in research/gesture-dataset/README.md: 3 or more frames, 700 ms hold, visibility 0.8, stale over 300 s, future under -30 s, event_id replay, STOP-only with no reset. Report false-trigger and missed-trigger rates WITH denominators and per slice, the way F4 did, and report abstentions separately rather than folding them into either rate. Every record must pass research/gesture-dataset/validate.py, including its consent, PII and split-leakage checks. The recognizer is imported read-only and not modified.",
+      "source": "manual:viz-camera",
+      "tier": 1,
+      "priority": 22,
+      "model": "design",
+      "owns": [
+        "research/gesture-dataset/**",
+        "progress/cam-3-gesture-shadow-eval.md"
+      ],
+      "gate": "python research/gesture-dataset/validate.py && python -m pytest research/gesture-dataset/tests -q",
+      "status": "blocked",
+      "needs_scoping": false,
+      "note": "Blocked until cam-2 produces frames. Shadow mode only: a learned or camera-fed path may propose STOP into the authenticated intervention path and may never reset, unlatch, resume or command motion. Real frames do not upgrade QIP-R9.x; the profile owner amends traceability under section 11, not this node.",
+      "created_utc": "2026-11-06T11:12:36Z",
+      "attempts": 0
     }
   ]
 }

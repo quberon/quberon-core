@@ -174,6 +174,20 @@
       "status": "open",
       "owns": ["spikes/copper-stop-path/**"],
       "note": "Isolated workspace. Raising the root Rust MSRV would make it Tier 2."
+    },
+    {
+      "id": "RESERVED-visualization",
+      "tier": 1,
+      "status": "open",
+      "owns": ["viz/**", "docs/assets/**"],
+      "note": "Figures, animations and video are GENERATED from committed evidence files, never hand-authored. Every artefact embeds its source path, that source's sha256, the commit and the UTC time, plus an evidence band: MEASURED-ON-HOST, SIMULATED, SYNTHETIC, or NOT TESTED. No visual may depict a capability whose QIP status is UNIMPLEMENTED without that band visible in the frame, and no rendered robot may be presented as a physical robot stopping. Regeneration must be byte-identical, same discipline as F4 and F6."
+    },
+    {
+      "id": "RESERVED-camera-research",
+      "tier": 1,
+      "status": "open",
+      "owns": ["research/camera-bringup/**", "research/gesture-dataset/**"],
+      "note": "Camera harness CODE is Tier 1 and runs nowhere by itself. RUNNING it against the physical Pi camera is a Tier 3 action under RESERVED-pi-deploy and needs per-session human authorization. Any capture involving a person is governed by the existing consent, PII and leakage rules already enforced by research/gesture-dataset/validate.py; that validator is the gate, not a new policy document. No capture of identifiable children. Real frames never upgrade a QIP requirement by themselves: QIP-R9.x stays UNIMPLEMENTED until the profile owner amends it under section 11."
     }
   ]
 }
