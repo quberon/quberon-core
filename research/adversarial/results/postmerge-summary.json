@@ -206,5 +206,39 @@
     "false_reject_rate": 0.0
   },
   "total_results": 63012,
-  "s0_violations": []
+  "s0_violations": [],
+  "complete": true,
+  "citable": true,
+  "reason": "finished (RC=0 in evidence/postmerge-full-run.txt)",
+  "commit": "c19501c8b8e4008fcc6724964baa57be158f62bd",
+  "started_utc": null,
+  "finished_utc": null,
+  "toolchain": {
+    "python": null,
+    "cargo": null,
+    "rustc": null,
+    "platform": null,
+    "machine": null,
+    "host": null,
+    "executable": null,
+    "git_commit": "c19501c8b8e4008fcc6724964baa57be158f62bd",
+    "cpu_count": null
+  },
+  "generator": {
+    "script": "research/adversarial/run.py",
+    "command": ".venv/bin/python research/adversarial/run.py --mutations 50000 --out research/adversarial/results/postmerge-results.jsonl --summary research/adversarial/results/postmerge-summary.json",
+    "model": "none-deterministic-template-corpus (per adversarial-postmerge.md)",
+    "cases": 56506,
+    "mutations": 50000
+  },
+  "provenance": {
+    "source": "research/adversarial/backfill_provenance.py",
+    "provenance_sources": [
+      "evidence/adversarial-postmerge.md",
+      "evidence/postmerge-full-run.txt"
+    ],
+    "results_jsonl_sha256_from_evidence_md": "3ca8169cf409cd196c02a692d2b9c6536e76e157f54aee272c8f18a7b384d9ee",
+    "backfilled": true,
+    "backfill_note": "finished_utc/toolchain are null: no UTC timestamp or toolchain is recorded in the committed postmerge evidence."
+  }
 }
