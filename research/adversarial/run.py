@@ -43,6 +43,9 @@ sys.path.insert(0, str(HERE))
 os.environ.setdefault("ADVERSARIAL_SENTINEL", "QUBERON_N5_SENTINEL_7f3a9c")
 
 from invariants import check_all  # noqa: E402
+from provenance import (  # noqa: E402
+    atomic_write_json, enrich_summary, git_commit, toolchain, utcnow,
+)
 from integrations.meta import validate_plan  # noqa: E402
 from integrations.secure_core import SecureCoreRejected, SecureCoreUnavailable  # noqa: E402
 
@@ -378,6 +381,20 @@ def main():
     paths = args.paths.split(",")
     ctx = make_endpoint() if "endpoint" in paths else None
     t_start = time.time()
+    started_utc = utcnow()
+    run_commit = git_commit()
+    generator = {"script": "research/adversarial/run.py",
+                 "name": "adversarial-runner",
+                 "command": " ".join(sys.argv),
+                 "mutations": args.mutations, "paths": args.paths,
+                 "cases": len(cases)}
+
+    def _enrich(summary, complete, reason):
+        return enrich_summary(
+            summary, complete=complete, reason=reason,
+            started_utc=started_utc, duration_s=round(time.time() - t_start, 3),
+            commit=run_commit, toolchain_info=toolchain(commit=run_commit),
+            generator=generator)
     try:
         for idx, case in enumerate(cases):
             state = state_for_case(case, idx)
@@ -390,8 +407,10 @@ def main():
                     if v["severity"] == "S0":
                         print(f"S0 VIOLATION {r['id']} {p} state={state} {v} -- STOPPING", flush=True)
                         Path(args.out).write_text("".join(json.dumps(x) + "\n" for x in results))
-                        Path(args.summary).write_text(json.dumps(
-                            summarize(results, cases_by_id), indent=2))
+                        # S0 stop is not a finished run: never citable.
+                        atomic_write_json(Path(args.summary), _enrich(
+                            summarize(results, cases_by_id),
+                            complete=False, reason="S0 violation: stopped early"))
                         return 2
             if (idx + 1) % 10000 == 0:
                 print(f"progress cases={idx+1}/{len(cases)} results={len(results)} "
@@ -404,7 +423,12 @@ def main():
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text("".join(json.dumps(r) + "\n" for r in results))
     summary = summarize(results, cases_by_id)
-    Path(args.summary).write_text(json.dumps(summary, indent=2))
+    # Self-describing: the count travels with complete/commit/finished_utc/
+    # toolchain/generator (via ops.longrun when importable, else the
+    # vendored fallback in provenance.py; the source is recorded inside).
+    enriched = _enrich(summary, complete=True, reason="finished")
+    atomic_write_json(Path(args.summary), enriched)
+    summary = enriched
     print(json.dumps({"total_results": summary["total_results"],
                       "escapes": len(summary["escapes"]),
                       "overblocked": len(summary["overblocked"]),

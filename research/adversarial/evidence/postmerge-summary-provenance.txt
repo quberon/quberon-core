@@ -1,0 +1,83 @@
+=== GATE RAW EVIDENCE advprov-postmerge-summary ===
+UTC: 2026-11-06T14:21:40Z
+Darwin Quberon1.local 24.3.0 Darwin Kernel Version 24.3.0: Thu Jan  2 20:22:58 PST 2025; root:xnu-11215.81.4~3/RELEASE_ARM64_T8132 arm64
+host: Quberon1.local
+7fd9ea5bfb8f702219d8c4f92bec711d2e716003
+node/advprov-postmerge-summary
+Python 3.11.15
+Python 3.11.15
+cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)
+rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)
+=== backfill + check ===
+postmerge-summary.json: complete=True citable=True commit=c19501c8b8e4008fcc6724964baa57be158f62bd finished_utc=None total_results=63012
+RC=0
+postmerge-summary.json carries required provenance fields
+RC=0
+=== exit gate: python -m pytest research/adversarial/tests -q ===
+.................                                                        [100%]
+17 passed in 0.13s
+RC=0
+=== cargo build --workspace (with Rust) ===
+   Compiling hashlink v0.9.1
+   Compiling rusqlite v0.32.1
+   Compiling quberon-secure-core v0.1.0 (/Users/quberon1/Library/Application Support/Quberon/worktrees/advprov-postmerge-summary/crates/quberon-secure-core)
+   Compiling quberon-secure-core-cli v0.1.0 (/Users/quberon1/Library/Application Support/Quberon/worktrees/advprov-postmerge-summary/apps/quberon-secure-core-cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.98s
+RC=0
+=== full suite WITH Rust ===
+........................................................................ [ 33%]
+........................................................................ [ 66%]
+.......................................Exception occurred during processing of request from ('127.0.0.1', 54458)
+................................. [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/Library/Application Support/Quberon/worktrees/advprov-postmerge-summary/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+<frozen importlib._bootstrap>:283
+  <frozen importlib._bootstrap>:283: DeprecationWarning: the load_module() method is deprecated and slated for removal in Python 3.12; use exec_module() instead
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+216 passed, 2 warnings in 40.47s
+RC=0
+=== both fail-direction tests (with Rust) ===
+..                                                                       [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/Library/Application Support/Quberon/worktrees/advprov-postmerge-summary/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 1 warning in 0.24s
+RC=0
+=== full suite WITHOUT Rust on PATH (same worktree; target/ binary still present on disk, see progress STILL NOT TRUE) ===
+cargo on PATH: None
+........................................................................ [ 33%]
+........................................................................ [ 66%]
+........................................................................ [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/Library/Application Support/Quberon/worktrees/advprov-postmerge-summary/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+<frozen importlib._bootstrap>:283
+  <frozen importlib._bootstrap>:283: DeprecationWarning: the load_module() method is deprecated and slated for removal in Python 3.12; use exec_module() instead
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+216 passed, 2 warnings in 40.13s
+RC=0
+=== both fail-direction tests (without Rust on PATH) ===
+..                                                                       [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/starlette/testclient.py:40
+  /Users/quberon1/Library/Application Support/Quberon/worktrees/advprov-postmerge-summary/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 1 warning in 0.24s
+RC=0
+=== import app.main creates zero files ===
+tmpdir: /var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/tmp.GHMn53tvdF
+files_created: []
+import app.main zero-files: OK
+RC=0
