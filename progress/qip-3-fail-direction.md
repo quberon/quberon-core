@@ -76,6 +76,12 @@ Raw output — import inertness (empty cwd, before/after find diff):
     IMPORT_ZERO_FILES:OK
     (before list empty; diff produced no output.)
 
+CLEAN-CLONE EXIT GATE:
+- git clone of this branch to /tmp/qip3-cleanclone, checkout a7a6094,
+  /tmp/qip3-venv/bin/python -m pytest conformance/ -q ->
+  raw: "27 passed, 1 skipped, 1 warning in 4.08s", exit 0
+  (no Rust binary in the clean clone; the 1 skip is NOT TESTED there).
+
 TESTS (both modes):
 - with Rust: full suite 211 passed; conformance 28 passed;
   both fail-direction tests 2 passed (adapter-invocation counts asserted
