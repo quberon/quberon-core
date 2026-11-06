@@ -1,0 +1,30 @@
+# Local failure-mode test - Attempt 2 (after README exists)
+# date_utc: 2026-11-06T06:44:27Z
+# command: scripts/pi_readiness_check.sh
+== Quberon Pi readiness probe (read-only) ==
+utc: 2026-11-06T06:44:27Z
+target: quberon1@10.77.0.2 (host 10.77.0.2)
+ssh_opts: -o BatchMode=yes -o ConnectTimeout=8 -o ConnectionAttempts=1 -o StrictHostKeyChecking=yes
+
+-- Phase 0: local artifacts --
+repo: /Users/quberon1/.hermes/profiles/anna-medelvarde/cache/scratch/pi-prep
+local_commit: 65f5271aa59d90a76ec53a0f0f6d750f9e566f4b
+local_branch: wave6/pi-prep
+present: scripts/deploy_pi.sh
+present: scripts/deploy_user_pi.sh
+present: scripts/healthcheck.sh
+present: scripts/setup_ap.sh
+present: docs/pi-readiness/README.md
+
+-- Phase 1: Ethernet reachability (ping 10.77.0.2) --
+PING 10.77.0.2 (10.77.0.2): 56 data bytes
+Request timeout for icmp_seq 0
+Request timeout for icmp_seq 1
+
+--- 10.77.0.2 ping statistics ---
+3 packets transmitted, 0 packets received, 100.0% packet loss
+FAIL: ping to 10.77.0.2 failed (rc=2).
+STOP: Ethernet management route not verified. Check cable, Mac 10.77.0.1/24,
+Pi power, and that Wi-Fi is still the default route. Do NOT deploy or
+fall back to guest-Wi-Fi SSH. See docs/pi-readiness/README.md section 6.
+exit_code=10
