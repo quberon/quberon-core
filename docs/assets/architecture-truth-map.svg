@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="994" viewBox="0 0 1240 994" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<defs><pattern id="gapHatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#f1f5f9"/><line x1="0" y1="0" x2="0" y2="8" stroke="#cbd5e1" stroke-width="2"/></pattern></defs>
+<rect width="1240" height="994" fill="#ffffff"/>
+<text x="30" y="38" font-size="25" font-weight="700" fill="#0f172a">Quberon Architecture — TRUTH MAP (generated)</text>
+<text x="30" y="62" font-size="13" font-weight="700" fill="#b91c1c">SIMULATION ONLY · STOP AUTHORIZATION ONLY · NO PHYSICAL CONTROL · NOT A SAFETY-RATED E-STOP · NO CERTIFICATION CLAIM</text>
+<text x="30" y="84" font-size="12.5" fill="#334155">Source: QIP-v0.1.md section 11 traceability table (16/34 requirements traced to an N4 test ID, 18 UNIMPLEMENTED) + CLAIM-TO-EVIDENCE.md status vocabulary. Status is derived from those committed sources, not from intent and not from re-running tests here.</text>
+<text x="30" y="102" font-size="12.5" fill="#334155">Hand-drawn system diagram retained separately: docs/assets/architecture.svg (not generated). This generated map covers QIP R1–R11 only.</text>
+<g data-component="R1" data-status="partial"><rect x="30" y="118" width="386" height="168" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+<text x="44" y="144" font-size="13.5" font-weight="700" fill="#0f172a">R1 — Intervention request identity and target scope</text>
+<text x="44" y="164" font-size="11.5" font-weight="700" fill="#a16207">PARTIAL — 2/3 traced, rest are gaps</text>
+<text x="44" y="184" font-size="11" fill="#15803d">● QIP-R1.1 (INTERVENE) — QIP-ID-01</text>
+<text x="44" y="199" font-size="11" fill="#15803d">● QIP-R1.2 (INTERVENE) — QIP-ID-02,QIP-ID-03</text>
+<text x="44" y="214" font-size="11" fill="#b91c1c">○ GAP QIP-R1.3 (INTERVENE) — UNIMPLEMENTED</text>
+</g>
+<g data-component="R2" data-status="partial"><rect x="427" y="118" width="386" height="168" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+<text x="441" y="144" font-size="13.5" font-weight="700" fill="#0f172a">R2 — Authentication and authorisation boundary</text>
+<text x="441" y="164" font-size="11.5" font-weight="700" fill="#a16207">PARTIAL — 2/3 traced, rest are gaps</text>
+<text x="441" y="184" font-size="11" fill="#15803d">● QIP-R2.1 (AUTHORIZE) — QIP-AUTH-01</text>
+<text x="441" y="199" font-size="11" fill="#15803d">● QIP-R2.2 (AUTHORIZE) — QIP-AUTH-02,QIP-AUTH-04</text>
+<text x="441" y="214" font-size="11" fill="#b91c1c">○ GAP QIP-R2.3 (AUTHORIZE) — UNIMPLEMENTED</text>
+</g>
+<g data-component="R3" data-status="gap"><rect x="824" y="118" width="386" height="168" rx="10" fill="url(#gapHatch)" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="838" y="144" font-size="13.5" font-weight="700" fill="#0f172a">R3 — Stop priority and independence</text>
+<text x="838" y="164" font-size="11.5" font-weight="700" fill="#64748b">GAP — not built or not tested</text>
+<text x="838" y="184" font-size="11" fill="#b91c1c">○ GAP QIP-R3.1 (INTERVENE) — UNIMPLEMENTED</text>
+<text x="838" y="199" font-size="11" fill="#b91c1c">○ GAP QIP-R3.2 (INTERVENE) — UNIMPLEMENTED</text>
+<text x="838" y="214" font-size="11" fill="#b91c1c">○ GAP QIP-R3.3 (INTERVENE) — UNIMPLEMENTED</text>
+</g>
+<g data-component="R4" data-status="trace_present"><rect x="30" y="300" width="386" height="168" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+<text x="44" y="326" font-size="13.5" font-weight="700" fill="#0f172a">R4 — Idempotency, duplicates, staleness</text>
+<text x="44" y="346" font-size="11.5" font-weight="700" fill="#15803d">TRACE PRESENT — 3/3 traced (no class claim)</text>
+<text x="44" y="366" font-size="11" fill="#15803d">● QIP-R4.1 (INTERVENE) — QIP-INT-02</text>
+<text x="44" y="381" font-size="11" fill="#15803d">● QIP-R4.2 (INTERVENE) — QIP-INT-03</text>
+<text x="44" y="396" font-size="11" fill="#15803d">● QIP-R4.3 (INTERVENE) — QIP-INT-04</text>
+</g>
+<g data-component="R5" data-status="partial"><rect x="427" y="300" width="386" height="168" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+<text x="441" y="326" font-size="13.5" font-weight="700" fill="#0f172a">R5 — Latching and restart/reset separation</text>
+<text x="441" y="346" font-size="11.5" font-weight="700" fill="#a16207">PARTIAL — 2/3 traced, rest are gaps</text>
+<text x="441" y="366" font-size="11" fill="#b91c1c">○ GAP QIP-R5.1 (INTERVENE) — UNIMPLEMENTED</text>
+<text x="441" y="381" font-size="11" fill="#15803d">● QIP-R5.2 (INTERVENE) — QIP-LATCH-02,QIP-LATCH-03</text>
+<text x="441" y="396" font-size="11" fill="#15803d">● QIP-R5.3 (INTERVENE) — QIP-LATCH-01</text>
+</g>
+<g data-component="R6" data-status="trace_present"><rect x="824" y="300" width="386" height="168" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+<text x="838" y="326" font-size="13.5" font-weight="700" fill="#0f172a">R6 — Command result versus observed state</text>
+<text x="838" y="346" font-size="11.5" font-weight="700" fill="#15803d">TRACE PRESENT — 3/3 traced (no class claim)</text>
+<text x="838" y="366" font-size="11" fill="#15803d">● QIP-R6.1 (OBSERVE) — QIP-STATE-02</text>
+<text x="838" y="381" font-size="11" fill="#15803d">● QIP-R6.2 (OBSERVE) — QIP-STATE-01</text>
+<text x="838" y="396" font-size="11" fill="#15803d">● QIP-R6.3 (OBSERVE) — QIP-STATE-03</text>
+</g>
+<g data-component="R7" data-status="partial"><rect x="30" y="482" width="386" height="168" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+<text x="44" y="508" font-size="13.5" font-weight="700" fill="#0f172a">R7 — Unavailability versus reachable refusal</text>
+<text x="44" y="528" font-size="11.5" font-weight="700" fill="#a16207">PARTIAL — 2/4 traced, rest are gaps</text>
+<text x="44" y="548" font-size="11" fill="#b91c1c">○ GAP QIP-R7.1 (AUTHORIZE) — UNIMPLEMENTED</text>
+<text x="44" y="563" font-size="11" fill="#15803d">● QIP-R7.2 (AUTHORIZE) — QIP-DEG-01</text>
+<text x="44" y="578" font-size="11" fill="#15803d">● QIP-R7.3 (AUTHORIZE) — QIP-DEG-01</text>
+<text x="44" y="593" font-size="11" fill="#b91c1c">○ GAP QIP-R7.4 (AUTHORIZE) — UNIMPLEMENTED</text>
+</g>
+<g data-component="R8" data-status="partial"><rect x="427" y="482" width="386" height="168" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+<text x="441" y="508" font-size="13.5" font-weight="700" fill="#0f172a">R8 — Evidence, timestamps, replay bounds, custody</text>
+<text x="441" y="528" font-size="11.5" font-weight="700" fill="#a16207">PARTIAL — 1/4 traced, rest are gaps</text>
+<text x="441" y="548" font-size="11" fill="#b91c1c">○ GAP QIP-R8.1 (EVIDENCE) — UNIMPLEMENTED</text>
+<text x="441" y="563" font-size="11" fill="#15803d">● QIP-R8.2 (EVIDENCE) — QIP-DEG-01</text>
+<text x="441" y="578" font-size="11" fill="#b91c1c">○ GAP QIP-R8.3 (EVIDENCE) — UNIMPLEMENTED</text>
+<text x="441" y="593" font-size="11" fill="#b91c1c">○ GAP QIP-R8.4 (EVIDENCE) — UNIMPLEMENTED</text>
+</g>
+<g data-component="R9" data-status="partial"><rect x="824" y="482" width="386" height="168" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+<text x="838" y="508" font-size="13.5" font-weight="700" fill="#0f172a">R9 — Human and machine intervention inputs</text>
+<text x="838" y="528" font-size="11.5" font-weight="700" fill="#a16207">PARTIAL — 1/3 traced, rest are gaps</text>
+<text x="838" y="548" font-size="11" fill="#b91c1c">○ GAP QIP-R9.1 (INTERVENE) — UNIMPLEMENTED</text>
+<text x="838" y="563" font-size="11" fill="#15803d">● QIP-R9.2 (INTERVENE) — QIP-INT-05</text>
+<text x="838" y="578" font-size="11" fill="#b91c1c">○ GAP QIP-R9.3 (INTERVENE) — UNIMPLEMENTED</text>
+</g>
+<g data-component="R10" data-status="gap"><rect x="30" y="664" width="386" height="168" rx="10" fill="url(#gapHatch)" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="44" y="690" font-size="13.5" font-weight="700" fill="#0f172a">R10 — Adapter capability and manufacturer-interface</text>
+<text x="44" y="705" font-size="13.5" font-weight="700" fill="#0f172a">mapping</text>
+<text x="44" y="725" font-size="11.5" font-weight="700" fill="#64748b">GAP — not built or not tested</text>
+<text x="44" y="745" font-size="11" fill="#b91c1c">○ GAP QIP-R10.1 (OBSERVE) — UNIMPLEMENTED</text>
+<text x="44" y="760" font-size="11" fill="#b91c1c">○ GAP QIP-R10.2 (OBSERVE) — UNIMPLEMENTED</text>
+</g>
+<g data-component="R11" data-status="gap"><rect x="427" y="664" width="386" height="168" rx="10" fill="url(#gapHatch)" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="441" y="690" font-size="13.5" font-weight="700" fill="#0f172a">R11 — Verification, lifecycle, and conformance</text>
+<text x="441" y="705" font-size="13.5" font-weight="700" fill="#0f172a">evidence</text>
+<text x="441" y="725" font-size="11.5" font-weight="700" fill="#64748b">GAP — not built or not tested</text>
+<text x="441" y="745" font-size="11" fill="#b91c1c">○ GAP QIP-R11.1 (OBSERVE) — UNIMPLEMENTED</text>
+<text x="441" y="760" font-size="11" fill="#b91c1c">○ GAP QIP-R11.2 (OBSERVE) — UNIMPLEMENTED</text>
+<text x="441" y="775" font-size="11" fill="#b91c1c">○ GAP QIP-R11.3 (EVIDENCE) — UNIMPLEMENTED</text>
+</g>
+<rect x="30" y="854" width="1180" height="96" rx="10" fill="#fef2f2" stroke="#fca5a5"/>
+<text x="44" y="874" font-size="12" font-weight="700" fill="#991b1b">LEGEND — read plainly:</text>
+<text x="44" y="890" font-size="12" font-weight="400" fill="#991b1b">Green TRACE PRESENT: QIP section 11 traces every requirement of this component to an N4 test ID (TRACE_PRESENT_NO_CLASS_CLAIM).</text>
+<text x="44" y="906" font-size="12" font-weight="400" fill="#991b1b">Amber PARTIAL: some requirements are traced; the ○ GAP requirements are UNIMPLEMENTED (UNSUPPORTED_EXPLICIT).</text>
+<text x="44" y="922" font-size="12" font-weight="400" fill="#991b1b">Hatched GAP: no requirement of this component has a passing traced test. A gap means not built or not tested.</text>
+<text x="44" y="938" font-size="12" font-weight="400" fill="#991b1b">A trace is not a QIP class, conformance, certification, or physical-safety claim (CLAIM-TO-EVIDENCE.md; QIP R11.2). No QIP class is claimed in v0.1.</text>
+</svg>

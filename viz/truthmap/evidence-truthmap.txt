@@ -1,0 +1,21 @@
+command: python3 -m viz.truthmap.generate && python3 -m pytest viz/truthmap/tests -q
+utc: 2026-11-06T11:31:45Z
+host: Darwin Quberon1.local 24.3.0 Darwin Kernel Version 24.3.0 arm64
+toolchain: Python 3.9.6, pytest 8.4.2, cargo present at /opt/homebrew/bin/cargo (generator is stdlib-only, does not use it)
+
+raw output (generator):
+wrote /Users/quberon1/Library/Application Support/Quberon/worktrees/viz-2-truth-map/docs/assets/architecture-truth-map.svg components=11 status_counts={'partial': 6, 'gap': 3, 'trace_present': 2}
+
+raw output (pytest):
+............                                                             [100%]
+12 passed in 0.01s
+exit: 0
+
+raw output (pytest, PATH without cargo: /usr/bin:/bin:/usr/sbin:/sbin):
+............                                                             [100%]
+12 passed in 0.01s
+NORUST_PATH_EXIT:0
+
+NOT RUN here: full repo suite (make test / ops gate). This host has no .venv
+and system python3 lacks fastapi (ModuleNotFoundError on collection of
+tests/test_app.py etc.). That is an environment absence, not a pass.
