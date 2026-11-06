@@ -47,8 +47,8 @@ if ! command -v "$HERMES_BIN" >/dev/null 2>&1; then
   exit 127
 fi
 
-CMD=("$HERMES_BIN" run --non-interactive --prompt-file "$PROMPT")
-[ -n "$MODEL" ] && CMD+=(--model "$MODEL")
+CMD=("$HERMES_BIN" chat --oneshot --query-file "$PROMPT" --in "$TREE" --provider meta-ai -Q)
+[ -n "$MODEL" ] && CMD+=(-m "$MODEL")
 
 {
   echo "=============================================================="

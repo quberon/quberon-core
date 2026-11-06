@@ -10,19 +10,16 @@
   "merge_method": "--merge",
   "branch_prefix": "node/",
   "default_base": "origin/main",
-
   "budget": {
     "daily_usd_ceiling": 40.0,
     "daily_token_ceiling": 40000000,
     "on_exhausted": "halt_dispatch"
   },
-
   "models": {
-    "mechanical": "meta-muse-wonder-fast",
-    "design": "meta-muse-wonder",
-    "_comment": "Replace with the exact model identifiers your Hermes install accepts. Record the verification in ops/RUNBOOK.md. Mechanical nodes are tests, scaffolding, docs assembly and dependency work; design nodes are adversarial, threat-model, profile and prose work."
+    "mechanical": "muse-wonder-1.0",
+    "design": "muse-wonder-1.0",
+    "_comment": "Verified 2026-11-06: Hermes provider meta-ai accepts model muse-wonder-1.0. No distinct fast model was verified, so both tiers intentionally use the same verified model until a separate model ID is proven."
   },
-
   "universal_gate": {
     "_comment": "Run on a fresh clean clone by ops/gate.sh for every node, in addition to the node's own gate command. These are the invariants no node may break.",
     "fail_direction_tests": [
@@ -32,10 +29,22 @@
     "import_side_effect_check": true,
     "require_both_modes": true
   },
-
   "hermes": {
-    "_comment": "PLACEHOLDER. Determine the real non-interactive invocation, verify it detaches and returns a usable exit code, and record how you verified it in ops/RUNBOOK.md before trusting this file.",
-    "command": ["hermes", "run", "--non-interactive", "--prompt-file", "{prompt}"],
+    "_comment": "Command form verified 2026-11-06, but worker detachment is NOT verified on this Mac: setsid is absent, so ops/worker.sh cannot yet satisfy the survive-launcher requirement. Do not trust for unattended dispatch until corrected and retested. See ops/RUNBOOK.md.",
+    "command": [
+      "hermes",
+      "chat",
+      "--oneshot",
+      "--query-file",
+      "{prompt}",
+      "--in",
+      "{worktree}",
+      "--provider",
+      "meta-ai",
+      "-Q",
+      "-m",
+      "{model}"
+    ],
     "verified": false
   }
 }
