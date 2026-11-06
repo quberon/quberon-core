@@ -12,8 +12,11 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
   QIP-PROP-01..03      proposal (planner) boundary    (frontier rule)
   QIP-DEG-01..03       degraded / fail-direction      (R7)
+  QIP-R11.3            EXPLICITLY UNTESTABLE here (see bottom of this file;
+                       not a trace, QIP-R11.3 stays UNIMPLEMENTED)
 
 A skipped test is NOT TESTED, not a pass. See README.md NOT TESTED section.
+An explicitly-untestable record is likewise not a pass and not a trace.
 """
 import pytest
 
@@ -229,3 +232,89 @@ def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
     events = refusing.events("operator").body["events"]
     match = [e for e in events if e["id"] == r.command_id]
     assert len(match) == 1 and match[0]["auth_result"] == "secure_core_rejected"
+
+
+# ------------------------------------------------- QIP-R11.3 (EVIDENCE)
+# QIP-R11.3 (QIP-v0.1.md Section 10/R11, class EVIDENCE):
+#   "Changes to normative text, class assignment, or traceability status
+#    MUST be versioned with the profile; an implementation MUST state the
+#    profile version it claims against, and a claim against a superseded
+#    version MUST be labelled as such."
+#
+# Disposition: EXPLICITLY UNTESTABLE through this suite, NOT traced.
+# QIP-R11.3 therefore stays UNIMPLEMENTED in QIP-v0.1.md Section 11.
+# This node does not amend that table: Section 11's amendment procedure
+# belongs to the profile owner (see progress/qip-qip-r11-3.md handoff).
+#
+# Clause-by-clause reasons no passing conformance test can be written
+# against the current neutral surface (adapter_interface.py):
+#  (a) "changes ... MUST be versioned with the profile" is an obligation
+#      on the profile document / its owners' change process, not runtime
+#      behaviour. AdapterUnderTest offers no operation to make, observe,
+#      or inspect a normative-text, class-assignment, or traceability
+#      change or its version history, and a repo-file assertion would
+#      break this suite's implementation-neutrality (README: another
+#      system runs test_conformance.py unchanged with its own adapter).
+#  (b) "an implementation MUST state the profile version it claims
+#      against": the neutral surface exposes no claim, class, or
+#      profile-version value to assert on (basis test below), and
+#      QIP-v0.1 records that no QIP class is claimed in v0.1, so there
+#      is no claim statement whose stated version could be checked.
+#  (c) "a claim against a superseded version MUST be labelled": only
+#      profile v0.1 exists, so no superseded version, and no claim
+#      surface on which a superseded claim could be constructed or its
+#      label observed, exists in this run.
+# What would make it testable (profile-owner / interface work, outside
+# this node): a neutral claim surface stating (class, profile version)
+# plus fixtures for a current and a superseded profile version and a
+# defined superseded-label value. Absent that, any narrower test would
+# be partial coverage and must not be rounded up to a trace.
+
+# Tokens that would indicate a claim / profile-version surface. The
+# neutral status body legitimately contains "capabilities" (role
+# capabilities), so that exact key is not treated as a class claim.
+_CLAIM_TOKENS = ("qip", "profile", "version", "claim", "conformance_class")
+
+
+def _claim_like_keys(mapping):
+    return sorted(
+        k for k in mapping
+        if any(t in str(k).lower() for t in _CLAIM_TOKENS)
+    )
+
+
+def test_QIP_R11_3_untestable_basis_no_claim_or_version_surface(adapter):
+    """NOT a QIP-R11.3 conformance trace; this passing test only records
+    the observable basis for the explicit-untestable disposition below.
+    It asserts absence of a testable surface, never R11.3 conformance."""
+    from conformance.adapter_interface import AdapterUnderTest
+
+    # (b) No claim/profile-version value in status or capabilities.
+    status = adapter.status("operator")
+    assert status.status_code == 200
+    assert _claim_like_keys(status.body) == []
+    assert _claim_like_keys(adapter.capabilities()) == []
+    # (a)+(c) The neutral interface defines no operation to change or
+    # inspect normative text, profile versioning, a class claim, or a
+    # superseded-version label.
+    neutral_ops = [name for name in vars(AdapterUnderTest) if not name.startswith("_")]
+    assert _claim_like_keys(dict.fromkeys(neutral_ops)) == []
+
+
+def test_QIP_R11_3_explicitly_untestable(adapter):
+    # Reference the adapter so this record is bound to a real run's
+    # fixture (which itself must construct successfully), then skip:
+    # a skip here is an explicit untestable record, not a pass.
+    assert adapter.status("operator").status_code == 200
+    pytest.skip(
+        "UNTESTABLE: QIP-R11.3 is explicitly untestable through the "
+        "neutral AdapterUnderTest surface -- (a) versioning of normative"
+        "/class/traceability changes is a profile-document process "
+        "obligation with no neutral operation to observe it; (b) no "
+        "claim/class/profile-version value is exposed and no QIP class "
+        "is claimed in v0.1, so no stated version can be checked; "
+        "(c) no superseded profile version or claim surface exists on "
+        "which a superseded claim or its label could be constructed or "
+        "observed. QIP-R11.3 stays UNIMPLEMENTED; this skip is not a "
+        "pass and not a trace."
+    )
