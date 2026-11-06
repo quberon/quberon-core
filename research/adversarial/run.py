@@ -32,9 +32,13 @@ import argparse
 import hashlib
 import json
 import os
+import platform
+import shutil
+import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -278,8 +282,101 @@ def run_endpoint(case, ctx, state="unlatched"):
 
 SEV_RANK = {"over-block": 0, "S4": 0, "S3": 1, "S2": 2, "S1": 3, "S0": 4}
 
+# --- Self-describing summary provenance -------------------------------------
+# A summary count (e.g. total_results) must never be quoted without the run
+# that produced it. Every summary written by this module therefore carries:
+# complete, commit, finished_utc, toolchain, generator. This mirrors the
+# contract a shared ops/longrun.py helper would provide; ops/ is outside
+# this node's owned paths, so the implementation lives here (see progress
+# handoff) and must be kept field-compatible with that contract.
+PROVENANCE_FIELDS = ("complete", "commit", "finished_utc", "toolchain", "generator")
 
-def summarize(results, cases_by_id):
+
+def _finished_utc():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _git_commit():
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(HERE.parents[1]), "rev-parse", "HEAD"],
+            capture_output=True, text=True, timeout=10, check=False)
+        commit = out.stdout.strip()
+        if out.returncode == 0 and len(commit) == 40:
+            return commit
+    except Exception:
+        pass
+    return "unknown-not-a-git-checkout"
+
+
+def _tool_version(name):
+    exe = shutil.which(name)
+    if not exe:
+        return "not available"
+    try:
+        out = subprocess.run([exe, "--version"], capture_output=True,
+                             text=True, timeout=10, check=False)
+        return out.stdout.strip().splitlines()[0] if out.stdout.strip() else "unknown"
+    except Exception:
+        return "unknown"
+
+
+def _toolchain():
+    return {
+        "python": platform.python_version(),
+        "python_implementation": platform.python_implementation(),
+        "platform": platform.platform(),
+        "rustc": _tool_version("rustc"),
+        "cargo": _tool_version("cargo"),
+    }
+
+
+def _generators(cases_by_id):
+    seen = {}
+    for case in (cases_by_id or {}).values():
+        gen = case.get("generator") if isinstance(case, dict) else None
+        if isinstance(gen, dict):
+            seen[json.dumps(gen, sort_keys=True)] = gen
+    ordered = [seen[k] for k in sorted(seen)]
+    if len(ordered) == 1:
+        return ordered[0]
+    if ordered:
+        return ordered
+    return {"model": "unknown", "provider": "unknown"}
+
+
+def enrich_summary(summary, cases_by_id, complete=False, finished_utc=None,
+                   commit=None, toolchain=None):
+    """Return summary with self-describing provenance fields attached.
+
+    complete defaults to False: only a run that finished writing all of
+    its results may pass complete=True. Provenance is never fabricated --
+    commit/toolchain are probed from the live environment, and generator
+    is aggregated verbatim from the cases actually run.
+    """
+    out = dict(summary)
+    out["complete"] = bool(complete)
+    out["commit"] = commit if commit else _git_commit()
+    out["finished_utc"] = finished_utc if finished_utc else _finished_utc()
+    out["toolchain"] = toolchain if toolchain is not None else _toolchain()
+    out["generator"] = _generators(cases_by_id)
+    return out
+
+
+def require_self_describing(summary):
+    """Raise ValueError if a summary cannot be quoted with its run."""
+    missing = [f for f in PROVENANCE_FIELDS
+               if f not in summary or summary[f] in (None, "", {}, [])]
+    if "complete" in summary and not isinstance(summary["complete"], bool):
+        missing.append("complete(not-a-bool)")
+    if missing:
+        raise ValueError(f"summary is not self-describing; missing/invalid: {missing}")
+    return summary
+
+
+
+def summarize(results, cases_by_id, complete=False, finished_utc=None,
+              commit=None, toolchain=None):
     by_class, by_inv, by_state = {}, {}, {}
     seen_class_ids = {}
     for iid in [f"I{i}" for i in range(1, 11)]:
@@ -341,10 +438,13 @@ def summarize(results, cases_by_id):
         round(benign["rejected_in_error"] / benign["accept_expected"], 6)
         if benign["accept_expected"] else None)
     benign_out = {**benign, "false_reject_rate": benign_rate}
-    return {"by_class": by_class, "by_invariant": by_inv, "by_state": by_state,
+    summary = {"by_class": by_class, "by_invariant": by_inv, "by_state": by_state,
             "escapes": escapes, "overblocked": overblocked, "benign": benign_out,
             "total_results": len(results),
             "s0_violations": [e for e in escapes if e.get("severity") == "S0"]}
+    return enrich_summary(summary, cases_by_id, complete=complete,
+                          finished_utc=finished_utc, commit=commit,
+                          toolchain=toolchain)
 
 
 def main():
@@ -391,7 +491,7 @@ def main():
                         print(f"S0 VIOLATION {r['id']} {p} state={state} {v} -- STOPPING", flush=True)
                         Path(args.out).write_text("".join(json.dumps(x) + "\n" for x in results))
                         Path(args.summary).write_text(json.dumps(
-                            summarize(results, cases_by_id), indent=2))
+                            summarize(results, cases_by_id, complete=False), indent=2))
                         return 2
             if (idx + 1) % 10000 == 0:
                 print(f"progress cases={idx+1}/{len(cases)} results={len(results)} "
@@ -403,7 +503,8 @@ def main():
                 setattr(SimulatedRobotAdapter, meth, o)
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text("".join(json.dumps(r) + "\n" for r in results))
-    summary = summarize(results, cases_by_id)
+    summary = summarize(results, cases_by_id, complete=True)
+    require_self_describing(summary)
     Path(args.summary).write_text(json.dumps(summary, indent=2))
     print(json.dumps({"total_results": summary["total_results"],
                       "escapes": len(summary["escapes"]),

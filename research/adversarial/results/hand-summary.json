@@ -11,7 +11,7 @@
     "capability-escalation": {
       "cases": 1,
       "expected_reject": 1,
-      "rejected": 1,
+      "rejected": 2,
       "accepted_in_error": 0,
       "violations": 0,
       "worst": null
@@ -19,7 +19,7 @@
     "malformed-nonobject-json": {
       "cases": 1,
       "expected_reject": 1,
-      "rejected": 1,
+      "rejected": 2,
       "accepted_in_error": 0,
       "violations": 0,
       "worst": null
@@ -27,7 +27,7 @@
     "latch-reset-targeting": {
       "cases": 1,
       "expected_reject": 1,
-      "rejected": 1,
+      "rejected": 2,
       "accepted_in_error": 0,
       "violations": 0,
       "worst": null
@@ -35,7 +35,7 @@
     "type-confusion": {
       "cases": 1,
       "expected_reject": 1,
-      "rejected": 1,
+      "rejected": 2,
       "accepted_in_error": 0,
       "violations": 0,
       "worst": null
@@ -93,8 +93,56 @@
       "worst": null
     }
   },
+  "by_state": {
+    "secure-core-unavailable": {
+      "results": 2,
+      "accepted": 2,
+      "rejected": 0,
+      "violations": 0
+    },
+    "secure-core-rejecting": {
+      "results": 2,
+      "accepted": 0,
+      "rejected": 2,
+      "violations": 0
+    },
+    "persistence-degraded": {
+      "results": 6,
+      "accepted": 0,
+      "rejected": 6,
+      "violations": 0
+    },
+    "unlatched": {
+      "results": 2,
+      "accepted": 2,
+      "rejected": 0,
+      "violations": 0
+    }
+  },
   "escapes": [],
   "overblocked": [],
+  "benign": {
+    "results": 4,
+    "accept_expected": 4,
+    "rejected_in_error": 0,
+    "false_reject_rate": 0.0
+  },
   "total_results": 12,
-  "s0_violations": []
+  "s0_violations": [],
+  "complete": true,
+  "commit": "bb0becdaf445d70fd9a28cad06340b795839b45e",
+  "finished_utc": "2026-11-06T13:38:39Z",
+  "toolchain": {
+    "python": "3.11.15",
+    "python_implementation": "CPython",
+    "platform": "macOS-15.3.1-arm64-arm-64bit",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)",
+    "cargo": "cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)"
+  },
+  "generator": {
+    "model": "hand-written",
+    "provider": "none-offline",
+    "utc": "2026-11-05T00:00:00Z",
+    "seed": 20261105
+  }
 }
