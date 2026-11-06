@@ -12,10 +12,14 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
   QIP-PROP-01..03      proposal (planner) boundary    (frontier rule)
   QIP-DEG-01..03       degraded / fail-direction      (R7)
+  QIP-CLAIM-01         class-claim form               (R11.1, NOT TESTED:
+                       no claim artifact is exposed; see README)
 
 A skipped test is NOT TESTED, not a pass. See README.md NOT TESTED section.
 """
 import pytest
+
+from conformance.adapter_interface import validate_class_claim
 
 
 def _needs_core(adapter):
@@ -229,3 +233,48 @@ def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
     events = refusing.events("operator").body["events"]
     match = [e for e in events if e["id"] == r.command_id]
     assert len(match) == 1 and match[0]["auth_result"] == "secure_core_rejected"
+
+
+# ------------------------------------------- CLAIM: class claims (R11.1)
+# QIP-R11.1 (OBSERVE): a class claim MUST name the class, this profile
+# version, and the exact test identifiers relied on, and MUST be
+# accompanied by the raw output of those tests; a summary without the
+# underlying output does not satisfy it. This is EXPLICITLY UNTESTABLE
+# against quberon-core, recorded as a skip (NOT TESTED), not a trace:
+#   * no class claim exists to validate -- QIP-v0.1 states no QIP class
+#     is claimed, and quberon-core exposes no claim artifact (probed:
+#     status body and capabilities() carry no class/profile/claim field);
+#   * absence of a claim is not a passing claim-form test, and an
+#     adapter-hardcoded claim/non-claim would fabricate the artifact;
+#   * even with a claim artifact, this suite could check only its form:
+#     it cannot verify the raw output is genuine/unedited output of the
+#     named tests on the claimed profile version, cannot reliably
+#     distinguish raw output from a summary by shape, cannot see claims
+#     made outside this surface (documents, PRs, external text), and
+#     cannot verify the cumulative MUSTs of the named class (several
+#     remain UNIMPLEMENTED). Those are partial-coverage limits; per
+#     QIP-v0.1 section 11 they stay UNIMPLEMENTED, never rounded up.
+# The non-skip branch below is the form check a future claimant-sourced
+# artifact would face; it was exercised against a stub adapter in this
+# node's session (see progress/qip-qip-r11-1.md), but a stub pass is
+# form-only evidence and is NOT a trace for QIP-R11.1.
+
+def test_QIP_CLAIM_01_class_claim_names_class_version_ids_and_raw_output(adapter):
+    if not adapter.capabilities().get("class_claim_available"):
+        pytest.skip("NOT TESTED: QIP-R11.1 requires a class-claim artifact "
+                    "sourced from the claimant/system under test; this adapter "
+                    "reports class_claim_available=False (no class is claimed "
+                    "in QIP-v0.1 and no claim surface is exposed), so claim "
+                    "form -- class, profile version, exact test IDs and "
+                    "accompanying raw output -- cannot be verified")
+    claim = adapter.class_claim()
+    assert claim is not None, "capability claims a claim artifact but none was returned"
+    assert validate_class_claim(claim) == []
+    # Named identifiers must be exact IDs of tests in this suite.
+    for tid in claim["test_ids"]:
+        prefix = "test_" + tid.replace("-", "_") + "_"
+        assert any(name.startswith(prefix) and callable(fn)
+                   for name, fn in globals().items()), tid
+    # NOTE: raw-output authenticity, summary-vs-raw distinction, claims
+    # outside this surface, and satisfaction of the named class's
+    # cumulative MUSTs are NOT verified here (see section comment).

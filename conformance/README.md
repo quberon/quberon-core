@@ -57,6 +57,21 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
 ## NOT TESTED (explicit gaps — remain gaps)
 
+- QIP-R11.1 class-claim form (QIP-CLAIM-01, appended; no renumbering):
+  explicitly untestable here and recorded as NOT TESTED (skip), never a
+  trace. QIP-v0.1 claims no QIP class and quberon-core exposes no
+  class-claim artifact (status/capabilities carry no class, profile
+  version or claim field), so there is no claimant-sourced claim naming
+  a class, profile version and exact test IDs with accompanying raw
+  output to verify. Absence of a claim is not a pass, and an
+  adapter-hardcoded claim would fabricate the artifact. Even if an
+  artifact existed, this suite could check only its form: raw-output
+  authenticity/provenance and summary-vs-raw distinction, claims made
+  in documents/PRs/external text outside the adapter surface, and
+  satisfaction of the claimed class's cumulative MUSTs (several QIP
+  requirements remain UNIMPLEMENTED) are all outside this suite.
+  QIP-R11.1 therefore stays UNIMPLEMENTED in QIP-v0.1 Section 11; the
+  Section 11 amendment procedure belongs to the profile owner.
 - QIP-DEG-03 injection limits: a REAL disk/SQLite persistence failure
   (injection flips the app's degraded flag, it does not corrupt storage),
   and a REAL Rust secure-core rejection of a signed envelope (injection
