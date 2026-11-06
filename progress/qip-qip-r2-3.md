@@ -128,6 +128,14 @@ s                                                                        [100%]
 SKIPPED [1] conformance/test_conformance.py:100: NOT TESTED -- QIP-R2.3 explicitly untestable by this suite: representational claim over all human-facing representations, no neutral adapter surface enumerates them and no profile-defined claim vocabulary exists; sampled-payload absence would be partial coverage, not a trace (see README.md NOT TESTED)
 1 skipped, 1 warning in 0.00s
 
+--- clean clone of pushed branch node/qip-qip-r2-3 @ 7a2258c ---
+(fresh git clone, fresh .venv from requirements.txt, no Rust binary built)
+........s.......s............                                            [100%]
+SKIPPED [1] conformance/test_conformance.py:100: NOT TESTED -- QIP-R2.3 explicitly untestable by this suite: representational claim over all human-facing representations, no neutral adapter surface enumerates them and no profile-defined claim vocabulary exists; sampled-payload absence would be partial coverage, not a trace (see README.md NOT TESTED)
+SKIPPED [1] conformance/test_conformance.py:25: NOT TESTED in this run: secure-core binary unavailable, so the authorized reset path cannot be exercised
+27 passed, 2 skipped, 1 warning in 4.03s
+exit:0
+
 --- import app.main, zero files ---
 import ok
 files_created:0
