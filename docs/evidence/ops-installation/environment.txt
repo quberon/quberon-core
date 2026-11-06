@@ -1,0 +1,11 @@
+node_id=ops-installation
+branch=ops/installation
+commit=5f0443cd734f57f53f21fa6ec1cd1506dd4018c2
+utc=2026-11-06T10:16:44Z
+host=Quberon1.local
+uname=Darwin Quberon1.local 24.3.0 Darwin Kernel Version 24.3.0: Thu Jan  2 20:22:58 PST 2025; root:xnu-11215.81.4~3/RELEASE_ARM64_T8132 arm64
+python=Python 3.11.15
+python_path=/Users/quberon1/.hermes/hermes-agent/venv/bin/python3.11
+cargo=cargo 1.99.1 (5f94df478 2026-08-27) (Homebrew)
+rustc=rustc 1.99.1 (58cf8f9c3 2026-10-13) (Homebrew)
+make=GNU Make 3.81

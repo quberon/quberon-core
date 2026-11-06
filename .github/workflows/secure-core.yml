@@ -1,7 +1,7 @@
 name: secure-core
 on:
   push:
-    branches: [main, "lane-*", "meta/*"]
+    branches: [main, "lane-*", "meta/*", "node/*", "wave*/*"]
   pull_request:
     branches: [main]
   workflow_dispatch:

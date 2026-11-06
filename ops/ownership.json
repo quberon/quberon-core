@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "_comment": [
+    "Authority for what may run concurrently. The scheduler reads this file;",
+    "it never asks a model whether two nodes conflict.",
+    "JSON, not YAML, on purpose: the supervisor runs under launchd on the system",
+    "python3 with no venv and no network, and requirements.txt carries no PyYAML.",
+    "A scheduler that cannot start because a parser is missing is the exact failure",
+    "mode this system exists to remove. To switch to YAML, add PyYAML to",
+    "requirements.txt and change load_ownership() in ops/schedule.py."
+  ],
+
+  "tier2_paths": [
+    "app/main.py",
+    "app/__init__.py",
+    "integrations/secure_core.py",
+    "integrations/meta.py",
+    "integrations/interventions.py",
+    "integrations/recognizers.py",
+    "crates/**",
+    "apps/**",
+    "tools/quberon-verify/**",
+    ".github/**",
+    "ops/**",
+    "Cargo.toml",
+    "Cargo.lock",
+    "Makefile",
+    "requirements.txt",
+    "deny.toml",
+    "scripts/deploy_pi.sh",
+    "scripts/deploy_user_pi.sh",
+    "scripts/setup_ap.sh",
+    "scripts/setup_cellular.sh",
+    "scripts/ap_rollback.sh"
+  ],
+
+  "tier3_paths": [
+    "docs/evidence/meta-live.md"
+  ],
+
+  "append_only": [
+    "docs/LIMITATIONS.md",
+    "docs/evidence/README.md",
+    "checks.md"
+  ],
+
+  "assembly_only": {
+    "_comment": "Written by the N0/assembly node alone, never by a work node.",
+    "paths": ["graph.md", "checks.md", "progress.md", "REPO-MAP.md"]
+  },
+
+  "areas": [
+    {
+      "id": "F1-degraded-conformance",
+      "tier": 1,
+      "status": "merged",
+      "owns": ["conformance/**", "progress/F1-degraded-conformance.md"],
+      "note": "QIP-DEG-03 closed via neutral injection points inside conformance/ only. Read app/main.py read-only; edited no control-path file. Correctly Tier 1."
+    },
+    {
+      "id": "F2-bundle-vectors",
+      "tier": 1,
+      "status": "merged",
+      "owns": ["evidence-bundle-conformance/**", "progress/F2-bundle-vectors.md"],
+      "note": "Independent stdlib checker written from crates/quberon-evidence-bundle/SPEC.md. Modified no crate, no verifier, no fixture, so Tier 1 despite being about Tier 2 artefacts. This is the pattern to repeat: test a Tier 2 component from outside it."
+    },
+    {
+      "id": "F3-stop-load",
+      "tier": 1,
+      "status": "merged",
+      "owns": ["loadtest/**", "progress/F3-stop-load.md"],
+      "note": "I predicted this might reach app/main.py. It did not: it drives the real app over loopback HTTP without editing it. Tier 1 confirmed by diff, not by claim."
+    },
+    {
+      "id": "F4-input-qualification",
+      "tier": 1,
+      "status": "merged",
+      "owns": ["research/safety-inputs/**", "progress/F4-input-qualification.md"],
+      "note": "Imports integrations/recognizers.py read-only. Synthetic datasets only."
+    },
+    {
+      "id": "F5-fleet-latch",
+      "tier": 1,
+      "status": "merged",
+      "owns": ["fleet-sim/**", "progress/F5-fleet-latch.md"],
+      "note": "Also predicted as possible Tier 2; it is a standalone stdlib simulation touching no production path. Tier 1 confirmed by diff."
+    },
+    {
+      "id": "F6-capability-tuples",
+      "tier": 1,
+      "status": "merged",
+      "owns": ["research/humanoids/**", "progress/F6-capability-tuples.md"],
+      "note": "All 25 entities remain candidate_unverified; universe_size_claim stays null. Promotion needs a human row in checks.md."
+    },
+    {
+      "id": "F7-repro-assurance",
+      "tier": 1,
+      "status": "merged",
+      "owns": ["tools/repro/**", "docs/assurance/**", "progress/F7-repro-assurance.md"],
+      "note": "Owns tools/repro/** only. tools/quberon-verify/** stays Tier 2 and is NOT part of this area."
+    },
+    {
+      "id": "F8-meta-runner",
+      "tier": 2,
+      "status": "merged",
+      "owns": [
+        "scripts/meta_live_evidence.py",
+        "scripts/run_meta_live_evidence.sh",
+        "tests/test_meta_live.py",
+        "docs/evidence/meta-live.md",
+        "progress/F8-meta-runner.md"
+      ],
+      "note": "Tier 2 because it is the credential path to a live provider call, even though it never touched integrations/meta.py. Tier follows blast radius, not directory. docs/evidence/meta-live.md is additionally Tier 3: only a real credential-backed run may change its verdict."
+    },
+
+    {
+      "id": "RESERVED-control-path",
+      "tier": 2,
+      "status": "reserved",
+      "owns": [
+        "app/**",
+        "integrations/secure_core.py",
+        "integrations/meta.py",
+        "integrations/interventions.py",
+        "integrations/recognizers.py"
+      ],
+      "note": "No node may claim these as owns without an explicit Tier 2 work order naming them."
+    },
+    {
+      "id": "RESERVED-secure-core",
+      "tier": 2,
+      "status": "reserved",
+      "owns": ["crates/**", "apps/**", "fuzz/**", "tools/quberon-verify/**"],
+      "note": "Rust control and verification surface."
+    },
+    {
+      "id": "RESERVED-ci-and-ops",
+      "tier": 2,
+      "status": "reserved",
+      "owns": [".github/**", "ops/**"],
+      "note": "The scheduler may not rewrite its own rules from inside a worker."
+    },
+    {
+      "id": "RESERVED-pi-deploy",
+      "tier": 3,
+      "status": "reserved",
+      "owns": [
+        "scripts/deploy_pi.sh",
+        "scripts/deploy_user_pi.sh",
+        "scripts/setup_ap.sh",
+        "scripts/setup_cellular.sh",
+        "scripts/ap_rollback.sh",
+        "systemd/**"
+      ],
+      "note": "Physical device. Read-only Pi inspection is Tier 1; any write to the Pi is Tier 3 and needs per-session human authorization."
+    },
+    {
+      "id": "RESERVED-adversarial",
+      "tier": 1,
+      "status": "open",
+      "owns": ["research/adversarial/**"],
+      "note": "Corpus and invariants. The adversary that writes cases must not be the agent that wrote the defence; record generator.model and generator.sees_implementation on every artefact."
+    },
+    {
+      "id": "RESERVED-profile",
+      "tier": 1,
+      "status": "open",
+      "owns": ["docs/specs/intervention-profile/**"],
+      "note": "QIP. Section 11 amendment procedure applies; a work node may not promote its own requirement to tested."
+    },
+    {
+      "id": "RESERVED-copper",
+      "tier": 1,
+      "status": "open",
+      "owns": ["spikes/copper-stop-path/**"],
+      "note": "Isolated workspace. Raising the root Rust MSRV would make it Tier 2."
+    },
+    {
+      "id": "RESERVED-visualization",
+      "tier": 1,
+      "status": "open",
+      "owns": ["viz/**", "docs/assets/**"],
+      "note": "Figures, animations and video are GENERATED from committed evidence files, never hand-authored. Every artefact embeds its source path, that source's sha256, the commit and the UTC time, plus an evidence band: MEASURED-ON-HOST, SIMULATED, SYNTHETIC, or NOT TESTED. No visual may depict a capability whose QIP status is UNIMPLEMENTED without that band visible in the frame, and no rendered robot may be presented as a physical robot stopping. Regeneration must be byte-identical, same discipline as F4 and F6."
+    },
+    {
+      "id": "RESERVED-camera-research",
+      "tier": 1,
+      "status": "open",
+      "owns": ["research/camera-bringup/**", "research/gesture-dataset/**"],
+      "note": "Camera harness CODE is Tier 1 and runs nowhere by itself. RUNNING it against the physical Pi camera is a Tier 3 action under RESERVED-pi-deploy and needs per-session human authorization. Any capture involving a person is governed by the existing consent, PII and leakage rules already enforced by research/gesture-dataset/validate.py; that validator is the gate, not a new policy document. No capture of identifiable children. Real frames never upgrade a QIP requirement by themselves: QIP-R9.x stays UNIMPLEMENTED until the profile owner amends it under section 11."
+    }
+  ]
+}

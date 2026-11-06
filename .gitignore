@@ -10,3 +10,5 @@ artifacts/display-mock.png
 .DS_Store
 target/
 sbom.cdx.json
+ops/HALT
+ops/state.json
