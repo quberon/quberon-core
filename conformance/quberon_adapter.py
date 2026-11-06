@@ -93,6 +93,21 @@ class QuberonCoreAdapter(AdapterUnderTest):
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
+            "manufacturer_mapping_declared": True,
+        }
+
+    # -- manufacturer-mapping declaration (QIP-R10.2) ---------------------
+    def manufacturer_mapping_declaration(self):
+        # quberon-core is a simulator (status adapter_mode == "SIMULATION").
+        # No manufacturer stop/status/reset interface has been observed in
+        # manufacturer-provided material recorded with its source for this
+        # implementation, so R10.2 requires an explicit non-claim here --
+        # not silence, and not an approximated/simulated mapping.
+        return {
+            "mapping_claimed": False,
+            "mappings": [],
+            "basis": "simulation_only: no manufacturer interface observed "
+                     "or claimed for this implementation",
         }
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
