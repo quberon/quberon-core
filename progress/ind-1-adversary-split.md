@@ -1,7 +1,7 @@
 NODE: ind-1-adversary-split
 TIER: 1
 BRANCH: node/ind-1-adversary-split
-COMMITS: see final message / git log on this branch (single commit on top of origin/main 7fd9ea5)
+COMMITS: 1e26741 (plus the report-hash commit on this branch); PR #47 https://github.com/quberon/quberon-core/pull/47 ; base origin/main 7fd9ea5
 STATUS: complete for the exit gate below; independent real-model adversary still BLOCKED (see STILL NOT TRUE)
 
 CHANGED (owned paths only: research/adversarial/**, progress/ind-1-adversary-split.md)
