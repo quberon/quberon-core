@@ -1,0 +1,18 @@
+{
+  "$schema": "gesture-dataset-v0.1 (descriptive; validate.py is normative)",
+  "type": "object",
+  "required": ["clip_id","schema_version","split","source","synthetic","session_id","person_id","environment_id","category","label","intent_stop","expected_endpoint_trigger","modality","voice","frames","conditions","consent","annotation","frames_hash"],
+  "properties": {
+    "schema_version": {"const": "gesture-dataset-v0.1"},
+    "split": {"enum": ["train","val","test"]},
+    "source": {"enum": ["synthetic","human_capture"]},
+    "category": {"enum": ["canonical_positive","negative_control","near_boundary","variation","temporal_anomaly","crossmodal_contradiction"]},
+    "label": {"enum": ["open_palm_stop","no_gesture","fist","pointing","thumb_tucked","sideways_palm","brief_wave","partial_open_palm","other_hand_gesture","person_no_hand","empty_scene"]},
+    "frames": {"required": ["frame_count","frame_timestamps_ms","min_visibility","consecutive_qualifying_frames","hold_ms","temporal_tag"],
+      "properties": {"temporal_tag": {"enum": ["none","stale","replay","duplicate_timestamp","out_of_order","duplicate_frame"]}}},
+    "conditions": {"required": ["distance_m","lighting_lux","lighting_category","occlusion_pct","motion_blur","background_id"]},
+    "consent": {"required": ["status","consent_id","retention_until","raw_media_stored"],
+      "properties": {"status": {"enum": ["consented","not_applicable_synthetic"]}}}
+  },
+  "notes": "pending/withdrawn consent, PII keys, cross-split session/person/environment/frames_hash reuse are rejected by validate.py, not merely by this schema."
+}
