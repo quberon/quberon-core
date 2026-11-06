@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="720" viewBox="0 0 1060 720">
+<metadata>title=QIP section-11 traceability grid (traced IDs are traces, not pass claims); band=NOT TESTED; source=docs/specs/intervention-profile/QIP-v0.1.md sha256=0be1a945ff90f82bba28075e1ff4e96864d20880b0396d890843f2dedd2d5520; git_commit=7fd9ea5bfb8f702219d8c4f92bec711d2e716003; utc=2026-11-06T09:42:56Z</metadata>
+<rect x="0" y="0" width="100%" height="100%" fill="#ffffff"/>
+<text x="10.0" y="22.0" font-family="sans-serif" font-size="15" fill="#1f2328" text-anchor="start" font-weight="bold">QIP section-11 traceability grid (traced IDs are traces, not pass claims)</text>
+<rect x="870" y="6" width="180" height="20" rx="4" fill="#cf222e"/>
+<text x="960.0" y="20.0" font-family="sans-serif" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">NOT TESTED</text>
+<text x="10.0" y="42.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">source: docs/specs/intervention-profile/QIP-v0.1.md  sha256: 0be1a945ff90f82bba28075e1ff4e96864d20880b0396d890843f2dedd2d5520</text>
+<text x="10.0" y="56.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">git_commit: 7fd9ea5bfb8f702219d8c4f92bec711d2e716003  utc: 2026-11-06T09:42:56Z</text>
+<text x="10.0" y="70.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">requirements: 34  UNIMPLEMENTED gaps: 18  traced: 16</text>
+<line x1="10" y1="84" x2="1050" y2="84" stroke="#d0d7de"/>
+<text x="10.0" y="100.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="bold">Requirement</text>
+<text x="140.0" y="100.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="bold">Lowest class</text>
+<text x="300.0" y="100.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="bold">W4-N4 test ID or UNIMPLEMENTED</text>
+<text x="880.0" y="100.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="bold">Status</text>
+<rect x="6" y="112.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="123.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R1.1</text>
+<text x="140.0" y="123.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="123.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-ID-01</text>
+<text x="880.0" y="123.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="129.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="140.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R1.2</text>
+<text x="140.0" y="140.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="140.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-ID-02, QIP-ID-03</text>
+<text x="880.0" y="140.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="146.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="157.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R1.3</text>
+<text x="140.0" y="157.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="157.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (QIP-INT-05 covers audit-only kinds only)</text>
+<text x="880.0" y="157.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="163.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="174.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R2.1</text>
+<text x="140.0" y="174.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">AUTHORIZE</text>
+<text x="300.0" y="174.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-AUTH-01</text>
+<text x="880.0" y="174.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="180.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="191.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R2.2</text>
+<text x="140.0" y="191.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">AUTHORIZE</text>
+<text x="300.0" y="191.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-AUTH-02, QIP-AUTH-04</text>
+<text x="880.0" y="191.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="197.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="208.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R2.3</text>
+<text x="140.0" y="208.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">AUTHORIZE</text>
+<text x="300.0" y="208.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="208.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="214.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="225.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R3.1</text>
+<text x="140.0" y="225.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="225.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (no load/priority test in N4)</text>
+<text x="880.0" y="225.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="231.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="242.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R3.2</text>
+<text x="140.0" y="242.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="242.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="242.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="248.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="259.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R3.3</text>
+<text x="140.0" y="259.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="259.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="259.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="265.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="276.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R4.1</text>
+<text x="140.0" y="276.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="276.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-INT-02</text>
+<text x="880.0" y="276.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="282.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="293.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R4.2</text>
+<text x="140.0" y="293.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="293.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-INT-03</text>
+<text x="880.0" y="293.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="299.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="310.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R4.3</text>
+<text x="140.0" y="310.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="310.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-INT-04</text>
+<text x="880.0" y="310.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="316.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="327.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R5.1</text>
+<text x="140.0" y="327.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="327.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (restart persistence not in N4)</text>
+<text x="880.0" y="327.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="333.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="344.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R5.2</text>
+<text x="140.0" y="344.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="344.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-LATCH-02, QIP-LATCH-03</text>
+<text x="880.0" y="344.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="350.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="361.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R5.3</text>
+<text x="140.0" y="361.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="361.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-LATCH-01</text>
+<text x="880.0" y="361.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="367.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="378.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R6.1</text>
+<text x="140.0" y="378.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE</text>
+<text x="300.0" y="378.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-STATE-02</text>
+<text x="880.0" y="378.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="384.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="395.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R6.2</text>
+<text x="140.0" y="395.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE</text>
+<text x="300.0" y="395.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-STATE-01</text>
+<text x="880.0" y="395.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="401.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="412.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R6.3</text>
+<text x="140.0" y="412.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE</text>
+<text x="300.0" y="412.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-STATE-03</text>
+<text x="880.0" y="412.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="418.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="429.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R7.1</text>
+<text x="140.0" y="429.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">AUTHORIZE</text>
+<text x="300.0" y="429.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (QIP-DEG-03 skipped: NOT TESTED, gap not pass)</text>
+<text x="880.0" y="429.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="435.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="446.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R7.2</text>
+<text x="140.0" y="446.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">AUTHORIZE</text>
+<text x="300.0" y="446.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-DEG-01</text>
+<text x="880.0" y="446.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="452.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="463.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R7.3</text>
+<text x="140.0" y="463.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">AUTHORIZE</text>
+<text x="300.0" y="463.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-DEG-01</text>
+<text x="880.0" y="463.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="469.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="480.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R7.4</text>
+<text x="140.0" y="480.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">AUTHORIZE</text>
+<text x="300.0" y="480.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (QIP-DEG-03 skipped: NOT TESTED, gap not pass)</text>
+<text x="880.0" y="480.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="486.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="497.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R8.1</text>
+<text x="140.0" y="497.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">EVIDENCE</text>
+<text x="300.0" y="497.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (QIP-AUDIT-01 covers event existence/id/ts only)</text>
+<text x="880.0" y="497.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="503.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="514.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R8.2</text>
+<text x="140.0" y="514.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">EVIDENCE</text>
+<text x="300.0" y="514.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-DEG-01</text>
+<text x="880.0" y="514.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="520.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="531.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R8.3</text>
+<text x="140.0" y="531.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">EVIDENCE</text>
+<text x="300.0" y="531.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="531.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="537.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="548.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R8.4</text>
+<text x="140.0" y="548.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">EVIDENCE</text>
+<text x="300.0" y="548.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="548.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="554.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="565.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R9.1</text>
+<text x="140.0" y="565.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="565.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (QIP-INT-04 covers stale voice input only)</text>
+<text x="880.0" y="565.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="571.0" width="1048" height="15" fill="#f6f8fa"/>
+<text x="10.0" y="582.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-R9.2</text>
+<text x="140.0" y="582.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="582.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">QIP-INT-05</text>
+<text x="880.0" y="582.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="start" font-weight="normal">TRACED</text>
+<rect x="6" y="588.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="599.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R9.3</text>
+<text x="140.0" y="599.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">INTERVENE</text>
+<text x="300.0" y="599.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="599.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="605.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="616.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R10.1</text>
+<text x="140.0" y="616.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE</text>
+<text x="300.0" y="616.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (R10: N4 records no manufacturer/capability mapping)</text>
+<text x="880.0" y="616.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="622.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="633.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R10.2</text>
+<text x="140.0" y="633.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE</text>
+<text x="300.0" y="633.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED (R10 gap, explicit in N4 README)</text>
+<text x="880.0" y="633.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="639.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="650.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R11.1</text>
+<text x="140.0" y="650.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE</text>
+<text x="300.0" y="650.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="650.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="656.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="667.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R11.2</text>
+<text x="140.0" y="667.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE</text>
+<text x="300.0" y="667.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="667.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<rect x="6" y="673.0" width="1048" height="15" fill="#ffebe9"/>
+<text x="10.0" y="684.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="bold">QIP-R11.3</text>
+<text x="140.0" y="684.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">EVIDENCE</text>
+<text x="300.0" y="684.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">UNIMPLEMENTED</text>
+<text x="880.0" y="684.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="start" font-weight="bold">GAP - UNIMPLEMENTED (NOT TESTED)</text>
+<text x="10.0" y="706.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">All 18 UNIMPLEMENTED requirements are marked GAP above; no QIP conformance class is claimed.</text>
+</svg>

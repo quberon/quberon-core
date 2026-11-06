@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="370" viewBox="0 0 980 370">
+<metadata>title=Fleet-sim scenario trace (SIMULATED, deterministic); band=SIMULATED; source=fleet-sim/run.py sha256=01a03faf5437c97d2f8ea59632ce1bd0ba96ab841b2b9df005e1f77c0e1182a8; source=fleet-sim/fleet_sim.py sha256=3983d4436666228f9e59f31956576a753a8612ab75e601499c78f5b82a6daa4d; git_commit=7fd9ea5bfb8f702219d8c4f92bec711d2e716003; utc=2026-11-06T09:42:56Z</metadata>
+<rect x="0" y="0" width="100%" height="100%" fill="#ffffff"/>
+<text x="10.0" y="22.0" font-family="sans-serif" font-size="15" fill="#1f2328" text-anchor="start" font-weight="bold">Fleet-sim scenario trace (SIMULATED, deterministic)</text>
+<rect x="790" y="6" width="180" height="20" rx="4" fill="#0969da"/>
+<text x="880.0" y="20.0" font-family="sans-serif" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">SIMULATED</text>
+<text x="10.0" y="42.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">source: fleet-sim/run.py  sha256: 01a03faf5437c97d2f8ea59632ce1bd0ba96ab841b2b9df005e1f77c0e1182a8</text>
+<text x="10.0" y="56.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">source: fleet-sim/fleet_sim.py  sha256: 3983d4436666228f9e59f31956576a753a8612ab75e601499c78f5b82a6daa4d</text>
+<text x="10.0" y="70.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">git_commit: 7fd9ea5bfb8f702219d8c4f92bec711d2e716003  utc: 2026-11-06T09:42:56Z</text>
+<text x="10.0" y="84.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">trace_sha256: bc00d02757b140236eff8687b4934a3cb373aee72759281b1f87087d13e79eb0  observed_verdict(robot-a): CONFLICTED</text>
+<line x1="10" y1="98" x2="970" y2="98" stroke="#d0d7de"/>
+<text x="10.0" y="114.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">step</text>
+<text x="60.0" y="114.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">event (verbatim trace line from fleet-sim/run.py output)</text>
+<rect x="10" y="129.0" width="980" height="16" fill="#ffffff"/>
+<circle cx="18" cy="137.0" r="4" fill="#8250df"/>
+<text x="34.0" y="140.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">0</text>
+<text x="60.0" y="140.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">PARTITION groups=[['n1', 'n2'], ['n3']]</text>
+<text x="900.0" y="140.0" font-family="monospace" font-size="9" fill="#8250df" text-anchor="end" font-weight="normal">PARTITION</text>
+<rect x="10" y="147.0" width="980" height="16" fill="#f6f8fa"/>
+<circle cx="18" cy="155.0" r="4" fill="#cf222e"/>
+<text x="34.0" y="158.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">1</text>
+<text x="60.0" y="158.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">STOP LATCHED node=n1 event=e1 epoch=1 net=0</text>
+<text x="900.0" y="158.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="end" font-weight="normal">STOP</text>
+<rect x="10" y="165.0" width="980" height="16" fill="#ffffff"/>
+<circle cx="18" cy="173.0" r="4" fill="#cf222e"/>
+<text x="34.0" y="176.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">2</text>
+<text x="60.0" y="176.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">STOP LATCHED node=n3 event=e2 epoch=1 net=0</text>
+<text x="900.0" y="176.0" font-family="monospace" font-size="9" fill="#cf222e" text-anchor="end" font-weight="normal">STOP</text>
+<rect x="10" y="183.0" width="980" height="16" fill="#f6f8fa"/>
+<circle cx="18" cy="191.0" r="4" fill="#bf8700"/>
+<text x="34.0" y="194.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">3</text>
+<text x="60.0" y="194.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">STOP_DUPLICATE node=n1 event=e1 outcome=LATCHED</text>
+<text x="900.0" y="194.0" font-family="monospace" font-size="9" fill="#bf8700" text-anchor="end" font-weight="normal">STOP_DUPLICATE</text>
+<rect x="10" y="201.0" width="980" height="16" fill="#ffffff"/>
+<circle cx="18" cy="209.0" r="4" fill="#0969da"/>
+<text x="34.0" y="212.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">4</text>
+<text x="60.0" y="212.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">GOSSIP net_calls=1</text>
+<text x="900.0" y="212.0" font-family="monospace" font-size="9" fill="#0969da" text-anchor="end" font-weight="normal">GOSSIP</text>
+<rect x="10" y="219.0" width="980" height="16" fill="#f6f8fa"/>
+<circle cx="18" cy="227.0" r="4" fill="#1a7f37"/>
+<text x="34.0" y="230.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">5</text>
+<text x="60.0" y="230.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">HEAL</text>
+<text x="900.0" y="230.0" font-family="monospace" font-size="9" fill="#1a7f37" text-anchor="end" font-weight="normal">HEAL</text>
+<rect x="10" y="237.0" width="980" height="16" fill="#ffffff"/>
+<circle cx="18" cy="245.0" r="4" fill="#0969da"/>
+<text x="34.0" y="248.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">6</text>
+<text x="60.0" y="248.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">GOSSIP net_calls=4</text>
+<text x="900.0" y="248.0" font-family="monospace" font-size="9" fill="#0969da" text-anchor="end" font-weight="normal">GOSSIP</text>
+<rect x="10" y="255.0" width="980" height="16" fill="#f6f8fa"/>
+<circle cx="18" cy="263.0" r="4" fill="#bf8700"/>
+<text x="34.0" y="266.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">7</text>
+<text x="60.0" y="266.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">RESET RESET_APPLIED node=n2 event=r1 clears=1</text>
+<text x="900.0" y="266.0" font-family="monospace" font-size="9" fill="#bf8700" text-anchor="end" font-weight="normal">RESET</text>
+<rect x="10" y="273.0" width="980" height="16" fill="#ffffff"/>
+<circle cx="18" cy="281.0" r="4" fill="#0969da"/>
+<text x="34.0" y="284.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">8</text>
+<text x="60.0" y="284.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">GOSSIP net_calls=7</text>
+<text x="900.0" y="284.0" font-family="monospace" font-size="9" fill="#0969da" text-anchor="end" font-weight="normal">GOSSIP</text>
+<rect x="10" y="291.0" width="980" height="16" fill="#f6f8fa"/>
+<circle cx="18" cy="299.0" r="4" fill="#57606a"/>
+<text x="34.0" y="302.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">9</text>
+<text x="60.0" y="302.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE node=n1 target=robot-a value=STOPPED src=sensor-1</text>
+<text x="900.0" y="302.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="end" font-weight="normal">OBSERVE</text>
+<rect x="10" y="309.0" width="980" height="16" fill="#ffffff"/>
+<circle cx="18" cy="317.0" r="4" fill="#57606a"/>
+<text x="34.0" y="320.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">10</text>
+<text x="60.0" y="320.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">OBSERVE node=n2 target=robot-a value=MOVING src=sensor-2</text>
+<text x="900.0" y="320.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="end" font-weight="normal">OBSERVE</text>
+<text x="10.0" y="344.0" font-family="monospace" font-size="8" fill="#1f2328" text-anchor="start" font-weight="normal">snapshot (sorted JSON): {"n1": {"robot-a": {"cleared_epoch": 1, "epoch": 1, "latched": false, "origin": "e1"}}, "n2": {"robot-a": {"cleared_epoch": 1, "epoch": 1, "latched": false, "origin": "e1"}}, "n3": {"robot-a": {"cleared_epoch": 1, "epoch": 1, "latched": false, "origin": "e1"}}}</text>
+<text x="10.0" y="358.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">Simulation only: no production control path, no network, no physical stop-time claim.</text>
+</svg>
