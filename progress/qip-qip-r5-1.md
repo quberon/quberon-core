@@ -3,7 +3,7 @@
 NODE: qip-qip-r5-1 (QIP-R5.1, INTERVENE)
 TIER: 1
 BRANCH: node/qip-qip-r5-1 (off origin/main 7fd9ea5; not rebased mid-node)
-COMMITS: see final message / PR (this file is committed with the change)
+COMMITS: 34d083d (plus the follow-up commit containing this file's final evidence update)
 STATUS: conformance trace supplied; QIP traceability amendment NOT done (not this node's to do)
 
 ## What was traced, and to what
@@ -90,6 +90,13 @@ QIP-DEG-03 reachable refusal / persistence-degraded) pass in the
 
 Exit gate: `python -m pytest conformance/ -q` exits 0 in both modes
 above (29 passed with Rust; 27 passed, 2 skipped without the binary).
+
+Clean-clone verification (fresh `git clone -b node/qip-qip-r5-1` of
+the pushed branch into scratch, fresh .venv, `cargo build
+--workspace`, 2026-11-06):
+  .venv/bin/python -m pytest conformance/ -q -rs -> exit 0
+  29 passed, 1 warning in 4.71s
+  Raw: /Users/quberon1/.hermes/cache/scratch/qip-r5-1/cleanclone-conformance.log
 
 ## TESTS (both modes)
 - With Rust: conformance 29 passed; full 212 passed.
