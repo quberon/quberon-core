@@ -93,7 +93,18 @@ class QuberonCoreAdapter(AdapterUnderTest):
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
+            # quberon-core exposes no class-claim artifact: its status
+            # body has no class/profile_version/claim field (probed) and
+            # QIP-v0.1 states no QIP class is claimed. Reporting False
+            # here is not itself a non-claim sourced from the system; it
+            # only records that QIP-CLAIM-01 cannot be exercised.
+            "class_claim_available": False,
         }
+
+    def class_claim(self):
+        # No claim surface exists to source a claim from (see above);
+        # do not fabricate one in the adapter.
+        return None
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
     def inject_persistence_failure(self) -> None:

@@ -58,6 +58,46 @@ class NeutralResult:
         return sc.get("status") if isinstance(sc, dict) else None
 
 
+QIP_CLASSES = ("OBSERVE", "INTERVENE", "AUTHORIZE", "EVIDENCE")
+
+
+def validate_class_claim(claim):
+    """Shape-check a QIP-R11.1 class-claim artifact; return error strings.
+
+    A claim satisfying this validator has only the required *form*: it
+    names a class, a profile version, exact test identifiers, and a
+    non-empty raw-output text mentioning each identifier. This does NOT
+    verify that the raw output is genuine or unedited, that the named
+    tests passed on the claimed version, or that the implementation
+    satisfies every MUST of the named (cumulative) class. A summary
+    paraphrase cannot be reliably distinguished from raw output by
+    shape alone, so a passing shape check must never be rounded up to
+    a trace for QIP-R11.1.
+    """
+    if not isinstance(claim, dict):
+        return ["class claim is not an explicit mapping"]
+    errors = []
+    if claim.get("claimed_class") not in QIP_CLASSES:
+        errors.append("claimed_class does not name a QIP class")
+    version = claim.get("profile_version")
+    if not isinstance(version, str) or not version.strip():
+        errors.append("profile_version is missing or empty")
+    test_ids = claim.get("test_ids")
+    if (not isinstance(test_ids, list) or not test_ids
+            or any(not isinstance(t, str) or not t.strip() for t in test_ids)
+            or len(set(test_ids)) != len(test_ids)):
+        errors.append("test_ids is not a non-empty list of distinct identifiers")
+        test_ids = []
+    raw = claim.get("raw_output")
+    if not isinstance(raw, str) or not raw.strip():
+        errors.append("raw_output is missing or empty (a summary does not satisfy QIP-R11.1)")
+    else:
+        for tid in test_ids:
+            if tid not in raw:
+                errors.append(f"raw_output does not mention {tid}")
+    return errors
+
+
 class AdapterUnderTest:
     """Neutral surface every adapter implementation must provide.
 
@@ -96,6 +136,19 @@ class AdapterUnderTest:
 
     def events(self, role: str) -> NeutralResult:
         raise NotImplementedError
+
+    # --- Class-claim artifact (QIP-R11.1) --------------------------------
+    # A class claim is a documentary artifact, not adapter runtime
+    # behaviour. An adapter/system that exposes one returns it here,
+    # sourced from the claimant (claim document/record), NOT hardcoded
+    # in the adapter: an adapter-invented claim or non-claim is not
+    # evidence. Expected shape when a claim exists:
+    #   {"claimed_class": one of QIP_CLASSES, "profile_version": str,
+    #    "test_ids": [exact test identifiers], "raw_output": str}
+    # Returning None means no claim artifact is exposed through this
+    # surface; the suite then reports QIP-R11.1 NOT TESTED, never a pass.
+    def class_claim(self):
+        return None
 
     # --- Implementation-neutral fault injection (QIP-DEG-03) -------------
     # These are the injection points the original interface lacked. They
@@ -138,4 +191,5 @@ class AdapterUnderTest:
         return {
             "persistence_failure_injectable": False,
             "secure_core_refusal_injectable": False,
+            "class_claim_available": False,
         }
