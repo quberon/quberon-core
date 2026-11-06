@@ -12,6 +12,7 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
   QIP-PROP-01..03      proposal (planner) boundary    (frontier rule)
   QIP-DEG-01..03       degraded / fail-direction      (R7)
+  QIP-CAP-01..02       manufacturer-mapping claim    (R10.2, negative only)
 
 A skipped test is NOT TESTED, not a pass. See README.md NOT TESTED section.
 """
@@ -229,3 +230,76 @@ def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
     events = refusing.events("operator").body["events"]
     match = [e for e in events if e["id"] == r.command_id]
     assert len(match) == 1 and match[0]["auth_result"] == "secure_core_rejected"
+
+
+# --------------------------------- CAP: manufacturer mapping (QIP-R10.2)
+# QIP-R10.2 is a negative requirement (MUST NOT claim a manufacturer
+# stop/status/reset mapping unless observed in manufacturer-provided
+# material recorded with its source). These tests cover only the
+# testable slice: an adapter must make an *explicit* declaration, and a
+# claimed mapping must carry a recorded source. They cannot verify that
+# a cited source is genuinely manufacturer-provided (see README NOT
+# TESTED), so passing them is candidate evidence for the profile owner
+# under QIP-v0.1 section 11 -- it does not amend traceability, and
+# QIP-R10.2 remains UNIMPLEMENTED until the owner says otherwise.
+from conformance.adapter_interface import (  # noqa: E402
+    validate_manufacturer_mapping_declaration,
+)
+
+
+def _needs_mapping_declaration(adapter):
+    if not adapter.capabilities().get("manufacturer_mapping_declared"):
+        pytest.skip("NOT TESTED in this run: manufacturer_mapping_declared "
+                    "is False, so no explicit R10.2 declaration is exposed "
+                    "by this adapter; silence is not a non-claim")
+
+
+def test_QIP_CAP_01_no_unobserved_manufacturer_mapping_claimed(adapter):
+    _needs_mapping_declaration(adapter)
+    declaration = None
+    try:
+        declaration = adapter.manufacturer_mapping_declaration()
+    except NotImplementedError:
+        pytest.skip("NOT TESTED in this run: adapter does not implement "
+                    "manufacturer_mapping_declaration()")
+    assert declaration is not None
+    assert validate_manufacturer_mapping_declaration(declaration) == []
+    # This reference implementation claims no mapping: that, not silence,
+    # is what R10.2 requires of it. A future adapter claiming a mapping
+    # passes the validator above only if every mapping names its kind,
+    # manufacturer interface and recorded source.
+    assert declaration["mapping_claimed"] is False
+    assert declaration["mappings"] == []
+
+
+def test_QIP_CAP_02_unsourced_or_contradictory_mapping_claim_rejected():
+    # Fail-direction for CAP-01: the validator must reject, not wave
+    # through, claims that R10.2 forbids. Without this, CAP-01 would be
+    # vacuous (any declaration would pass).
+    bad_declarations = [
+        {},  # no explicit declaration at all
+        {"mapping_claimed": "false", "mappings": []},  # not an explicit bool
+        {"mappings": []},  # missing mapping_claimed
+        {"mapping_claimed": False, "mappings": [
+            {"kind": "stop", "manufacturer_interface": "VendorStop",
+             "source": "vendor manual p.1"}]},  # contradicts non-claim
+        {"mapping_claimed": True, "mappings": []},  # claim without mapping
+        {"mapping_claimed": True, "mappings": [
+            {"kind": "stop", "manufacturer_interface": "VendorStop"}]},
+        {"mapping_claimed": True, "mappings": [
+            {"kind": "stop", "manufacturer_interface": "VendorStop",
+             "source": ""}]},  # mapping without a recorded source
+        {"mapping_claimed": True, "mappings": [
+            {"kind": "halt", "manufacturer_interface": "VendorStop",
+             "source": "vendor manual p.1"}]},  # outside stop/status/reset
+    ]
+    for bad in bad_declarations:
+        assert validate_manufacturer_mapping_declaration(bad) != [], bad
+    # And the well-formed shapes on both sides of the claim are accepted
+    # as *shapes* (provenance of the source is not checked here).
+    assert validate_manufacturer_mapping_declaration(
+        {"mapping_claimed": False, "mappings": []}) == []
+    assert validate_manufacturer_mapping_declaration(
+        {"mapping_claimed": True, "mappings": [
+            {"kind": "stop", "manufacturer_interface": "VendorStop",
+             "source": "vendor manual p.1"}]}) == []

@@ -43,7 +43,9 @@ auth_result "secure_core_rejected".
 ID (R1) · AUTH (R2) · INT intervention/idempotency/inputs (R3/R4/R9 partial)
 · LATCH (R5) · STATE (R6) · AUDIT (R8 partial) · PROPOSAL planner boundary
 (frontier rule: model proposes, deterministic law disposes) ·
-DEGRADED fail-direction (R7, graph.md R-IMM-1/R-IMM-2).
+DEGRADED fail-direction (R7, graph.md R-IMM-1/R-IMM-2) ·
+CAP manufacturer-mapping claim discipline (R10.2, negative slice only;
+see below).
 
 ## Run
 
@@ -57,6 +59,25 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
 ## NOT TESTED (explicit gaps — remain gaps)
 
+- QIP-R10.2 provenance (explicitly untestable in this suite):
+  QIP-CAP-01/02 test only the testable slice of R10.2 — an adapter must
+  expose an explicit manufacturer_mapping_declaration() (silence is
+  NOT TESTED via the manufacturer_mapping_declared capability, never a
+  pass), a non-claim must carry no mappings, and any claimed mapping
+  must name its kind (stop/status/reset), manufacturer interface and a
+  non-empty recorded source. The suite cannot verify that a cited
+  source is genuinely manufacturer-provided, current, or applicable to
+  a given product/firmware: that ground truth lives in manufacturer
+  material outside this runtime, and an adapter could cite a plausible
+  but false source and still pass the shape check. Verifying provenance
+  requires recorded manufacturer-material review (e.g. the registry /
+  capability-tuple record), not a conformance run. Passing CAP-01/02 is
+  therefore candidate evidence only; it does not amend QIP-v0.1
+  section 11 traceability (that amendment belongs to the profile owner
+  under the section 11 procedure), and QIP-R10.2 stays UNIMPLEMENTED.
+  QIP-R10.1 (declaring supported kinds/scope/status/reset semantics) is
+  likewise not traced by CAP: a mapping non-claim is not a capability
+  declaration.
 - QIP-DEG-03 injection limits: a REAL disk/SQLite persistence failure
   (injection flips the app's degraded flag, it does not corrupt storage),
   and a REAL Rust secure-core rejection of a signed envelope (injection
