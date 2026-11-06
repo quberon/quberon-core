@@ -51,6 +51,28 @@ Run it
   python3 bundle_check.py ../tools/quberon-verify/tests/fixtures/simulated-stop.qeb
   python3 -m pytest test_bundle_conformance.py -q     # from this directory
 
+Second independent verifier (ind-3 cross-verifier)
+---------------------------------------------------
+  independent_verify.py   second stdlib-only verifier, written from
+                          SPEC.md without reading the Rust source and
+                          without importing/loading tools/quberon-verify
+                          or bundle_check.py above. Ed25519 verification
+                          uses extended twisted-Edwards coordinates.
+                          Usage: python3 independent_verify.py <bundle.qeb>
+                          (exit 0 PASS_LIMITED_CLAIMS, 1 REJECT, 2 usage)
+  test_cross_verifier.py  differential suite, F2 pattern: exact parity
+                          (verdict, exit code, checks, errors, supported /
+                          unsupported claims) on both committed fixtures,
+                          verdict parity on a deterministic mutation
+                          corpus, exact error parity on the curated subset.
+  SPEC-DEFECTS.md         SD-1..SD-9: every place SPEC.md alone cannot
+                          adjudicate a second implementation (missing
+                          supported-claims list, undefined error codes,
+                          comparison tokens, unchecked attestation fields,
+                          reference crashes on malformed JSON types, ...).
+                          A disagreement is recorded there as a spec
+                          defect, never silently coded around.
+
 Rebuild-and-resign limitation (read this before trusting any PASS)
 ------------------------------------------------------------------
 EB-RESIGN-01 is a limitation disclosure, not a security claim. An attacker
