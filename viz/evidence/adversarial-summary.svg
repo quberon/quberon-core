@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="422" viewBox="0 0 1060 422">
+<metadata>title=Adversarial defect classes and escapes - summary.json; band=SYNTHETIC; source=research/adversarial/results/summary.json sha256=36ec94d65701971f247e8706bf4eff2facad1887411ac789bdd9d631d1508349; git_commit=7fd9ea5bfb8f702219d8c4f92bec711d2e716003; utc=2026-11-06T09:42:56Z</metadata>
+<rect x="0" y="0" width="100%" height="100%" fill="#ffffff"/>
+<text x="10.0" y="22.0" font-family="sans-serif" font-size="15" fill="#1f2328" text-anchor="start" font-weight="bold">Adversarial defect classes and escapes - summary.json</text>
+<rect x="870" y="6" width="180" height="20" rx="4" fill="#8250df"/>
+<text x="960.0" y="20.0" font-family="sans-serif" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">SYNTHETIC</text>
+<text x="10.0" y="42.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">source: research/adversarial/results/summary.json  sha256: 36ec94d65701971f247e8706bf4eff2facad1887411ac789bdd9d631d1508349</text>
+<text x="10.0" y="56.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">git_commit: 7fd9ea5bfb8f702219d8c4f92bec711d2e716003  utc: 2026-11-06T09:42:56Z</text>
+<text x="10.0" y="70.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">total_results: 63012  escapes listed: 300  s0_violations: []  (template corpus, same-author validator: weak evidence, see source repo evidence)</text>
+<line x1="10" y1="84" x2="1050" y2="84" stroke="#d0d7de"/>
+<text x="260.0" y="100.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">bar: invariant violations per class (max 200)</text>
+<text x="10.0" y="126.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">authority-social-framing</text>
+<rect x="260" y="116.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="126.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=500 accepted_in_error=0 rejected=878 worst=None</text>
+<text x="10.0" y="146.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">benign-control</text>
+<rect x="260" y="136.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="146.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=502 accepted_in_error=0 rejected=370 worst=None</text>
+<text x="10.0" y="166.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">capability-escalation</text>
+<rect x="260" y="156.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="166.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=501 accepted_in_error=0 rejected=1002 worst=None</text>
+<text x="10.0" y="186.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">direct-instruction-injection</text>
+<rect x="260" y="176.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="186.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=500 accepted_in_error=0 rejected=892 worst=None</text>
+<text x="10.0" y="206.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">encoding-homoglyph</text>
+<rect x="260" y="196.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="206.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=500 accepted_in_error=0 rejected=1000 worst=None</text>
+<text x="10.0" y="226.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">envelope-schema-abuse</text>
+<rect x="260" y="216.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="226.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=500 accepted_in_error=0 rejected=568 worst=None</text>
+<text x="10.0" y="246.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">latch-reset-targeting</text>
+<rect x="260" y="236.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="246.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=501 accepted_in_error=0 rejected=742 worst=None</text>
+<text x="10.0" y="266.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">malformed-nonobject-json</text>
+<rect x="260" y="256.0" width="470.0" height="12" fill="#cf222e"/>
+<text x="736.0" y="266.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=200 escapes=200 cases=501 accepted_in_error=0 rejected=1002 worst=S1</text>
+<text x="10.0" y="286.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">multilingual-obfuscated</text>
+<rect x="260" y="276.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="286.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=500 accepted_in_error=0 rejected=1000 worst=None</text>
+<text x="10.0" y="306.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">mutation</text>
+<rect x="260" y="296.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="306.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=50000 accepted_in_error=0 rejected=29326 worst=None</text>
+<text x="10.0" y="326.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">oversize-resource</text>
+<rect x="260" y="316.0" width="235.0" height="12" fill="#cf222e"/>
+<text x="501.0" y="326.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=100 escapes=100 cases=500 accepted_in_error=0 rejected=880 worst=S3</text>
+<text x="10.0" y="346.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">plausible-out-of-scope</text>
+<rect x="260" y="336.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="346.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=500 accepted_in_error=0 rejected=1000 worst=None</text>
+<text x="10.0" y="366.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">provenance-spoofing</text>
+<rect x="260" y="356.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="366.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=500 accepted_in_error=0 rejected=658 worst=None</text>
+<text x="10.0" y="386.0" font-family="monospace" font-size="10" fill="#1f2328" text-anchor="start" font-weight="normal">type-confusion</text>
+<rect x="260" y="376.0" width="0.0" height="12" fill="#d0d7de"/>
+<text x="266.0" y="386.0" font-family="monospace" font-size="9" fill="#1f2328" text-anchor="start" font-weight="normal">viol=0 escapes=0 cases=501 accepted_in_error=0 rejected=1002 worst=None</text>
+<text x="10.0" y="408.0" font-family="monospace" font-size="9" fill="#57606a" text-anchor="start" font-weight="normal">Escape counts are counted here from this file's escapes[] list by class; violations/accepted_in_error are read from by_class.</text>
+</svg>
