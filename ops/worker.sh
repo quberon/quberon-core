@@ -47,6 +47,18 @@ if ! command -v "$HERMES_BIN" >/dev/null 2>&1; then
   exit 127
 fi
 
+# Detachment preflight. Linux hosts usually ship setsid(1); macOS does not.
+# Perl is part of the base macOS install and POSIX::setsid gives the same
+# new-session semantics. Fail before claiming a worker started.
+if command -v setsid >/dev/null 2>&1; then
+  DETACH=(setsid)
+elif command -v perl >/dev/null 2>&1; then
+  DETACH=(perl -MPOSIX -e 'POSIX::setsid() or die "setsid failed"; exec { $ARGV[0] } @ARGV' --)
+else
+  echo "worker: no detachment mechanism available (need setsid or perl)" >&2
+  exit 127
+fi
+
 CMD=("$HERMES_BIN" chat --oneshot --query-file "$PROMPT" --in "$TREE" --provider meta-ai -Q)
 [ -n "$MODEL" ] && CMD+=(-m "$MODEL")
 
@@ -63,10 +75,10 @@ CMD=("$HERMES_BIN" chat --oneshot --query-file "$PROMPT" --in "$TREE" --provider
 
 cd "$TREE" || exit 1
 
-# setsid: new session, so no shared process group with the supervisor.
-# caffeinate -is: keep the machine awake while this runs.
+# "${DETACH[@]}" starts a new session, so no shared process group with the
+# supervisor. caffeinate -is: keep the machine awake while this runs.
 # The exit code is appended so harvest can tell a crash from a clean finish.
-setsid nohup bash -c '
+"${DETACH[@]}" nohup bash -c '
   caffeinate -is "$@" >> "'"$LOG"'" 2>&1
   rc=$?
   printf "%s [worker] exit rc=%s\n" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$rc" >> "'"$LOG"'"

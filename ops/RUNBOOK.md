@@ -29,26 +29,27 @@ Verified directly on this Mac:
    verified "fast" model exists on this install, so `ops/config.json`
    intentionally maps both model tiers to the same verified model.
 
-### Worker detachment blocker
+### Worker detachment — corrected and verified
 
-`ops/worker.sh` was updated to the real command above and probed with a
-throwaway prompt. It reported `started pid=...` and exited `0`, but the log
-contains:
+The first probe found a genuine macOS defect in the supplied worker:
 
 ```text
 ops/worker.sh: line 69: setsid: command not found
 ```
 
 macOS on this host has no `setsid` binary (`/usr/bin/setsid`,
-`/bin/setsid`, and `/opt/homebrew/bin/setsid` are all absent). Therefore the
-worker's survive-the-launcher property is **not verified**, and the launcher
-can falsely report success after the detached command fails to start.
-`ops/config.json` therefore keeps `hermes.verified: false`.
+`/bin/setsid`, and `/opt/homebrew/bin/setsid` are all absent), and the
+worker initially reported a start even though the detached command had
+not run. `ops/worker.sh` now preflights detachment: it uses `setsid(1)`
+when present and otherwise falls back to base-system Perl
+`POSIX::setsid`, failing before it claims a worker started.
 
-Do not install or trust the launchd supervisor for unattended dispatch
-until the detachment mechanism is corrected for macOS and retested:
-a worker must complete after its launcher exits, and a failed launch must
-not be recorded as started.
+Detached proof on 2026-11-06: the launcher returned in 0 seconds; the
+worker process had PPID 1 and its own process group; it slept inside the
+agent task, wrote `/tmp/quberon-detached-proof.txt` at
+`2026-11-06T10:16:09Z`, printed `DETACHED_WORKER_DONE`, and the worker log
+recorded `exit rc=0`. Therefore `ops/config.json` sets
+`hermes.verified: true` for the invocation and worker detachment.
 
 ## Host path note
 

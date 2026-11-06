@@ -30,7 +30,7 @@
     "require_both_modes": true
   },
   "hermes": {
-    "_comment": "Command form verified 2026-11-06, but worker detachment is NOT verified on this Mac: setsid is absent, so ops/worker.sh cannot yet satisfy the survive-launcher requirement. Do not trust for unattended dispatch until corrected and retested. See ops/RUNBOOK.md.",
+    "_comment": "Verified 2026-11-06 on macOS: hermes chat --oneshot --query-file reads the prompt from file, requires no TTY, exits 0 on success and 1 on an invalid provider, and ops/worker.sh detached proof completed after the launcher exited. See ops/RUNBOOK.md.",
     "command": [
       "hermes",
       "chat",
@@ -45,6 +45,6 @@
       "-m",
       "{model}"
     ],
-    "verified": false
+    "verified": true
   }
 }
