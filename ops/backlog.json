@@ -744,6 +744,24 @@
       "note": "Blocked until cam-2 produces frames. Shadow mode only: a learned or camera-fed path may propose STOP into the authenticated intervention path and may never reset, unlatch, resume or command motion. Real frames do not upgrade QIP-R9.x; the profile owner amends traceability under section 11, not this node.",
       "created_utc": "2026-11-06T11:12:36Z",
       "attempts": 0
+    },
+    {
+      "id": "viz-4-github-frontpage",
+      "title": "Publish the generated visualization on the GitHub front page: embed the generated truth map / evidence SVG in README.md so it is visible on the repository landing page, with its evidence band, source paths, source sha256, commit and UTC visible or one click away. Link to the viz/ artefacts and the underlying evidence, never to a hand-edited image. Do not add any capability claim that the generated figure does not support; components that are gaps in the truth map must remain visibly gaps on the front page. Blocked until viz-1 and viz-2 have produced the generated SVG artefacts.",
+      "source": "manual:viz-frontpage",
+      "tier": 1,
+      "priority": 24,
+      "model": "design",
+      "owns": [
+        "README.md",
+        "progress/viz-4-github-frontpage.md"
+      ],
+      "gate": "python -m pytest viz/tests -q",
+      "status": "blocked",
+      "needs_scoping": false,
+      "note": "Front page means README.md on the default branch. The published figure must be the generated artefact, not a screenshot or hand redraw; regeneration instructions stay in viz/README.md.",
+      "created_utc": "2026-11-06T11:15:51Z",
+      "attempts": 0
     }
   ]
 }
