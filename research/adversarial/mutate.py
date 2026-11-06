@@ -136,8 +136,10 @@ def generate_mutations(control_cases, target=5000):
             seen.add(h)
             out.append({"id": f"mut-{len(out):05d}", "class": "mutation",
                         "subclass": op,
-                        "generator": {"model": "none-deterministic-mutation",
-                                      "provider": "none-offline", "seed": 20261105},
+                        "generator": {"model": "none-programmatic-templates",
+                                      "provider": "none-offline", "seed": 20261105,
+                                      "sees_implementation": False,
+                                      "lineage": "legacy-pre-split-deterministic-mutation (runtime reads no implementation source; author lineage shared with validator - not independent evidence)"},
                         "payload": raw, "expectation": exp,
                         "rationale": f"deterministic mutation {op} of benign control case"})
             if len(out) >= target:

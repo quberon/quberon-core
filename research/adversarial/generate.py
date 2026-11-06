@@ -1,5 +1,12 @@
 """Deterministic offline TEMPLATE corpus generator. No model, no live provider.
 
+LEGACY (pre-split) generator: superseded for new adversarial work by
+adversary.py, the ind-1 split adversary that consumes only the public
+interface + QIP. This module is retained so the prior corpora remain
+regenerable and so regression tests can import payload_for. Do not cite
+output of this module as independent-adversary evidence: the prior
+corpora were authored in the same lineage as the validator.
+
 WEAK EVIDENCE WARNING: these templates and the validator under test were
 authored by the same agent. A template corpus can only find failures its
 author already imagined; it is weak evidence about a real adversary.
@@ -22,7 +29,9 @@ from pathlib import Path
 SEED = 20261105
 ROBOT = "quberon-demo-001"
 OUT = Path(__file__).parent / "corpus"
-GEN = {"model": "BLOCKED-no-real-model-template-corpus", "provider": "none-offline-templates",
+GEN = {"model": "none-programmatic-templates", "provider": "none-offline-templates",
+       "sees_implementation": False,
+       "lineage": "legacy-pre-split-template-generator (runtime reads no implementation source; author lineage shared with validator - not independent evidence)",
        "utc": "2026-11-05T00:00:00Z", "seed": SEED}
 
 CLASSES = [
