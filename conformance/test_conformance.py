@@ -11,7 +11,7 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-STATE-01..03     command vs observed state      (R6)
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
   QIP-PROP-01..03      proposal (planner) boundary    (frontier rule)
-  QIP-DEG-01..03       degraded / fail-direction      (R7)
+  QIP-DEG-01..04       degraded / fail-direction      (R7)
 
 A skipped test is NOT TESTED, not a pass. See README.md NOT TESTED section.
 """
@@ -229,3 +229,59 @@ def test_QIP_DEG_03_persistence_failure_and_reachable_refusal(
     events = refusing.events("operator").body["events"]
     match = [e for e in events if e["id"] == r.command_id]
     assert len(match) == 1 and match[0]["auth_result"] == "secure_core_rejected"
+
+
+def test_QIP_DEG_04_unavailable_and_reachable_refusal_are_distinct(
+        adapter_no_core, adapter_refusing_core):
+    # QIP-R7.1 (AUTHORIZE): authority unavailability and reachable refusal
+    # MUST be recorded and returned as distinct outcomes, with distinct
+    # operator-facing meaning. DEG-01 covers unavailability alone and
+    # DEG-03 refusal alone; this test issues the SAME operation (operator
+    # STOP) against both states and asserts the outcomes never collapse
+    # into one another in any returned or recorded field. This supports
+    # (does not amend) the QIP-v0.1 traceability row for QIP-R7.1, whose
+    # amendment is reserved to the profile owner (QIP-v0.1 section 11).
+    _needs_injection(adapter_refusing_core, "secure_core_refusal_injectable")
+
+    unavailable = adapter_no_core.stop("operator", "qip-deg-04-unavailable")
+    refusing = adapter_refusing_core.stop("operator", "qip-deg-04-refusal")
+
+    # Returned outcome: unavailability permits the STOP unsigned
+    # (200/ACKNOWLEDGED, explicitly "unavailable"); reachable refusal
+    # fails closed (503/UNKNOWN, explicitly "rejected").
+    assert unavailable.status_code == 200
+    assert unavailable.command_state == "ACKNOWLEDGED"
+    assert unavailable.secure_core_status == "unavailable"
+    assert refusing.status_code == 503
+    assert refusing.command_state == "UNKNOWN"
+    assert refusing.observed_state == "UNKNOWN"
+    assert refusing.secure_core_status == "rejected"
+
+    # The two outcomes are pairwise distinct on every operator-facing
+    # field, and neither borrows the other's secure-core label.
+    assert unavailable.status_code != refusing.status_code
+    assert unavailable.command_state != refusing.command_state
+    assert unavailable.secure_core_status != refusing.secure_core_status
+    assert unavailable.observed_state != refusing.observed_state
+    assert unavailable.body.get("detail") != refusing.body.get("detail")
+    assert refusing.body.get("detail")  # refusal explains itself, not silent
+
+    # Both retain the latch, but for opposite recorded reasons.
+    assert unavailable.stop_latched is True
+    assert refusing.stop_latched is True
+
+    # Recorded outcome: exactly one audit event per STOP, with distinct
+    # auth_result values -- "UNSIGNED/core_unavailable" vs
+    # "secure_core_rejected" -- so the distinction survives in evidence,
+    # not only in the transient response.
+    def _auth_result(adapter, command_id):
+        events = adapter.events("operator").body["events"]
+        match = [e for e in events if e["id"] == command_id]
+        assert len(match) == 1
+        return match[0]["auth_result"]
+
+    unavailable_auth = _auth_result(adapter_no_core, unavailable.command_id)
+    refusing_auth = _auth_result(adapter_refusing_core, refusing.command_id)
+    assert unavailable_auth == "UNSIGNED/core_unavailable"
+    assert refusing_auth == "secure_core_rejected"
+    assert unavailable_auth != refusing_auth

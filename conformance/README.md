@@ -34,6 +34,23 @@ retained, observed UNKNOWN, stop/task/reset all 503; reachable refusal
 -> stop 503, secure_core_status "rejected" (distinct from DEG-01
 "unavailable"), command/observed UNKNOWN, latch retained, audit
 auth_result "secure_core_rejected".
+
+## QIP-R7.1 distinctness (QIP-DEG-04)
+
+QIP-DEG-04 issues the same operator STOP against the no-core
+(unavailable) and refusing-core (reachable refusal) adapters and asserts
+the outcomes are pairwise distinct in every returned field (status_code,
+command_state, observed_state, secure_core_status "unavailable" vs
+"rejected", detail) and in the recorded audit auth_result
+("UNSIGNED/core_unavailable" vs "secure_core_rejected", exactly one event
+per STOP). DEG-01/DEG-03 cover each state alone; DEG-04 covers their
+non-collapse, which is the QIP-R7.1 requirement. This supports (does not
+amend) the QIP-v0.1 section 11 traceability row for QIP-R7.1: that
+amendment belongs to the profile owner, and QIP-R7.1 stays UNIMPLEMENTED
+in QIP-v0.1.md until the owner runs it. DEG-04 needs no Rust binary
+(both fixtures are core-less / stub-authority), so it runs in both
+with-Rust and without-Rust configurations; its refusal side is still
+subject to the stub-authority limit in NOT TESTED below.
 - test_conformance.py — the suite. Stable test IDs QIP-<CLASS>-<nn> are in
   every test function name; N5 and later nodes reference them verbatim.
   Do not renumber; append new IDs only.
