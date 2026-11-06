@@ -1,0 +1,13 @@
+cases=6 unique_payloads=6 paths=direct,endpoint
+{
+  "total_results": 12,
+  "escapes": 0,
+  "overblocked": 0,
+  "benign": {
+    "results": 4,
+    "accept_expected": 4,
+    "rejected_in_error": 0,
+    "false_reject_rate": 0.0
+  },
+  "s0": 0
+}
