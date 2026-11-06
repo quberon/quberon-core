@@ -3,7 +3,7 @@
 NODE: viz-3-stop-path-animation
 TIER: 1
 BRANCH: node/viz-3-stop-path-animation
-COMMITS: see final PR (code commit + this progress commit; hashes in final report)
+COMMITS: f639261 (code + output + this file as first committed); PR #53. Any later hash is this progress-file amendment — see git log on the branch.
 STATUS: complete (gate green locally; PR to be opened, not self-merged)
 
 ## What was built
