@@ -37,5 +37,5 @@ no model training, no sensor qualification claim (QIP-R9.3, R11.2).
 - Example generator run twice: identical sha256 (above).
 
 ## PR
-PR: TBD (filled in on this branch before merge; see final report).
-CI: TBD.
+PR #38 https://github.com/quberon/quberon-core/pull/38
+CI: pending at push; final verdict in PR / final report.
