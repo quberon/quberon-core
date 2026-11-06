@@ -120,6 +120,26 @@ class AdapterUnderTest:
         """
         raise NotImplementedError
 
+    # --- Non-intervention saturation (QIP-INT-06, QIP-R3.1 partial) -----
+    # Same injection contract as above: call before the operation under
+    # test, on a fresh adapter; the saturated state persists for the rest
+    # of that adapter's life. Scope is deliberately narrow: this saturates
+    # the adapter's declared non-intervention (planner/proposal) capacity
+    # only. It does NOT saturate status reads, task submission, network,
+    # or any shared lock/threadpool, and a pass therefore does not by
+    # itself satisfy QIP-R3.1 (see README.md NOT TESTED).
+    def saturate_non_intervention_traffic(self) -> None:
+        """Saturate the non-intervention (planner/proposal) capacity.
+
+        Expected neutral semantics afterwards are the adapter's own
+        bounded-refusal contract; for quberon-core: further proposals
+        return provider_status "busy" immediately, while STOP remains
+        serviceable. An adapter that cannot saturate this capacity MUST
+        leave the capability False and MUST raise NotImplementedError
+        here; the suite then reports NOT TESTED (skip), never a pass.
+        """
+        raise NotImplementedError
+
     def inject_secure_core_refusal(self) -> None:
         """Make the authorising authority REACHABLE but REFUSING.
 
@@ -138,4 +158,5 @@ class AdapterUnderTest:
         return {
             "persistence_failure_injectable": False,
             "secure_core_refusal_injectable": False,
+            "non_intervention_saturation_injectable": False,
         }

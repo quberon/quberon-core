@@ -93,6 +93,7 @@ class QuberonCoreAdapter(AdapterUnderTest):
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
+            "non_intervention_saturation_injectable": True,
         }
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
@@ -108,6 +109,22 @@ class QuberonCoreAdapter(AdapterUnderTest):
 
     def inject_secure_core_refusal(self) -> None:
         self._app.state.secure_core = _RefusingSecureCore()
+
+    def saturate_non_intervention_traffic(self) -> None:
+        # Hold every planner slot for the rest of this adapter's life.
+        # This is the same BoundedSemaphore(2) the app's own planner gate
+        # (app.main plan handler) and tests/test_app.py's planner-gate
+        # test use: with no slot free, the next proposal takes the app's
+        # existing non-blocking "busy" branch. No app/control-path code
+        # is changed, no provider call is made, and STOP does not touch
+        # this semaphore (app.main execute_stop), which is exactly the
+        # isolation QIP-INT-06 observes. It saturates nothing else.
+        sem = self._app.state.plan_semaphore
+        held = 0
+        while sem.acquire(blocking=False):
+            held += 1
+        assert held > 0, "planner semaphore had no slots to saturate"
+        self._planner_slots_held = held
 
     # -- neutral surface ---------------------------------------------------
     def status(self, role):
