@@ -97,6 +97,20 @@ class AdapterUnderTest:
     def events(self, role: str) -> NeutralResult:
         raise NotImplementedError
 
+    def restart(self) -> None:
+        """Restart the system under test, preserving its durable state.
+
+        Implementation-neutral: how restart happens (new app instance on
+        the same durable store, service restart, ...) is the adapter's
+        business. The suite only observes neutral results afterwards.
+        After restart the adapter must be usable through the same neutral
+        surface (re-authenticated if its sessions do not survive). An
+        adapter that cannot restart MUST leave the ``restartable``
+        capability False and MUST raise NotImplementedError here; the
+        suite then reports restart NOT TESTED (skip), never a pass.
+        """
+        raise NotImplementedError
+
     # --- Implementation-neutral fault injection (QIP-DEG-03) -------------
     # These are the injection points the original interface lacked. They
     # name STATES, not mechanisms: how an adapter puts its system into the
@@ -136,6 +150,7 @@ class AdapterUnderTest:
     # A False capability is a NOT TESTED gap in the report, never a pass.
     def capabilities(self) -> Dict[str, bool]:
         return {
+            "restartable": False,
             "persistence_failure_injectable": False,
             "secure_core_refusal_injectable": False,
         }

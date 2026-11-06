@@ -7,7 +7,7 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-ID-01..04        identity & target scope        (outline R1)
   QIP-AUTH-01..04      authentication/authorization   (R2)
   QIP-INT-01..05       intervention & idempotency     (R3/R4/R9, partial)
-  QIP-LATCH-01..03     latching & reset separation    (R5)
+  QIP-LATCH-01..04     latching & reset separation    (R5)
   QIP-STATE-01..03     command vs observed state      (R6)
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
   QIP-PROP-01..03      proposal (planner) boundary    (frontier rule)
@@ -116,6 +116,44 @@ def test_QIP_LATCH_03_admin_reset_unlatches_without_starting_task(adapter):
     assert adapter.status("admin").stop_latched is False
     # Reset alone starts nothing: a subsequent explicit stop re-latches.
     assert adapter.stop("operator", "qip-latch-03").stop_latched is True
+
+
+def _needs_restart(adapter):
+    if not adapter.capabilities().get("restartable"):
+        pytest.skip("NOT TESTED in this run: restartable is False, so "
+                    "restart persistence cannot be exercised through "
+                    "this adapter")
+
+
+def test_QIP_LATCH_04_stop_latch_persists_across_restart(adapter):
+    # QIP-R5.1 candidate trace. This test does NOT amend QIP-v0.1
+    # Section 11 (that amendment belongs to the profile owner); it only
+    # supplies a passing conformance identifier for the owner to verify.
+    #
+    # Non-vacuity: quberon-core's fresh-start default is itself latched,
+    # so "stop, restart, still latched" alone could pass on a fresh DB.
+    # Requiring the secure core lets the test first reach the
+    # non-default UNLATCHED state, prove that state survives a restart
+    # (so restart really re-reads durable state, not defaults), and
+    # only then prove an actioned STOP's latch survives a restart.
+    # Without the core this skips: NOT TESTED, never a pass.
+    _needs_restart(adapter)
+    _needs_core(adapter)
+    reset = adapter.reset_latch("admin")
+    assert reset.status_code == 200
+    assert adapter.status("admin").stop_latched is False
+    adapter.restart()
+    assert adapter.status("admin").stop_latched is False
+    r = adapter.stop("operator", "qip-latch-04")
+    assert r.status_code == 200 and r.command_state == "ACKNOWLEDGED"
+    assert r.stop_latched is True
+    adapter.restart()
+    s = adapter.status("operator")
+    assert s.stop_latched is True
+    assert s.observed_state == "SIMULATED_STOPPED"
+    # Still latched after restart: motion-permitting work is refused.
+    assert adapter.submit_task("operator", "SIMULATE_INSPECTION").status_code == 409
+    assert adapter.status("operator").stop_latched is True
 
 
 # ------------------------------------------------------------- STATE (R6)
