@@ -70,7 +70,7 @@ Installing collected packages: typing-extensions, qrcode, python-multipart, plug
 Successfully installed Pillow-11.0.0 annotated-types-0.8.0 anyio-4.16.0 certifi-2026.10.23 click-8.5.0 fastapi-0.115.6 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pydantic-2.14.3 pydantic-core-2.50.4 pytest-8.3.4 python-multipart-0.0.20 qrcode-8.0 starlette-0.41.3 typing-extensions-4.16.0 typing-inspection-0.4.5 uvicorn-0.34.0
 
 [notice] A new release of pip is available: 24.0 -> 26.3
-[notice] To update, run: /private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-lEc9Um/clone/.venv/bin/python -m pip install --upgrade pip
+[notice] To update, run: /private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-1VNaHv/clone/.venv/bin/python -m pip install --upgrade pip
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.02s
 .venv/bin/python -m pytest -q
 ........................................................................ [ 34%]
@@ -78,11 +78,11 @@ Successfully installed Pillow-11.0.0 annotated-types-0.8.0 anyio-4.16.0 certifi-
 ...................................................................      [100%]
 =============================== warnings summary ===============================
 .venv/lib/python3.11/site-packages/starlette/testclient.py:40
-  /private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-lEc9Um/clone/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+  /private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-1VNaHv/clone/.venv/lib/python3.11/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
     _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
 
 <frozen importlib._bootstrap>:283
   <frozen importlib._bootstrap>:283: DeprecationWarning: the load_module() method is deprecated and slated for removal in Python 3.12; use exec_module() instead
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-211 passed, 2 warnings in 43.32s
+211 passed, 2 warnings in 43.18s

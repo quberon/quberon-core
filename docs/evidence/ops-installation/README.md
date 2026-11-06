@@ -1,8 +1,8 @@
 # Gate evidence: ops-installation
 
-- commit: `f9b485d29ff0c9410341c050b6f02d876ce8b5ad`
+- commit: `5f0443cd734f57f53f21fa6ec1cd1506dd4018c2`
 - branch: `ops/installation`
-- UTC: 2026-11-06T09:50:39Z
+- UTC: 2026-11-06T10:18:27Z
 - host: Quberon1.local, Darwin 24.3.0
 - result: PASS
 

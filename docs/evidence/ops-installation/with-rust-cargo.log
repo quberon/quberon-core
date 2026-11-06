@@ -6,53 +6,53 @@
    Compiling rustix v1.1.6
    Compiling fastrand v2.5.0
    Compiling autocfg v1.5.1
-   Compiling bit-vec v0.10.1
    Compiling quick-error v1.2.3
    Compiling fnv v1.0.7
-   Compiling ahash v0.8.12
+   Compiling bit-vec v0.10.1
    Compiling chacha20 v0.10.2
    Compiling rand_xorshift v0.5.0
+   Compiling ahash v0.8.12
    Compiling unarray v0.1.4
-   Compiling bit-set v0.11.1
    Compiling core_detect v1.0.0
-   Compiling hashbrown v0.14.5
    Compiling regex-syntax v0.8.11
+   Compiling bit-set v0.11.1
+   Compiling hashbrown v0.14.5
    Compiling num-traits v0.2.19
    Compiling hashlink v0.9.1
    Compiling rusqlite v0.32.1
+   Compiling getrandom v0.2.17
    Compiling errno v0.3.14
    Compiling cpufeatures v0.2.17
-   Compiling getrandom v0.2.17
-   Compiling wait-timeout v0.2.1
    Compiling sha2 v0.10.9
    Compiling rand_core v0.6.4
+   Compiling wait-timeout v0.2.1
    Compiling rand v0.10.3
    Compiling ed25519-dalek v2.2.0
-   Compiling quberon-secure-core v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-lEc9Um/clone/crates/quberon-secure-core)
+   Compiling quberon-secure-core v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-1VNaHv/clone/crates/quberon-secure-core)
    Compiling tempfile v3.27.0
-   Compiling quberon-secure-core-cli v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-lEc9Um/clone/apps/quberon-secure-core-cli)
+   Compiling quberon-secure-core-cli v0.1.0 (/private/var/folders/nk/gpyf0s3538j3bs6jp9syqv5m0000gn/T/quberon-gate-ops-installation-1VNaHv/clone/apps/quberon-secure-core-cli)
    Compiling rusty-fork v0.3.1
    Compiling proptest v1.12.0
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.01s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.97s
      Running unittests src/lib.rs (target/debug/deps/quberon_secure_core-84c212d92b2da0fe)
 
 running 14 tests
 test tests::audit_hash_is_deterministic_and_sensitive ... ok
 test tests::read_only_and_missing_db_paths_never_accept ... ok
 test tests::audit_capacity_fails_closed_without_growth ... ok
-test tests::anchor_fault_and_missing_anchor_never_accept ... ok
 test tests::accepts_valid_then_replay_rejected ... ok
+test tests::anchor_fault_and_missing_anchor_never_accept ... ok
 test tests::audit_tamper_rejects_next_authorization ... ok
 test tests::epoch_binding_rejects_old_epoch_and_preserves_sequence ... ok
 test tests::real_sqlite_write_failure_via_trigger_never_accepts ... ok
-test tests::revoked_and_out_of_window_keys_rejected_rotation_accepted ... ok
 test tests::rejects_expired_future_long_validity_and_tamper ... ok
-test tests::anchor_detects_rollback_to_older_valid_db ... ok
+test tests::revoked_and_out_of_window_keys_rejected_rotation_accepted ... ok
 test tests::fault_injection_never_accepts ... ok
+test tests::anchor_detects_rollback_to_older_valid_db ... ok
 test tests::mutated_valid_envelope_never_accepts_without_resigning ... ok
 test tests::arbitrary_bytes_never_panic_and_never_accept ... ok
 
-test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
 
      Running unittests src/main.rs (target/debug/deps/quberon_secure_core_cli-0f9c968a71aa07d4)
 
@@ -67,7 +67,7 @@ test malformed_and_oversized_input_rejected_without_crash ... ok
 test subprocess_sign_authorize_replay_and_tamper ... ok
 test epoch_mismatch_and_anchor_rollback_via_cli ... ok
 
-test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
 
    Doc-tests quberon_secure_core
 
