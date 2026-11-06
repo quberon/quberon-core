@@ -6,7 +6,10 @@ swapping the fixtures in conftest.py. This run binds quberon-core.
 Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-ID-01..04        identity & target scope        (outline R1)
   QIP-AUTH-01..04      authentication/authorization   (R2)
-  QIP-INT-01..05       intervention & idempotency     (R3/R4/R9, partial)
+  QIP-INT-01..06       intervention & idempotency     (R3/R4/R9, partial;
+                       INT-06 is the QIP-R1.3 test and is NOT TESTED
+                       unless the adapter reports a system-sourced
+                       QIP-R10.1 kind declaration -- see its docstring)
   QIP-LATCH-01..03     latching & reset separation    (R5)
   QIP-STATE-01..03     command vs observed state      (R6)
   QIP-AUDIT-01..03     audit/evidence records         (R8, partial)
@@ -92,6 +95,46 @@ def test_QIP_INT_05_audit_only_kind_never_triggers_stop(adapter):
     before = adapter.status("operator").stop_latched
     r = adapter.intervene("operator", "PANIC_CANDIDATE", "qip-int-05")
     assert r.status_code == 200 and r.body["stop_triggered"] is False
+    assert adapter.status("operator").stop_latched == before
+
+
+def test_QIP_INT_06_undeclared_intervention_kind_rejected(adapter):
+    """QIP-R1.3: reject a kind not declared under QIP-R10.1.
+
+    Explicitly NOT TESTED for quberon-core in this run. R1.3 is defined
+    relative to a QIP-R10.1 declaration, and neither the neutral
+    interface's system under test nor quberon-core's status surface
+    exposes such a declaration (the status "capabilities" field lists
+    role permissions, not intervention kinds; QIP-R10.1 itself is
+    UNIMPLEMENTED in QIP-v0.1 Section 11). The app does return 400 for
+    a kind string outside its internal enum, but that is only partial
+    coverage: without a system-sourced declaration a test cannot tell
+    rejection-because-undeclared from rejection-because-not-in-a-
+    hardcoded-enum, cannot exercise a kind declared as unsupported,
+    and cannot exercise an adapter that declares only a subset of
+    kinds. Hardcoding that enum in this suite or in the adapter would
+    fabricate the declaration. Partial coverage stays UNIMPLEMENTED;
+    this test therefore skips (NOT TESTED, never a pass) until an
+    adapter reports intervention_kinds_declared=True with a
+    declaration sourced from its system under test.
+    """
+    if not adapter.capabilities().get("intervention_kinds_declared"):
+        pytest.skip(
+            "NOT TESTED: QIP-R1.3 requires a QIP-R10.1 intervention-kind "
+            "declaration sourced from the system under test; this adapter "
+            "reports intervention_kinds_declared=False, so rejection of "
+            "undeclared kinds cannot be verified (unknown-string 400s "
+            "alone are partial coverage and stay UNIMPLEMENTED)")
+    declared = adapter.declared_intervention_kinds()
+    assert isinstance(declared, dict), "declared kinds must be a mapping"
+    supported = set(declared.get("supported") or [])
+    assert supported, "declaration must name at least one supported kind"
+    undeclared = "QIP_KIND_NOT_DECLARED"
+    assert undeclared not in supported
+    before = adapter.status("operator").stop_latched
+    r = adapter.intervene("operator", undeclared, "qip-int-06")
+    assert 400 <= r.status_code < 500
+    assert r.body.get("stop_triggered") is not True
     assert adapter.status("operator").stop_latched == before
 
 
