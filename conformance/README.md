@@ -57,6 +57,26 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
 ## NOT TESTED (explicit gaps — remain gaps)
 
+- QIP-R2.3 (AUTHORIZE) — EXPLICITLY UNTESTABLE by this suite
+  (QIP-AUTH-05, always skipped = NOT TESTED, never a trace, never a
+  pass). R2.3 forbids *representing* application-level authorisation as
+  a safety-rated authorisation architecture or as evidence of physical
+  safety. That predicates over all human-facing representations (docs,
+  UI, exports, logs, marketing, future surfaces), while the neutral
+  adapter can only sample status/stop/task/proposal/intervene/events
+  results, and the profile defines no neutral claim vocabulary whose
+  absence would decide the question. Asserting the quberon binding's
+  sampled payloads contain no forbidden phrase, or carry its
+  implementation-specific disclaimers (`adapter_mode="SIMULATION"`,
+  `safety_notice`, secure-core scope
+  `SIMULATION_ONLY_STOP_AUTHORIZATION`), would be partial coverage and
+  would pass even if an unsampled representation violated R2.3.
+  QIP-AUTH-01 (R2.1) and QIP-AUTH-02/QIP-AUTH-04 (R2.2) do not cover
+  R2.3. It stays UNIMPLEMENTED in QIP-v0.1 Section 11 until the profile
+  owner defines a human claim-audit procedure outside this runtime
+  suite or amends the requirement. This does not assert that quberon
+  makes no such representation anywhere; no such audit was performed
+  here.
 - QIP-DEG-03 injection limits: a REAL disk/SQLite persistence failure
   (injection flips the app's degraded flag, it does not corrupt storage),
   and a REAL Rust secure-core rejection of a signed envelope (injection

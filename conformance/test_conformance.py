@@ -5,7 +5,9 @@ swapping the fixtures in conftest.py. This run binds quberon-core.
 
 Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-ID-01..04        identity & target scope        (outline R1)
-  QIP-AUTH-01..04      authentication/authorization   (R2)
+  QIP-AUTH-01..05      authentication/authorization   (R2; 05 is an
+                       explicitly-untestable record for QIP-R2.3,
+                       skipped = NOT TESTED, never a trace)
   QIP-INT-01..05       intervention & idempotency     (R3/R4/R9, partial)
   QIP-LATCH-01..03     latching & reset separation    (R5)
   QIP-STATE-01..03     command vs observed state      (R6)
@@ -61,6 +63,47 @@ def test_QIP_AUTH_03_stop_without_csrf_rejected(adapter):
 def test_QIP_AUTH_04_operator_with_csrf_may_stop(adapter):
     r = adapter.stop("operator", "qip-auth-04")
     assert r.status_code == 200 and r.command_state == "ACKNOWLEDGED"
+
+
+def test_QIP_AUTH_05_qip_r2_3_representation_claim_untestable():
+    """QIP-R2.3 (AUTHORIZE): application-level authorisation MUST NOT be
+    represented as a safety-rated authorisation architecture or as
+    evidence of physical safety.
+
+    Explicitly UNTESTABLE by this conformance suite -- NOT a trace.
+
+    Reason (recorded 2026-11-06, node qip-qip-r2-3): R2.3 predicates over
+    *representations* -- any human-facing claim, in any medium, at any
+    time -- not over intervention behaviour observable through
+    AdapterUnderTest. The neutral surface can only sample the results of
+    status/stop/task/proposal/intervene/events; it has no operation that
+    enumerates an implementation's documentation, UI text, exports,
+    logs, marketing, or future representations, and the profile defines
+    no neutral vocabulary or phrase list whose absence would decide
+    what counts as "safety-rated authorisation architecture" or
+    "evidence of physical safety" (that classification requires human
+    judgement by the profile owner). Sampling the quberon binding's
+    payloads for forbidden phrases, or asserting its implementation-
+    specific disclaimer fields (adapter_mode="SIMULATION",
+    safety_notice, secure-core scope "SIMULATION_ONLY_STOP_AUTHORIZATION"),
+    would at most prove those sampled payloads carry no such claim
+    today; it would pass even while a representation outside the sampled
+    surface violated R2.3. That is partial coverage, which QIP S.11 and
+    this node both forbid rounding up to a trace.
+
+    QIP-AUTH-01 covers QIP-R2.1 and QIP-AUTH-02/QIP-AUTH-04 cover
+    QIP-R2.2; none of them, and not this skipped record, tests R2.3.
+    R2.3 therefore stays UNIMPLEMENTED in QIP-v0.1 S.11 until the profile
+    owner either defines a claim-audit procedure outside this runtime
+    suite or amends the requirement; this node does not amend it.
+    """
+    pytest.skip(
+        "NOT TESTED -- QIP-R2.3 explicitly untestable by this suite: "
+        "representational claim over all human-facing representations, "
+        "no neutral adapter surface enumerates them and no profile-defined "
+        "claim vocabulary exists; sampled-payload absence would be "
+        "partial coverage, not a trace (see README.md NOT TESTED)"
+    )
 
 
 # ------------------------------------------- INT: intervention (R3/R4/R9)
