@@ -14,6 +14,11 @@ Stable IDs (N5 and later nodes reference these verbatim; do not renumber):
   QIP-DEG-01..03       degraded / fail-direction      (R7)
 
 A skipped test is NOT TESTED, not a pass. See README.md NOT TESTED section.
+QIP-R3.3 (priority MUST NOT be represented as a real-time/physical
+stop-time guarantee) is EXPLICITLY UNTESTABLE via this adapter suite and
+is recorded by an unconditional skip below, not by a stable QIP-* ID:
+it constrains representations, not adapter behaviour, and defines no
+timing threshold. It remains UNIMPLEMENTED; no trace is claimed.
 """
 import pytest
 
@@ -86,6 +91,46 @@ def test_QIP_INT_04_stale_intervention_rejected(adapter):
     r = adapter.intervene("operator", "VOICE_STOP", "qip-int-04",
                           evidence_text="stop", timestamp="2020-01-01T00:00:00+00:00")
     assert r.status_code == 400
+
+
+def test_QIP_R3_3_priority_must_not_be_represented_as_guarantee():
+    """QIP-R3.3 (INTERVENE): priority handling MUST NOT be represented as
+    a real-time or physical stop-time guarantee.
+
+    EXPLICITLY UNTESTABLE via this adapter suite -- recorded, not traced:
+
+    1. Subject mismatch. The requirement constrains *representations*
+       made about the system (in docs, UI, reports, claims by humans or
+       downstream tools), not any runtime behaviour of the system under
+       test. No operation on AdapterUnderTest (status, stop, reset,
+       task, proposal, intervene, events, capabilities, injections)
+       returns a representation/claim about timing guarantees, so no
+       neutral observable exists that this requirement could fail on.
+    2. No threshold to measure against. The profile allocates no
+       response-time budget, deadline, or stop-time value for R3 (see
+       QIP-v0.1 page-one notice), so a latency measurement has no
+       pass/fail criterion for R3.3. Timing runs (e.g. progress/
+       F3-stop-load.md) may inform R3.1/R3.2 but by their own stated
+       scope do not, and cannot, satisfy R3.3.
+    3. Partial observables do not close the gap. That a NeutralResult
+       happens to carry no guarantee field, or that in-repo prose
+       happens to carry a disclaimer, covers only this snapshot and
+       cannot show that priority handling is never represented as a
+       guarantee elsewhere. Partial coverage stays UNIMPLEMENTED;
+       it is not rounded up to a trace.
+
+    What CAN assess R3.3 is human/governance review of claims against
+    raw output (the QIP-R11.1/R11.2 discipline), owned by the profile
+    owner under QIP-v0.1 Section 11 -- not this work node, and not an
+    automated conformance test. QIP-R3.3 therefore remains
+    UNIMPLEMENTED in Section 11; this skip is the explicit record,
+    and a skip is NOT TESTED, never a pass.
+    """
+    pytest.skip(
+        "QIP-R3.3 EXPLICITLY UNTESTABLE via adapter conformance: it "
+        "constrains representations of priority handling, returns no "
+        "neutral observable, and defines no timing threshold; remains "
+        "UNIMPLEMENTED (not a trace, not a pass)")
 
 
 def test_QIP_INT_05_audit_only_kind_never_triggers_stop(adapter):

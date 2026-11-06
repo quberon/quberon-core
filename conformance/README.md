@@ -57,6 +57,22 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
 ## NOT TESTED (explicit gaps — remain gaps)
 
+- QIP-R3.3 (INTERVENE) — EXPLICITLY UNTESTABLE via this suite, recorded
+  by the unconditional skip
+  `test_QIP_R3_3_priority_must_not_be_represented_as_guarantee` in
+  test_conformance.py: the requirement constrains how priority handling
+  is *represented* (it MUST NOT be represented as a real-time or
+  physical stop-time guarantee), not any adapter behaviour. No
+  AdapterUnderTest operation returns a claim/representation about
+  timing guarantees, and the profile allocates no response-time budget
+  or stop-time threshold that a measurement could pass/fail against.
+  Absence of a guarantee field in a NeutralResult, disclaimers in
+  in-repo prose, and latency runs (e.g. progress/F3-stop-load.md,
+  scoped by its own text to R3.1/R3.2) are at most partial coverage
+  and are NOT rounded up to a trace. QIP-R3.3 stays UNIMPLEMENTED in
+  QIP-v0.1 Section 11; amending that table is the profile owner's
+  procedure (Section 11), not this suite's. Assessment, if any, is
+  human/governance review of claims against raw output.
 - QIP-DEG-03 injection limits: a REAL disk/SQLite persistence failure
   (injection flips the app's degraded flag, it does not corrupt storage),
   and a REAL Rust secure-core rejection of a signed envelope (injection
