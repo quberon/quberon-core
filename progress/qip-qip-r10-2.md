@@ -1,7 +1,7 @@
 NODE: qip-qip-r10-2
 TIER: 1
 BRANCH: node/qip-qip-r10-2
-COMMITS: see git log on this branch (single node commit; hash recorded in PR)
+COMMITS: 12e1feb (plus this report-hash commit if present; see PR https://github.com/quberon/quberon-core/pull/64)
 STATUS: partial
 CHANGED:
   - conformance/adapter_interface.py: added AdapterUnderTest.manufacturer_mapping_declaration() (default NotImplementedError, capability manufacturer_mapping_declared=False, so silence is NOT TESTED never a pass) and validate_manufacturer_mapping_declaration() shape validator for QIP-R10.2.
