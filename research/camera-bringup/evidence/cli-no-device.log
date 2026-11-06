@@ -1,0 +1,25 @@
+NO DEVICE: no video devices enumerated on this host
+manifest: /tmp/cam-out-evidence/manifest.json
+{
+  "device": null,
+  "devices": [],
+  "driver": null,
+  "frames": [],
+  "metadata_handling": "stripped_on_write: frame files are pixel bytes only; EXIF/location/GPS metadata values are excluded from manifest",
+  "probe": null,
+  "qualification_claim": "NONE - code-only harness; no physical camera qualified",
+  "reason": "no video devices enumerated on this host",
+  "schema_version": 1,
+  "settings": {
+    "fps": 30.0,
+    "frames": 10,
+    "height": 480,
+    "width": 640
+  },
+  "status": "NO_DEVICE",
+  "synthetic": false,
+  "utc_window": {
+    "ended_at": "2026-11-06T12:43:44.895988Z",
+    "started_at": "2026-11-06T12:43:44.895831Z"
+  }
+}
