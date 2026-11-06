@@ -48,6 +48,12 @@ EVIDENCE:
   full-without-rust.txt, fail-direction-with-rust.txt,
   fail-direction-without-rust.txt, import-zero.txt
 - Raw output (verbatim tail lines, also reproduced below in TESTS).
+- Clean-clone verification of the pushed branch (clone of
+  node/qip-qip-r7-4 @ 0a33174 into /tmp/qip-r7-4-clean, fresh .venv,
+  cargo build --workspace, 2026-11-06T16:42:19Z):
+  command: .venv/bin/python -m pytest conformance/ -q
+  raw:
+    28 passed, 1 warning in 4.47s
 
 TESTS (both modes):
 With Rust (cargo build --workspace built target/debug/quberon-secure-core-cli):
