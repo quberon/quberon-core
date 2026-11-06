@@ -45,8 +45,18 @@ USERS = {
 class QuberonCoreAdapter(AdapterUnderTest):
     def __init__(self, tmp_path, **create_kwargs):
         self.robot_id = ROBOT_ID
-        db = str(tmp_path / "conformance.db")
-        app = create_app(db_path=db, **create_kwargs)
+        self._db = str(tmp_path / "conformance.db")
+        self._create_kwargs = dict(create_kwargs)
+        self._build()
+
+    def _build(self):
+        # One app instance on self._db. restart() calls this again on the
+        # SAME db path: a new app/Store instance re-reading durable state,
+        # which is exactly the simulator's restart surface (cf.
+        # tests/test_app.py::test_restart_persists_latch, strengthened in
+        # QIP-LATCH-04 by first reaching a non-default unlatched state).
+        db = self._db
+        app = create_app(db_path=db, **self._create_kwargs)
         store = Store(db)
         for username, password, role in USERS.values():
             store.create_user(username, password, role)
@@ -93,7 +103,15 @@ class QuberonCoreAdapter(AdapterUnderTest):
             "adapter_mode_simulation": status.get("adapter_mode") == "SIMULATION",
             "persistence_failure_injectable": True,
             "secure_core_refusal_injectable": True,
+            "restartable": True,
         }
+
+    def restart(self) -> None:
+        # New app instance on the same durable DB; clients are rebuilt
+        # and re-authenticated in _build(). Injected degraded/refusing
+        # states (conformance-only, in-memory) do not survive this and
+        # no test restarts such an adapter.
+        self._build()
 
     # -- neutral fault injection (QIP-DEG-03, conformance only) ----------
     def inject_persistence_failure(self) -> None:

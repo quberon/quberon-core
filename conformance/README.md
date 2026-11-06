@@ -16,6 +16,18 @@ NOT certification, and NOT evidence about any physical robot (R11 caveat).
 - conftest.py — fixtures binding the suite to quberon-core, plus
   no-core (DEGRADED), failing-adapter (STATE/DEGRADED), persistence-
   degraded and refusing-core (QIP-DEG-03) variants.
+- Restart (QIP-LATCH-04): AdapterUnderTest.restart() plus the
+  `restartable` capability (False by default: an adapter that cannot
+  restart reports restart NOT TESTED, never a pass). quberon_adapter
+  implements it as a new app instance on the same durable SQLite DB
+  (the simulator's restart surface), re-authenticating its clients.
+  QIP-LATCH-04 first reaches the non-default unlatched state (requires
+  the secure core; skips without it), proves that state survives a
+  restart, then proves an actioned STOP's latch and SIMULATED_STOPPED
+  observation survive a restart with tasks still refused (409). This
+  is a candidate trace for QIP-R5.1 only: QIP-v0.1 Section 11 still
+  reads UNIMPLEMENTED until the profile owner amends it by that
+  section's procedure — this suite does not amend the profile.
 
 ## QIP-DEG-03 injection (Wave 5 F1)
 
@@ -52,7 +64,7 @@ DEGRADED fail-direction (R7, graph.md R-IMM-1/R-IMM-2).
     .venv/bin/python -m pytest conformance/ -q
 
 Without the Rust secure-core binary, motion-permitting reset cannot be
-exercised: QIP-LATCH-03 skips, and the no-core DEGRADED tests still run.
+exercised: QIP-LATCH-03 and QIP-LATCH-04 skip, and the no-core DEGRADED tests still run.
 Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 
 ## NOT TESTED (explicit gaps — remain gaps)
@@ -63,6 +75,14 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
   uses a stub authority; no signing/verification is exercised). Restart
   recovery from either degraded state. Adapter non-invocation is observed
   via UNKNOWN/latch/audit outcomes, not via an invocation counter.
+- QIP-LATCH-04 restart limits: restart is a new in-process app
+  instance on the same SQLite file — not an OS process kill/restart,
+  not a host reboot, not power loss, and not restart/reconnect
+  against a real controller. Restart recovery from either QIP-DEG-03
+  degraded state remains NOT TESTED (above). Without the Rust
+  secure-core binary QIP-LATCH-04 skips (NOT TESTED), because the
+  non-default unlatched state that makes the test non-vacuous
+  cannot be reached.
 - Any real manufacturer interface, vendor stop/status/reset mapping,
   capability negotiation (R10: registry api-surfaces.jsonl was empty at
   gate zero) — no adapter for any real robot exists here.
