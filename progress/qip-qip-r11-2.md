@@ -39,7 +39,14 @@ EVIDENCE (command, toolchain, host, UTC, raw output path):
 - Raw outputs (uncommitted, on this host): /tmp/qip-r11-2-evidence/
   with-rust-conformance.txt, with-rust-full.txt,
   without-rust-conformance.txt, without-rust-full.txt.
-- Clean-clone verification: see below (filled before PR).
+- Clean-clone verification: fresh clone of origin/node/qip-qip-r11-2 @ b2e71e8
+  to /tmp/qip-r11-2-clean, fresh .venv, 2026-11-06T14:22Z:
+  no Rust binary: python -m pytest conformance/ -q -rs -> 27 passed,
+  2 skipped (QIP-LATCH-03 NOT TESTED; QIP-R11.2 EXPLICITLY UNTESTABLE),
+  exit 0. After cargo build --workspace in that clone:
+  python -m pytest conformance/ -q -> 28 passed, 1 skipped (QIP-R11.2
+  only), exit 0. Raw: /tmp/qip-r11-2-evidence/clean-clone-no-rust.txt
+  and clean-clone-with-rust.txt on this host. Exit gate exits zero.
 
 TESTS (both modes):
 - With Rust binary:
