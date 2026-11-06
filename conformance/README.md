@@ -75,3 +75,24 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 - Recognizer qualification (voice/gesture sensors, ESPE, human factors):
   QIP-INT-04/05 test endpoint policy only, not recognition (R9 limits).
 - Standards/PL/SIL/hazard/legal conformity of any kind (R11).
+
+## EXPLICITLY UNTESTABLE (distinct from NOT TESTED above)
+
+- QIP-R11.3 (EVIDENCE): recorded in test_conformance.py as
+  `test_QIP_R11_3_explicitly_untestable` (always skipped with an
+  UNTESTABLE reason; a skip is not a pass and not a trace), backed by the
+  passing basis test `test_QIP_R11_3_untestable_basis_no_claim_or_version_surface`
+  (which asserts only absence of a testable surface, never conformance).
+  Reasons: (a) versioning of normative-text/class/traceability changes is
+  a profile-document process obligation with no operation on the neutral
+  AdapterUnderTest surface to observe it, and a repo-file assertion would
+  break implementation-neutrality; (b) no claim/class/profile-version
+  value is exposed by status/capabilities and QIP-v0.1 claims no class,
+  so no stated version can be checked; (c) only profile v0.1 exists, so
+  no superseded version or claim surface exists on which a superseded
+  claim or its label could be constructed or observed. QIP-R11.3 stays
+  UNIMPLEMENTED in QIP-v0.1.md Section 11; amending that table is the
+  profile owner's Section 11 procedure, not a work node's. It becomes
+  testable only if a neutral claim surface stating (class, profile
+  version), current+superseded profile fixtures, and a defined
+  superseded-label value are added.
