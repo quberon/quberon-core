@@ -8,9 +8,20 @@ below and N0 (assembly owner, graph.md) records a human row in
 checks.md; only a later applying node may then change registry data.
 
 Prepared by: Wave 4 node N6 (registry decisions packet), Tier 1.
+Refreshed by: node reg-decision-packet-refresh, Tier 1, 2026-11-06.
+Refresh scope: research only. The refresh re-derived every section 3
+entry from the current registry files and re-ran the validator; it
+changed no recommendation, no registry record, and no decision code.
 Inputs read: research/humanoids/registry/{candidates,sources,provenance-claims}.jsonl,
 research/humanoids/registry/index.json, progress/N4-registry-dedup.md
-(Wave 3 N4 proposals), graph.md (assembly and no-promotion rules).
+(Wave 3 N4 proposals), graph.md (assembly and no-promotion rules),
+and (new since the original packet) research/humanoids/capability-tuples/
+{capability-tuples.jsonl,README.md} (Wave 5 F6, summarised in section 3A).
+Refresh result: all 25 candidates still candidate_unverified with
+canonical_name=null and evidence_source_ids=[]; every candidate's
+sources and provenance_claim_ids in candidates.jsonl appear, with
+their official URLs, in the corresponding section 3 entry; the
+section 4 recommendation counts are unchanged (see section 6).
 universe_size_claim: null (index.json unchanged; 25 is the seed
 candidate count, not a claim about how many humanoid companies exist).
 
@@ -436,6 +447,57 @@ retain unverified and let the human verify that lead, not to adopt it.
 - Recommendation confidence: medium.
 - Current state (unchanged by this packet): status=candidate_unverified, canonical_name=null, evidence_source_ids=[], humanoid_relevance=unknown.
 
+## 3A. Capability-tuple context (refresh addition; NOT entity evidence)
+
+Wave 5 F6 added 78 manufacturer capability tuples in
+research/humanoids/capability-tuples/capability-tuples.jsonl (three
+core capabilities per candidate, plus sdk_adapter_availability where
+observed). They are included here only so the human reviewer sees the
+current research context in one sitting. They must NOT be used as
+entity evidence: every tuple keeps canonical_name=null and
+entity_verification_status=candidate_unverified, every tuple has
+qip_r10.mapping_claimed=false, and no tuple promotes, renames, or
+reclassifies any candidate. Epistemic vocabulary is F6's own:
+observed / inferred / unknown / not_found ("not_found in recorded
+sources only" — never a claim that no interface exists anywhere).
+No certification, physical-safety, latency, or QIP-mapping claim is
+made by these tuples or by this packet.
+
+| candidate | intervention_stop | status_observation | latch_reset | sdk_adapter_availability |
+|---|---|---|---|---|
+| cand-agibot | not_found | not_found | not_found | — |
+| cand-agility | not_found | not_found | not_found | — |
+| cand-apptronik | not_found | not_found | not_found | — |
+| cand-booster-robotics | not_found | not_found | not_found | — |
+| cand-boston-dynamics | not_found | not_found | not_found | — |
+| cand-deep-robotics | not_found | not_found | not_found | — |
+| cand-engineai | not_found | not_found | not_found | — |
+| cand-fourier | observed | observed | not_found | observed |
+| cand-jaka-robotics | not_found | not_found | not_found | — |
+| cand-kepler | not_found | not_found | not_found | — |
+| cand-leju-robot | not_found | not_found | not_found | — |
+| cand-limx-dynamics | unknown | unknown | unknown | — |
+| cand-magiclab | not_found | not_found | not_found | — |
+| cand-physicalintelligence | not_found | not_found | not_found | — |
+| cand-pndbotics | not_found | not_found | not_found | — |
+| cand-pudu-robotics | not_found | not_found | not_found | — |
+| cand-robot-era | not_found | not_found | not_found | — |
+| cand-romela | not_found | not_found | not_found | — |
+| cand-sanctuary-ai | not_found | not_found | not_found | — |
+| cand-tencent | not_found | not_found | not_found | — |
+| cand-tesla-optimus | unknown | unknown | unknown | — |
+| cand-ubtech | not_found | not_found | not_found | observed |
+| cand-unitree | inferred | observed | not_found | observed |
+| cand-x-humanoid | not_found | not_found | not_found | — |
+| cand-xpeng | not_found | not_found | not_found | — |
+
+Totals (validator, section 6): 78 tuples = observed 6, inferred 1,
+unknown 6, not_found 65; all 25 candidates covered; mapping_claimed
+is false for every tuple. unknown for cand-tesla-optimus and
+cand-limx-dynamics matches their section 3 access limits
+(not_accessed / metadata_only) and asserts neither presence nor
+absence. This context changes no section 3 recommendation.
+
 ## 4. Batch decision sheet (complete all 25, then sign)
 
 | # | candidate | seed | recommended code | A (approve) | R (reject) | D (defer) |
@@ -510,7 +572,13 @@ pending signature' with the signed outcome and the signing date:
 
 ## 6. Deterministic validation and counts (raw output)
 
+Refreshed 2026-11-06 by node reg-decision-packet-refresh. The JSON
+below is the verbatim validator output at refresh time; the earlier
+Wave 4 output it replaces predated the Wave 5 F6 capability tuples
+and therefore lacked the capability_tuple fields.
+
 Command: python3 research/humanoids/tools/validate_registry.py
+Exit code: 0
 
 ```json
 {
@@ -522,16 +590,34 @@ Command: python3 research/humanoids/tools/validate_registry.py
     "dataset": 0,
     "api_surface": 0,
     "compliance_assessment": 0,
-    "provenance_claim": 38
+    "provenance_claim": 38,
+    "capability_tuple": 78
+  },
+  "capability_tuple_epistemic_counts": {
+    "inferred": 1,
+    "not_found": 65,
+    "observed": 6,
+    "unknown": 6
   },
   "verified_companies": 0
 }
 ```
 
-Command: python3 -m pytest tests/test_humanoid_registry.py -q
-Raw result: 8 passed. Full suite: make test = 80 passed.
+Command: .venv/bin/python -m pytest tests/test_humanoid_registry.py research/humanoids/tests/test_capability_tuples.py -q
+Raw result: 12 passed.
+Command: make test
+Raw result: 211 passed (full suite, with Rust; see
+progress/reg-decision-packet-refresh.md for both-mode evidence).
 
-Packet counts (generated deterministically from the registry): candidates=25, official sources=26, provenance claims=38, recommendations by code={'ALIAS-THEN-PARTIAL': 1, 'DEFER-METADATA-ONLY': 1, 'DEFER-NO-ACCESS': 1, 'OUT-OF-SCOPE': 2, 'PARENT-CONTEXT-ONLY': 1, 'PARTIAL-BRAND-OF-ENTITY': 2, 'PARTIAL-LEGAL-ENTITY': 2, 'RETAIN-UNVERIFIED': 15}, total recommendations=25.
+Packet counts (re-derived deterministically from the registry at
+refresh): candidates=25, official sources=26, provenance claims=38,
+capability tuples=78, recommendations by code={'ALIAS-THEN-PARTIAL': 1, 'DEFER-METADATA-ONLY': 1, 'DEFER-NO-ACCESS': 1, 'OUT-OF-SCOPE': 2, 'PARENT-CONTEXT-ONLY': 1, 'PARTIAL-BRAND-OF-ENTITY': 2, 'PARTIAL-LEGAL-ENTITY': 2, 'RETAIN-UNVERIFIED': 15}, total recommendations=25.
+Refresh cross-check (candidate record -> packet section): for all 25
+candidates, every source ID and provenance claim ID listed in
+candidates.jsonl, with its official URL, appears in the matching
+section 3 entry; errors=[]; no candidate is promoted
+(candidate_unverified / canonical_name=null / evidence_source_ids=[]
+for all 25).
 index.json: candidate_count=25, verified_count=0, universe_size_claim=null (unchanged).
 
 ## 7. What this packet deliberately does not do
@@ -539,4 +625,5 @@ index.json: candidate_count=25, verified_count=0, universe_size_claim=null (unch
 - Does not edit checks.md, graph.md, progress.md, or any registry record.
 - Does not decide: the human in section 4 decides; confidence here is advisory and last, after the deterministic evidence above.
 - Does not promote any candidate to partially_verified/verified, set any canonical_name, or mark any candidate duplicate/out_of_scope.
+- Does not treat section 3A capability tuples as entity evidence, and claims no QIP mapping, certification, physical safety, or latency from them.
 - Makes no universe-size claim: universe_size_claim remains null.
