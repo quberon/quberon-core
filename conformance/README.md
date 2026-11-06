@@ -75,3 +75,18 @@ Skips are NOT TESTED, never passes (see progress/N4-conformance.md).
 - Recognizer qualification (voice/gesture sensors, ESPE, human factors):
   QIP-INT-04/05 test endpoint policy only, not recognition (R9 limits).
 - Standards/PL/SIL/hazard/legal conformity of any kind (R11).
+- QIP-R11.2 (OBSERVE) — EXPLICITLY UNTESTABLE in this suite, not
+  merely untested: the requirement prohibits *representing* passing
+  tests as standards conformance, certification, or physical safety
+  validation. That is a property of unbounded human representations
+  (documents, PRs, external and future claims), not of any behaviour
+  observable through AdapterUnderTest, which exposes no operation
+  that makes or enumerates representations.
+  `conformance/test_qip_r11_2_untestable.py` records this as a
+  permanently skipped (never passing, never a trace) test with the
+  full reasoning. Any repo-text grep substitute would be partial
+  coverage — enumerated files/phrasings only, blind to negation,
+  paraphrase, and out-of-repo claims — and must not be rounded up
+  to a trace. QIP-R11.2 stays UNIMPLEMENTED; changing that status
+  is a profile-owner amendment under QIP-v0.1.md Section 11, based
+  on human review of each concrete claim artefact when it is made.
